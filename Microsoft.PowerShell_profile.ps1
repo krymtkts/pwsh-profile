@@ -47,10 +47,10 @@ Import-Module -Name oh-my-posh
 # Default the prompt to agnoster oh-my-posh theme
 Set-Theme agnoster
 
-# modify symbols. ⚡→💪
+# modify symbols. ⚡->💪
 $Muscle = [char]::ConvertFromUtf32(0x1f4aa)
 $ThemeSettings.PromptSymbols.ElevatedSymbol = $Muscle
-# modify symbols. →
+# modify symbols. ->
 $Fire = [char]::ConvertFromUtf32(0xe0c0)
 $ThemeSettings.PromptSymbols.SegmentForwardSymbol = $Fire
 $ThemeSettings.PromptSymbols.SegmentSeparatorForwardSymbol = $Fire
@@ -58,9 +58,10 @@ $BackFire = [char]::ConvertFromUtf32(0xe0c2)
 $ThemeSettings.PromptSymbols.SegmentBackwardSymbol = $BackFire
 $ThemeSettings.PromptSymbols.SegmentSeparatorBackwardSymbol = $BackFire
 
-Write-Host "🤘 posh $($PSVersionTable.PSVersion.ToString()) is ready 🤘"
+$Horns = [char]::ConvertFromUtf32(0x1f918)
+Write-Host "$Horns posh $($PSVersionTable.PSVersion.ToString()) is ready $Horns"
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
-    Import-Module "$ChocolateyProfile"
+  Import-Module "$ChocolateyProfile"
 }
