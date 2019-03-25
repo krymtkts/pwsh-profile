@@ -10,9 +10,27 @@ Import-Module -Name Pester
 Set-Alias l Get-ChildItemColor -Option AllScope
 Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 
+# Helper function to change directory to my development workspace
+# Change c:\ws to your usual workspace and everytime you type
+# in cws from PowerShell it will take you directly there.
+function cws { Set-Location c:\workspace }
+
 # Helper function to set location to the User Profile directory
 function cuserprofile { Set-Location ~ }
 Set-Alias ~ cuserprofile -Option AllScope
+
+# Helper function to edit hosts file.
+function Edit-Hosts {
+    Start-Process notepad c:\windows\system32\drivers\etc\hosts -verb runas
+}
+
+# Helper function to execute choco upgrade.
+function Update-ChocoPackages {
+    choco upgrade chocolatey -y
+    choco upgrade all -y
+}
+
+Set-Alias ll Get-ChildItem -Option AllScope
 
 # Helper function to show Unicode character
 function global:U
