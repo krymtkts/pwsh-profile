@@ -27,6 +27,8 @@ function Edit-Hosts {
 # Helper function to execute choco upgrade.
 function Update-ChocoPackages {
     choco upgrade chocolatey -y
+    # finish to install faster than other apps.
+    choco upgrade GoogleChrome vscode -y
     choco upgrade all -y
 }
 
@@ -63,10 +65,10 @@ Import-Module -Name oh-my-posh
 # Default the prompt to agnoster oh-my-posh theme
 Set-Theme agnoster
 
-# modify symbols. ⚡->💪
+# modify symbols. âš¡->ðŸ’ª
 $Muscle = [char]::ConvertFromUtf32(0x1f4aa)
 $ThemeSettings.PromptSymbols.ElevatedSymbol = $Muscle
-# modify symbols. ->
+# modify symbols. î‚°->îƒ€
 $Fire = [char]::ConvertFromUtf32(0xe0c0)
 $ThemeSettings.PromptSymbols.SegmentForwardSymbol = $Fire
 $ThemeSettings.PromptSymbols.SegmentSeparatorForwardSymbol = $Fire
