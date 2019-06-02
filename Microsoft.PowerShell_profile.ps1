@@ -65,10 +65,10 @@ Import-Module -Name oh-my-posh
 # Default the prompt to agnoster oh-my-posh theme
 Set-Theme agnoster
 
-# modify symbols. âš¡->ðŸ’ª
+# modify symbols. ⚡->💪
 $Muscle = [char]::ConvertFromUtf32(0x1f4aa)
 $ThemeSettings.PromptSymbols.ElevatedSymbol = $Muscle
-# modify symbols. î‚°->îƒ€
+# modify symbols. ->
 $Fire = [char]::ConvertFromUtf32(0xe0c0)
 $ThemeSettings.PromptSymbols.SegmentForwardSymbol = $Fire
 $ThemeSettings.PromptSymbols.SegmentSeparatorForwardSymbol = $Fire
