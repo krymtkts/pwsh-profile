@@ -6,6 +6,12 @@ Import-Module -Name PowerShellGet
 Import-Module -Name PSScriptAnalyzer
 Import-Module -Name Pester
 
+# Prepare for Maven
+Import-Module -Name MavenAutoCompletion
+
+# Prepare for poco
+Import-Module -Name poco
+
 # Set l and ls alias to use the new Get-ChildItemColor cmdlets
 Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 Set-Alias ll Get-ChildItemColor -Option AllScope
@@ -65,10 +71,10 @@ Import-Module -Name oh-my-posh
 # Default the prompt to agnoster oh-my-posh theme
 Set-Theme agnoster
 
-# modify symbols. ⚡->💪
+# modify symbols. thunder -> muscle
 $Muscle = [char]::ConvertFromUtf32(0x1f4aa)
 $ThemeSettings.PromptSymbols.ElevatedSymbol = $Muscle
-# modify symbols. ->
+# modify symbols. triangle -> sidefire
 $Fire = [char]::ConvertFromUtf32(0xe0c0)
 $ThemeSettings.PromptSymbols.SegmentForwardSymbol = $Fire
 $ThemeSettings.PromptSymbols.SegmentSeparatorForwardSymbol = $Fire
@@ -83,5 +89,3 @@ $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
   Import-Module "$ChocolateyProfile"
 }
-
-Import-Module -Name MavenAutoCompletion
