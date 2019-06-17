@@ -27,7 +27,7 @@ Set-Alias ~ cuserprofile -Option AllScope
 
 # Helper function to edit hosts file.
 function Edit-Hosts {
-    Start-Process notepad c:\windows\system32\drivers\etc\hosts -verb runas
+    Start-Process notepad $Env:SystemRoot\system32\drivers\etc\hosts -verb runas
 }
 
 # Helper function to execute choco upgrade.
