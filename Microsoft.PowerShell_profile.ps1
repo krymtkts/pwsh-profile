@@ -38,6 +38,18 @@ function Update-ChocoPackages {
     choco upgrade all -y
 }
 
+function New-EmptyFIle([parameter(mandatory)][string]$Name) {
+    New-Item -Name $Name -ItemType File
+}
+Set-Alias touch New-EmptyFile -Option AllScope
+
+function New-TemporaryDirectory {
+    $parent = [System.IO.Path]::GetTempPath()
+    [string] $name = [System.Guid]::NewGuid()
+    New-Item -ItemType Directory -Path (Join-Path $parent $name)
+}
+Set-Alias tmpdir New-TemporaryDirectory -Option AllScope
+
 # Helper function to show Unicode character
 function global:U
 {
