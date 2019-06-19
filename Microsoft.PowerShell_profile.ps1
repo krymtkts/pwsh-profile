@@ -12,6 +12,33 @@ Import-Module -Name MavenAutoCompletion
 # Prepare for poco
 Import-Module -Name poco
 
+function Set-SelectedLocation {
+    param(
+        [Parameter(Mandatory = $true)][ValidateSet("Add", "Query", "Remove")]$Mode = "Query",
+        [string]$Location
+    )
+    switch ($Mode)
+    {
+        "Add" {
+            if ($Location) {
+                Write-Output "$Location" | Out-File -Append -Encoding UTF8 "~/.poco-cd"
+                break
+            }
+        }
+        "Query" {
+            Get-Content -Path "~/.poco-cd" | Select-Poco
+            break
+        }
+        "Remove" {
+            break
+        }
+        Default {
+
+        }
+    }
+}
+Set-Alias pcd Set-SelectedLocation -Option AllScope
+
 # Prepare for Github
 Import-Module -Name PowerShellForGitHub
 
@@ -22,7 +49,7 @@ Set-Alias ll Get-ChildItemColor -Option AllScope
 # Helper function to change directory to my development workspace
 # Change c:\ws to your usual workspace and everytime you type
 # in cws from PowerShell it will take you directly there.
-function cws { Set-Location c:\workspace }
+# function cws { Set-Location c:\workspace }
 
 # Helper function to set location to the User Profile directory
 function cuserprofile { Set-Location ~ }
@@ -30,7 +57,7 @@ Set-Alias ~ cuserprofile -Option AllScope
 
 # Helper function to edit hosts file.
 function Edit-Hosts {
-    Start-Process notepad $Env:SystemRoot\system32\drivers\etc\hosts -verb runas
+    Start-Process notepad c:\windows\system32\drivers\etc\hosts -verb runas
 }
 
 # Helper function to execute choco upgrade.
