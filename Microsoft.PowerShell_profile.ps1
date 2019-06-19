@@ -12,6 +12,9 @@ Import-Module -Name MavenAutoCompletion
 # Prepare for poco
 Import-Module -Name poco
 
+# Prepare for Github
+Import-Module -Name PowerShellForGitHub
+
 # Set l and ls alias to use the new Get-ChildItemColor cmdlets
 Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 Set-Alias ll Get-ChildItemColor -Option AllScope
