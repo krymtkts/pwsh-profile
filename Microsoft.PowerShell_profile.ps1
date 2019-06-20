@@ -40,7 +40,7 @@ function Set-SelectedLocation {
 }
 Set-Alias pcd Set-SelectedLocation -Option AllScope
 
-function Select-Pathes() {
+function Show-Paths() {
     ($Env:Path).split(';') | poco
 }
 
