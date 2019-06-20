@@ -14,7 +14,7 @@ Import-Module -Name poco
 
 function Set-SelectedLocation {
     param(
-        [Parameter(Mandatory = $true)][ValidateSet("Add", "Query", "Edit")]$Mode = "Query",
+        [ValidateSet("Add", "Move", "Edit")]$Mode = "Move",
         [string]$Location
     )
     switch ($Mode)
@@ -25,16 +25,12 @@ function Set-SelectedLocation {
                 break
             }
         }
-        "Query" {
-            Get-Content -Path "~/.poco-cd" | Select-Poco
+        "Move" {
+            Get-Content -Path "~/.poco-cd" | Select-Poco | Set-Location
             break
         }
         "Edit" {
-
             break
-        }
-        Default {
-
         }
     }
 }
