@@ -14,7 +14,7 @@ Import-Module -Name poco
 
 function Set-SelectedLocation {
     param(
-        [Parameter(Mandatory = $true)][ValidateSet("Add", "Query", "Remove")]$Mode = "Query",
+        [Parameter(Mandatory = $true)][ValidateSet("Add", "Query", "Edit")]$Mode = "Query",
         [string]$Location
     )
     switch ($Mode)
@@ -29,7 +29,8 @@ function Set-SelectedLocation {
             Get-Content -Path "~/.poco-cd" | Select-Poco
             break
         }
-        "Remove" {
+        "Edit" {
+
             break
         }
         Default {
@@ -39,8 +40,17 @@ function Set-SelectedLocation {
 }
 Set-Alias pcd Set-SelectedLocation -Option AllScope
 
+function Select-Pathes() {
+    ($Env:Path).split(';') | poco
+}
+
 # Prepare for Github
 Import-Module -Name PowerShellForGitHub
+
+# Prepare for Google Cloud
+if (Get-Module -Name GoogleCloud) {
+    Import-Module -Name GoogleCloud
+}
 
 # Set l and ls alias to use the new Get-ChildItemColor cmdlets
 Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
