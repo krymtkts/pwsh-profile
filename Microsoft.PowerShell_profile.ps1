@@ -41,7 +41,7 @@ function Show-Paths() {
 }
 
 function Show-ReadLineHistory() {
-    Get-Content -Path (Get-PSReadlineOption).HistorySavePathnsoleHost_history.txt | poco
+    Get-Content -Path (Get-PSReadlineOption).HistorySavePath | poco
 }
 
 # Prepare for Github
