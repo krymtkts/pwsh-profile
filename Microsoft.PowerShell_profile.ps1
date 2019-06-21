@@ -40,6 +40,10 @@ function Show-Paths() {
     ($Env:Path).split(';') | poco
 }
 
+function Show-ReadLineHistory() {
+    Get-Content -Path (Get-PSReadlineOption).HistorySavePathnsoleHost_history.txt | poco
+}
+
 # Prepare for Github
 Import-Module -Name PowerShellForGitHub
 
