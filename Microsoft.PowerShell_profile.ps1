@@ -24,7 +24,7 @@ function Set-SelectedLocation {
             }
         }
         "Move" {
-            Get-Content -Path "~/.poco-cd" | Select-Poco -CaseSensitive | Set-Location
+            Get-Content -Path "~/.poco-cd" | Select-Poco -CaseSensitive | Select-Object -First 1 | Set-Location
             break
         }
         "Edit" {
