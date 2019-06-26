@@ -1,10 +1,8 @@
 # Ensure that Get-ChildItemColor is loaded
 Import-Module Get-ChildItemColor
 
-# Prepare for PowerShell Gallary
-Import-Module -Name PowerShellGet
-Import-Module -Name PSScriptAnalyzer
-Import-Module -Name Pester
+# Prepare for PowerShell
+Import-Module -Name PowerShellGet, PSScriptAnalyzer, Pester, psake
 
 # Prepare for Maven
 Import-Module -Name MavenAutoCompletion
