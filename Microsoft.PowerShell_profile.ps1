@@ -37,7 +37,7 @@ Set-Alias pcd Set-SelectedLocation -Option AllScope
 function Set-SelectedRepository {
     ghq list | Select-Poco | Select-Object -First 1 | %{Set-Location "$(ghq root)/$_"}
 }
-Set-Alias gcd Set-SelectedLocation -Option AllScope
+Set-Alias gcd Set-SelectedRepository -Option AllScope
 
 function Show-Paths() {
     ($Env:Path).split(';') | poco
