@@ -115,9 +115,11 @@ function global:U
     throw "Invalid character code $Code"
 }
 
-# Start Open SSH Agent if not already
-# Need this if you are using github as your remote git repository
-if (! (Get-Process -Name 'ssh-agent')) {
+# install ssh-agent service if not exists.
+# it will happend after updating Windows OpenSSH.
+if (! (Get-Service -Name 'ssh-agent' -ErrorAction SilentlyContinue)) {
+    install-sshd.ps1
+    Set-Service -Name "ssh-agent" -StartupType Automatic
     Start-Service ssh-agent
 }
 
