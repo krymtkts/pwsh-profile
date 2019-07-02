@@ -46,7 +46,7 @@ function Show-Paths() {
 function Show-ReadLineHistory() {
     Get-Content -Path (Get-PSReadlineOption).HistorySavePath | poco
 }
-Set-Alias phistory Show-ReadLineHistory -Option AllScope
+Set-Alias rhis Show-ReadLineHistory -Option AllScope
 
 # Prepare for Github
 Import-Module -Name PowerShellForGitHub
