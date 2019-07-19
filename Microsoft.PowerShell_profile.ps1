@@ -44,7 +44,7 @@ function Show-Paths() {
 }
 
 function Show-ReadLineHistory() {
-    Get-Content -Path (Get-PSReadlineOption).HistorySavePath | poco
+    Get-Content -Path (Get-PSReadlineOption).HistorySavePath | Select-Object -Unique | poco
 }
 Set-Alias rhistory Show-ReadLineHistory -Option AllScope
 
