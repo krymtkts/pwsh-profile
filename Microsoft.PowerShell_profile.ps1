@@ -83,7 +83,6 @@ function Update-Packages {
     choco upgrade all -y
 }
 
-
 function New-EmptyFIle([parameter(mandatory)][string]$Name) {
     New-Item -Name $Name -ItemType File
 }
