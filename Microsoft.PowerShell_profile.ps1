@@ -15,8 +15,7 @@ function Set-SelectedLocation {
         [ValidateSet("Add", "Move", "Edit")]$Mode = "Move",
         [string]$Location
     )
-    switch ($Mode)
-    {
+    switch ($Mode) {
         "Add" {
             if ($Location) {
                 Write-Output "$Location" | Out-File -Append -Encoding UTF8 "~/.poco-cd"
@@ -35,7 +34,7 @@ function Set-SelectedLocation {
 Set-Alias pcd Set-SelectedLocation -Option AllScope
 
 function Set-SelectedRepository {
-    ghq list | Select-Poco | Select-Object -First 1 | %{Set-Location "$(ghq root)/$_"}
+    ghq list | Select-Poco | Select-Object -First 1 | % { Set-Location "$(ghq root)/$_" }
 }
 Set-Alias gcd Set-SelectedRepository -Option AllScope
 
@@ -75,12 +74,15 @@ function Edit-Hosts {
 }
 
 # Helper function to execute choco upgrade.
-function Update-ChocoPackages {
+function Update-Packages {
+    Get-InstalledModule | Update-Module -AllowPrerelease
+
     choco upgrade chocolatey -y
     # finish to install faster than other apps.
     choco upgrade GoogleChrome vscode -y
     choco upgrade all -y
 }
+
 
 function New-EmptyFIle([parameter(mandatory)][string]$Name) {
     New-Item -Name $Name -ItemType File
@@ -95,20 +97,17 @@ function New-TemporaryDirectory {
 Set-Alias tmpdir New-TemporaryDirectory -Option AllScope
 
 # Helper function to show Unicode character
-function global:U
-{
+function global:U {
     param
     (
         [int] $Code
     )
 
-    if ((0 -le $Code) -and ($Code -le 0xFFFF))
-    {
+    if ((0 -le $Code) -and ($Code -le 0xFFFF)) {
         return [char] $Code
     }
 
-    if ((0x10000 -le $Code) -and ($Code -le 0x10FFFF))
-    {
+    if ((0x10000 -le $Code) -and ($Code -le 0x10FFFF)) {
         return [char]::ConvertFromUtf32($Code)
     }
 
@@ -145,5 +144,5 @@ Write-Host "$Horns posh $($PSVersionTable.PSVersion.ToString()) is ready $Horns"
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
-  Import-Module "$ChocolateyProfile"
+    Import-Module "$ChocolateyProfile"
 }
