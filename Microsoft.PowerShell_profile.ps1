@@ -47,6 +47,11 @@ function Show-ReadLineHistory() {
 }
 Set-Alias rhistory Show-ReadLineHistory -Option AllScope
 
+function Invoke-ReadLineHistory() {
+    Get-Content -Path (Get-PSReadlineOption).HistorySavePath | Select-Object -Unique | Select-Poco -CaseSensitive | Select-Object -First 1 | Invoke-Expression
+}
+Set-Alias pihy Show-ReadLineHistory -Option AllScope
+
 # Prepare for Github
 Import-Module -Name PowerShellForGitHub
 
