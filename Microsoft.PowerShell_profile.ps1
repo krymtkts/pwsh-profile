@@ -45,12 +45,12 @@ function Show-Paths() {
 function Show-ReadLineHistory() {
     Get-Content -Path (Get-PSReadlineOption).HistorySavePath | Select-Object -Unique | poco
 }
-Set-Alias rhistory Show-ReadLineHistory -Option AllScope
+Set-Alias pghy Show-ReadLineHistory -Option AllScope
 
 function Invoke-ReadLineHistory() {
     Get-Content -Path (Get-PSReadlineOption).HistorySavePath | Select-Object -Unique | Select-Poco -CaseSensitive | Select-Object -First 1 | Invoke-Expression
 }
-Set-Alias pihy Show-ReadLineHistory -Option AllScope
+Set-Alias pihy Invoke-ReadLineHistory -Option AllScope
 
 # Prepare for Github
 Import-Module -Name PowerShellForGitHub
