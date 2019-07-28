@@ -48,7 +48,7 @@ function Show-ReadLineHistory() {
 Set-Alias pghy Show-ReadLineHistory -Option AllScope
 
 function Invoke-ReadLineHistory() {
-    Get-Content -Path (Get-PSReadlineOption).HistorySavePath | Select-Object -Unique | Select-Poco -CaseSensitive | Select-Object -First 1 | Invoke-Expression
+    Show-ReadLineHistory | Select-Object -First 1 | Invoke-Expression
 }
 Set-Alias pihy Invoke-ReadLineHistory -Option AllScope
 
