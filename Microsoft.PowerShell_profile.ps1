@@ -43,7 +43,7 @@ function Show-Paths() {
 }
 
 function Show-ReadLineHistory() {
-    Get-Content -Path (Get-PSReadlineOption).HistorySavePath | Select-Object -Unique | poco
+    Get-Content -Path (Get-PSReadlineOption).HistorySavePath | Select-Object -Unique | Select-Poco -CaseSensitive
 }
 Set-Alias pghy Show-ReadLineHistory -Option AllScope
 
