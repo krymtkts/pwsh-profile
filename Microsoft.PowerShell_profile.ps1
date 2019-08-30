@@ -120,9 +120,16 @@ function global:U {
 
 # install ssh-agent service if not exists.
 # it will happend after updating Windows OpenSSH.
-if (! (Get-Service -Name 'ssh-agent' -ErrorAction SilentlyContinue)) {
+if (! ($SshAgent = (Get-Service -Name 'ssh-agent' -ErrorAction SilentlyContinue))) {
     install-sshd.ps1
     Set-Service -Name "ssh-agent" -StartupType Automatic
+    Start-Service ssh-agent
+}
+elseif ($SshAgent.StartType -eq 'Disabled') {
+    Set-Service -Name "ssh-agent" -StartupType Automatic
+    Start-Service ssh-agent
+}
+else {
     Start-Service ssh-agent
 }
 
