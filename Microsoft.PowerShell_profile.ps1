@@ -26,12 +26,17 @@ function Set-SelectedLocation {
             Get-Content -Path "~/.poco-cd" | Select-Poco -CaseSensitive | Select-Object -First 1 | Set-Location
             break
         }
-        "Edit" {
+        "Open" {
+            Get-Content -Path "~/.poco-cd" | Select-Poco -CaseSensitive | Select-Object -First 1 | Invoke-Item
             break
         }
     }
 }
 Set-Alias pcd Set-SelectedLocation -Option AllScope
+function Invoke-SelectedLocation() {
+    Set-SelectedLocation -Mode Open
+}
+Set-Alias pii Invoke-SelectedLocation -Option AllScope
 
 function Set-SelectedRepository {
     ghq list | Select-Poco | Select-Object -First 1 | % { Set-Location "$(ghq root)/$_" }
