@@ -61,6 +61,14 @@ function Invoke-ReadLineHistory() {
 }
 Set-Alias pihy Invoke-ReadLineHistory -Option AllScope
 
+function Start-VBoxVM() {
+    vboxmanage list vms | Select-Poco -CaseSensitive | Out-String -Stream | Select-String -Pattern '\{(.+)\}' | ForEach-Object { vboxmanage startvm ($_.Matches[0].Groups['1'].Value) --type headless }
+}
+
+function Stop-VBoxVM() {
+    vboxmanage list runningvms | Select-Poco -CaseSensitive | Out-String -Stream | Select-String -Pattern '\{(.+)\}' | ForEach-Object { vboxmanage controlvm ($_.Matches[0].Groups['1'].Value) poweroff }
+}
+
 # Prepare for Github
 Import-Module -Name PowerShellForGitHub
 
