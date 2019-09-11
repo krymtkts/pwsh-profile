@@ -12,14 +12,18 @@ Import-Module -Name poco
 
 function Set-SelectedLocation {
     param(
-        [ValidateSet("Add", "Move", "Edit")]$Mode = "Move",
-        [string]$Location
+        [ValidateSet("Add", "Move", "Open")]$Mode = "Move",
+        [string]$Location,
+        [switch]$Here
     )
     switch ($Mode) {
         "Add" {
             if ($Location) {
                 Write-Output "$Location" | Out-File -Append -Encoding UTF8 "~/.poco-cd"
                 break
+            }
+            elseif ($Here) {
+                Write-Output "$(Get-Location)" | Out-File -Append -Encoding UTF8 "~/.poco-cd"
             }
         }
         "Move" {
