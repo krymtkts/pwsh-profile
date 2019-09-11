@@ -69,6 +69,10 @@ function Stop-VBoxVM() {
     vboxmanage list runningvms | Select-Poco -CaseSensitive | Out-String -Stream | Select-String -Pattern '\{(.+)\}' | ForEach-Object { vboxmanage controlvm ($_.Matches[0].Groups['1'].Value) poweroff }
 }
 
+function Get-RunningVBoxVMs() {
+    vboxmanage list runningvms
+}
+
 # Prepare for Github
 Import-Module -Name PowerShellForGitHub
 
