@@ -101,7 +101,10 @@ function Edit-Hosts {
 
 # Helper function to execute choco upgrade.
 function Update-Packages {
+    # Update PowerShell modules.
     Get-InstalledModule | Update-Module -AllowPrerelease
+
+    # Update Pip modules.
 
     choco upgrade chocolatey -y
     # finish to install faster than other apps.
