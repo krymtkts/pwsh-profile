@@ -99,7 +99,11 @@ function Edit-Hosts {
     Start-Process notepad c:\windows\system32\drivers\etc\hosts -verb runas
 }
 
+function Update-PipModules {
+    pip list --outdated | %{[string]::Join(',', $_ -split "\s+")} | ConvertFrom-Csv -Header Package,Version,Latest,Type | Select-Object -Property Package -Skip 2 | %{pip install -U $_.Package}
+}
 # Helper function to execute choco upgrade.
+
 function Update-Packages {
     # Update PowerShell modules.
     Get-InstalledModule | Update-Module -AllowPrerelease
