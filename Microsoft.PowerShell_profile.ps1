@@ -100,7 +100,10 @@ function Edit-Hosts {
 }
 
 function Update-PipModules {
-    pip list --outdated | %{[string]::Join(',', $_ -split "\s+")} | ConvertFrom-Csv -Header Package,Version,Latest,Type | Select-Object -Property Package -Skip 2 | %{pip install -U $_.Package}
+    pip list --outdated | ForEach-Object{[string]::Join(',', $_ -split "\s+")} | `
+        ConvertFrom-Csv -Header Package,Version,Latest,Type |
+        Select-Object -Property Package -Skip 2 | `
+        ForEach-Object{pip install -U $_.Package}
 }
 # Helper function to execute choco upgrade.
 
