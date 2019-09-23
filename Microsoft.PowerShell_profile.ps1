@@ -6,6 +6,10 @@ Import-Module -Name PowerShellGet, PSScriptAnalyzer, Pester, psake
 
 # Prepare for Maven
 Import-Module -Name MavenAutoCompletion
+# Prepare for Docker
+Import-Module -Name DockerCompletion
+Import-Module -Name DockerMachineCompletion
+Import-Module -Name DockerComposeCompletion
 
 # Prepare for poco
 Import-Module -Name poco
