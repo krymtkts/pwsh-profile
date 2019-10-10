@@ -65,15 +65,15 @@ function Invoke-ReadLineHistory() {
 }
 Set-Alias pihy Invoke-ReadLineHistory -Option AllScope
 
-function Start-VBoxVM() {
+function Start-VBoxMachine() {
     vboxmanage list vms | Select-Poco -CaseSensitive | Out-String -Stream | Select-String -Pattern '\{(.+)\}' | ForEach-Object { vboxmanage startvm ($_.Matches[0].Groups['1'].Value) --type headless }
 }
 
-function Stop-VBoxVM() {
+function Stop-VBoxMachine() {
     vboxmanage list runningvms | Select-Poco -CaseSensitive | Out-String -Stream | Select-String -Pattern '\{(.+)\}' | ForEach-Object { vboxmanage controlvm ($_.Matches[0].Groups['1'].Value) poweroff }
 }
 
-function Get-RunningVBoxVMs() {
+function Get-RunningVBoxMachines() {
     vboxmanage list runningvms
 }
 
@@ -192,4 +192,9 @@ Write-Host "$Horns posh $($PSVersionTable.PSVersion.ToString()) is ready $Horns"
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
     Import-Module "$ChocolateyProfile"
+}
+
+if (Test-Path("$PSScriptRoot\CustomScript.psm1")) {
+    # Import environment specific script from CustomScript.psm1.
+    Import-Module "$PSScriptRoot\CustomScript.psm1"
 }
