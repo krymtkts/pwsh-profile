@@ -104,6 +104,7 @@ function Edit-Hosts {
 }
 
 function Update-PipModules {
+    python -m pip install --upgrade pip
     pip list --outdated | ForEach-Object { [string]::Join(',', $_ -split "\s+") } | `
         ConvertFrom-Csv -Header Package, Version, Latest, Type | `
         Select-Object -Property Package -Skip 2 | `
