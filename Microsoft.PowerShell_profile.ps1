@@ -199,3 +199,16 @@ if (Test-Path("$PSScriptRoot\CustomScript.psm1")) {
     # Import environment specific script from CustomScript.psm1.
     Import-Module "$PSScriptRoot\CustomScript.psm1"
 }
+
+# thefuck
+function fuck {
+    $history = (Get-History -Count 1).CommandLine;
+    if (-not [string]::IsNullOrWhiteSpace($history)) {
+        $fuck = $(thefuck $args $history);
+        if (-not [string]::IsNullOrWhiteSpace($fuck)) {
+            if ($fuck.StartsWith("echo")) { $fuck = $fuck.Substring(5); }
+            else { iex "$fuck"; }
+        }
+    }
+    [Console]::ResetColor()
+}
