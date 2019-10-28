@@ -14,6 +14,8 @@ Import-Module -Name DockerMachineCompletion
 # Prepare for poco
 Import-Module -Name poco
 
+function gitlog { git log --graph --all --decorate --abbrev-commit --branches --oneline }
+
 function Set-SelectedLocation {
     param(
         [ValidateSet("Add", "Move", "Open")]$Mode = "Move",
