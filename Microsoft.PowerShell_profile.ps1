@@ -1,5 +1,6 @@
-# Ensure that Get-ChildItemColor is loaded
-Import-Module Get-ChildItemColor
+# Prepare for cli utilities.
+Import-Module -Name Get-ChildItemColor
+Import-Module -Name ClipboardText
 
 # Prepare for PowerShell
 Import-Module -Name PowerShellGet, PSScriptAnalyzer, Pester, psake
