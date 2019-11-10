@@ -1,15 +1,15 @@
 $names = @(
     # Prepare basic utilities
     'PSReadLine', 'ClipboardText', 'Get-ChildItemColor',
-    'posh-git', 'oh-my-posh', 'PowerShellGet',
+    'posh-git', 'oh-my-posh', 'PowerShellGet', 'poco',
     # Prepare for PowerShell
     'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake',
     # Prepare for Maven
     'MavenAutoCompletion',
     # Prepare for Docker
     'DockerCompletion', 'DockerComposeCompletion', 'DockerMachineCompletion',
-    # Prepare for poco
-    'poco'
+    # Prepare for AWS
+    'AWSPowerShell.NetCore'
 )
 
 Function Install-NonExistsModule {
