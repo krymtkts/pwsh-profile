@@ -4,6 +4,8 @@ $names = @(
     'posh-git', 'oh-my-posh', 'PowerShellGet', 'poco',
     # Prepare for PowerShell
     'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake',
+    # Prepare for GitHub
+    'PowerShellForGitHub',
     # Prepare for Maven
     'MavenAutoCompletion',
     # Prepare for Docker
