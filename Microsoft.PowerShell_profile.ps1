@@ -1,19 +1,39 @@
-# Prepare for cli utilities.
-Import-Module -Name Get-ChildItemColor
-Import-Module -Name ClipboardText
+$names = @(
+    # Prepare basic utilities
+    'PSReadLine', 'ClipboardText', 'Get-ChildItemColor',
+    'posh-git', 'oh-my-posh', 'PowerShellGet',
+    # Prepare for PowerShell
+    'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake',
+    # Prepare for Maven
+    'MavenAutoCompletion',
+    # Prepare for Docker
+    'DockerCompletion', 'DockerComposeCompletion', 'DockerMachineCompletion',
+    # Prepare for poco
+    'poco'
+)
 
-# Prepare for PowerShell
-Import-Module -Name PowerShellGet, PSScriptAnalyzer, Pester, psake
+Function Install-NonExistsModule {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True)]
+        [string[]]$Name
+    )
 
-# Prepare for Maven
-Import-Module -Name MavenAutoCompletion
-# Prepare for Docker
-Import-Module -Name DockerCompletion
-Import-Module -Name DockerComposeCompletion
-Import-Module -Name DockerMachineCompletion
+    begin {
+        $modules = Get-InstalledModule
+    }
 
-# Prepare for poco
-Import-Module -Name poco
+    process {
+        foreach ($n in $Name) {
+            if (!($modules | Where-Object -Property Name -eq $n)) {
+                Install-Module $n -AllowPrerelease -AllowClobber -Force -Scope AllUsers
+            }
+        }
+    }
+}
+
+$names | Install-NonExistsModule | Import-Module
 
 function gitlog { git log --graph --all --decorate --abbrev-commit --branches --oneline }
 
