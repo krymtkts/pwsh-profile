@@ -31,6 +31,9 @@ Function Install-NonExistsModule {
             if (!($modules | Where-Object -Property Name -eq $n)) {
                 Install-Module $n -AllowPrerelease -AllowClobber -Force -Scope AllUsers
             }
+            else {
+                $n
+            }
         }
     }
 }
