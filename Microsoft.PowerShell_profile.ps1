@@ -198,9 +198,6 @@ else {
     Start-Service ssh-agent
 }
 
-# Ensure oh-my-posh is loaded
-Import-Module -Name oh-my-posh
-
 # Default the prompt to agnoster oh-my-posh theme
 Set-Theme agnoster
 
