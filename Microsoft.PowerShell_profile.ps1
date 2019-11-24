@@ -1,4 +1,4 @@
-$names = @(
+pre$names = @(
     # Prepare basic utilities
     'PSReadLine', 'ClipboardText', 'Get-ChildItemColor',
     'posh-git', 'oh-my-posh', 'PowerShellGet', 'poco',
@@ -29,7 +29,7 @@ Function Install-NonExistsModule {
     process {
         foreach ($n in $Name) {
             if (!($modules | Where-Object -Property Name -eq $n)) {
-                Install-Module $n -AllowPrerelease -AllowClobber -Force -Scope AllUsers
+                Install-Module $n -AllowPrerelease -AllowClobber -Force
             }
             else {
                 $n
