@@ -1,4 +1,4 @@
-pre$names = @(
+$names = @(
     # Prepare basic utilities
     'PSReadLine', 'ClipboardText', 'Get-ChildItemColor',
     'posh-git', 'oh-my-posh', 'PowerShellGet', 'poco',
@@ -9,9 +9,9 @@ pre$names = @(
     # Prepare for Maven
     'MavenAutoCompletion',
     # Prepare for Docker
-    'DockerCompletion', 'DockerComposeCompletion', 'DockerMachineCompletion',
-    # Prepare for AWS
-    'AWSPowerShell.NetCore'
+    'DockerCompletion', 'DockerComposeCompletion', 'DockerMachineCompletion'
+    # Prepare for AWS https://dev.classmethod.jp/server-side/problem-about-awspowershell-netcore-not-autoloaded/
+    # 'AWSPowerShell.NetCore'
 )
 
 Function Install-NonExistsModule {
@@ -28,6 +28,7 @@ Function Install-NonExistsModule {
 
     process {
         foreach ($n in $Name) {
+            Write-Debug $n
             if (!($modules | Where-Object -Property Name -eq $n)) {
                 Install-Module -Name $n -AllowPrerelease -AllowClobber -Scope AllUsers
             }
@@ -36,7 +37,7 @@ Function Install-NonExistsModule {
     }
 }
 
-$names | Install-NonExistsModule | Import-Module
+$names | Install-NonExistsModule | Out-Null
 
 function gitlog { git log --graph --all --decorate --abbrev-commit --branches --oneline }
 function tgitcommit { TortoiseGitProc.exe /command:commit }
