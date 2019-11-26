@@ -29,7 +29,7 @@ Function Install-NonExistsModule {
     process {
         foreach ($n in $Name) {
             if (!($modules | Where-Object -Property Name -eq $n)) {
-                Install-Module -Name $n -AllowPrerelease -AllowClobber
+                Install-Module -Name $n -AllowPrerelease -AllowClobber -Scope AllUsers
             }
             $n
         }
