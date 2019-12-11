@@ -238,3 +238,31 @@ function fuck {
     }
     [Console]::ResetColor()
 }
+
+function find {
+    [CmdletBinding()]
+    param(
+        [string]$path = '.',
+        [Parameter(Mandatory = $True,
+            ValueFromPipeline = $True)]
+        [string[]]$name,
+        [switch]$delete
+    )
+
+    begin {
+    }
+
+    process {
+        foreach ($n in $Name) {
+            if ($delete) {
+                Get-ChildItem -Recurse -Path $path | Where-Object -Property Name -like $n | Remove-Item
+            }
+            else {
+                Get-ChildItem -Recurse -Path $path | Where-Object -Property Name -like $n
+            }
+        }
+    }
+
+    end {
+    }
+}
