@@ -1,3 +1,9 @@
+$completions = @(
+    # Prepare for Maven
+    'MavenAutoCompletion',
+    # Prepare for Docker
+    'DockerCompletion', 'DockerComposeCompletion', 'DockerMachineCompletion'
+)
 $names = @(
     # Prepare basic utilities
     'PSReadLine', 'ClipboardText', 'Get-ChildItemColor',
@@ -5,14 +11,10 @@ $names = @(
     # Prepare for PowerShell
     'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake',
     # Prepare for GitHub
-    'PowerShellForGitHub',
-    # Prepare for Maven
-    'MavenAutoCompletion',
-    # Prepare for Docker
-    'DockerCompletion', 'DockerComposeCompletion', 'DockerMachineCompletion'
+    'PowerShellForGitHub'
     # Prepare for AWS https://dev.classmethod.jp/server-side/problem-about-awspowershell-netcore-not-autoloaded/
     # 'AWSPowerShell.NetCore'
-)
+    ) + $completions
 
 Function Install-NonExistsModule {
     [CmdletBinding()]
