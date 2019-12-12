@@ -14,7 +14,7 @@ $names = @(
     'PowerShellForGitHub'
     # Prepare for AWS https://dev.classmethod.jp/server-side/problem-about-awspowershell-netcore-not-autoloaded/
     # 'AWSPowerShell.NetCore'
-    ) + $completions
+) + $completions
 
 Function Install-NonExistsModule {
     [CmdletBinding()]
@@ -40,6 +40,7 @@ Function Install-NonExistsModule {
 }
 
 $names | Install-NonExistsModule | Out-Null
+Import-Module -Name $completions
 
 function gitlog { git log --graph --all --decorate --abbrev-commit --branches --oneline }
 function tgitcommit { TortoiseGitProc.exe /command:commit }
