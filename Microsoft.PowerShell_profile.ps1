@@ -78,6 +78,42 @@ function Invoke-SelectedLocation() {
 }
 Set-Alias pii Invoke-SelectedLocation -Option AllScope
 
+
+function Open-VSCodeWorkspace {
+    param(
+        [ValidateSet("Add", "Open")]$Mode = "Open",
+        # Specifies a path to one or more locations.
+        [Parameter(
+            Position = 0,
+            ParameterSetName = "Path",
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = "Path to one or more locations.")]
+        [Alias("PSPath")]
+        [ValidateNotNullOrEmpty()]
+        [string[]]
+        $Path
+    )
+    $file = "~/.code-ws"
+    switch ($Mode) {
+        "Add" {
+            if ($Path -and (Test-Path($Path))) {
+                (Resolve-Path $Path).Path | Out-File -Append -Encoding UTF8 $file
+                break
+            }
+            else {
+                Write-Host 'no .code-workspace found.'
+            }
+        }
+        "Open" {
+            Get-Content -Path $file | Select-Poco -CaseSensitive | Select-Object -First 1 | Invoke-Item
+            break
+        }
+    }
+}
+Set-Alias codeof Open-VSCodeWorkspace -Option AllScope
+
+
 function Set-SelectedRepository {
     ghq list | Select-Poco | Select-Object -First 1 | % { Set-Location "$(ghq root)/$_" }
 }
