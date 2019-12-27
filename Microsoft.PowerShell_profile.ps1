@@ -106,7 +106,7 @@ function Open-VSCodeWorkspace {
             }
         }
         "Open" {
-            Get-Content -Path $file | Select-Poco -CaseSensitive | Select-Object -First 1 | Invoke-Item
+            code (Get-Content -Path $file | Select-Poco -CaseSensitive | Select-Object -First 1)
             break
         }
     }
