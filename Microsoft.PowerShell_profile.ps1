@@ -7,7 +7,7 @@ $completions = @(
 $names = @(
     # Prepare basic utilities
     'PSReadLine', 'ClipboardText', 'Get-ChildItemColor',
-    'posh-git', 'oh-my-posh', 'PowerShellGet', 'poco',
+    'posh-git', 'oh-my-posh', 'PowerShellGet', 'poco', 'Get-GzipContent',
     # Prepare for PowerShell
     'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake',
     # Prepare for GitHub
