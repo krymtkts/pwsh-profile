@@ -43,8 +43,6 @@ $names | Install-NonExistsModule | Out-Null
 Import-Module -Name $completions
 
 function gitlog { git log --graph --all --decorate --abbrev-commit --branches --oneline }
-function tgitcommit { TortoiseGitProc.exe /command:commit }
-function tgitlog { TortoiseGitProc.exe /command:log }
 
 function Set-SelectedLocation {
     param(
