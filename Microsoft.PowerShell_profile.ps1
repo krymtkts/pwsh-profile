@@ -242,17 +242,6 @@ else {
 # Default the prompt to agnoster oh-my-posh theme
 Set-Theme krymtkts
 
-# modify symbols. thunder -> muscle
-$Muscle = [char]::ConvertFromUtf32(0x1f4aa)
-$ThemeSettings.PromptSymbols.ElevatedSymbol = $Muscle
-# modify symbols. triangle -> sidefire
-$Fire = [char]::ConvertFromUtf32(0xe0c0)
-$ThemeSettings.PromptSymbols.SegmentForwardSymbol = $Fire
-$ThemeSettings.PromptSymbols.SegmentSeparatorForwardSymbol = $Fire
-$BackFire = [char]::ConvertFromUtf32(0xe0c2)
-$ThemeSettings.PromptSymbols.SegmentBackwardSymbol = $BackFire
-$ThemeSettings.PromptSymbols.SegmentSeparatorBackwardSymbol = $BackFire
-
 $Horns = [char]::ConvertFromUtf32(0x1f918)
 Write-Host "$Horns posh $($PSVersionTable.PSVersion.ToString()) is ready $Horns"
 # Chocolatey profile
