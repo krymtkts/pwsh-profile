@@ -240,7 +240,7 @@ else {
 }
 
 # Default the prompt to agnoster oh-my-posh theme
-Set-Theme agnoster
+Set-Theme krymtkts
 
 # modify symbols. thunder -> muscle
 $Muscle = [char]::ConvertFromUtf32(0x1f4aa)
