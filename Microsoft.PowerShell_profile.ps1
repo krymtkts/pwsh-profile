@@ -154,9 +154,9 @@ if (Get-Module -Name GoogleCloud) {
     Import-Module -Name GoogleCloud
 }
 
-# Set l and ls alias to use the new Get-ChildItemColor cmdlets
-Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
-Set-Alias ll Get-ChildItemColor -Option AllScope
+# # Set l and ls alias to use the new Get-ChildItemColor cmdlets
+# Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
+# Set-Alias ll Get-ChildItemColor -Option AllScope
 
 # Helper function to change directory to my development workspace
 # Change c:\ws to your usual workspace and everytime you type
@@ -190,7 +190,7 @@ function Update-Packages {
 
     choco upgrade chocolatey -y
     # finish to install faster than other apps.
-    choco upgrade GoogleChrome vscode -y
+    choco upgrade GoogleChrome vscode microsoft-windows-terminal -y
     choco upgrade all -y
 }
 
@@ -253,19 +253,6 @@ if (Test-Path($ChocolateyProfile)) {
 if (Test-Path("$PSScriptRoot\CustomScript.psm1")) {
     # Import environment specific script from CustomScript.psm1.
     Import-Module "$PSScriptRoot\CustomScript.psm1"
-}
-
-# thefuck
-function fuck {
-    $history = (Get-History -Count 1).CommandLine;
-    if (-not [string]::IsNullOrWhiteSpace($history)) {
-        $fuck = $(thefuck $args $history);
-        if (-not [string]::IsNullOrWhiteSpace($fuck)) {
-            if ($fuck.StartsWith("echo")) { $fuck = $fuck.Substring(5); }
-            else { iex "$fuck"; }
-        }
-    }
-    [Console]::ResetColor()
 }
 
 function find {
