@@ -42,6 +42,8 @@ Function Install-NonExistsModule {
 $names | Install-NonExistsModule | Out-Null
 Import-Module -Name $completions
 
+Set-Alias ll ls -Option AllScope
+
 function gitlog { git log --graph --all --decorate --abbrev-commit --branches --oneline }
 
 function Set-SelectedLocation {
