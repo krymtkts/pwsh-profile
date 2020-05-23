@@ -156,8 +156,8 @@ if (Get-Module -Name GoogleCloud) {
     Import-Module -Name GoogleCloud
 }
 
-# # Set l and ls alias to use the new Get-ChildItemColor cmdlets
-# Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
+# Set l and ls alias to use the new Get-ChildItemColor cmdlets
+Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 # Set-Alias ll Get-ChildItemColor -Option AllScope
 
 # Helper function to change directory to my development workspace
