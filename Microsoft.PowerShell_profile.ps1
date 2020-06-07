@@ -44,6 +44,8 @@ Import-Module -Name $completions
 
 Set-Alias ll ls -Option AllScope
 
+Set-PSReadLineOption -PredictionSource History
+
 function gitlog { git log --graph --all --decorate --abbrev-commit --branches --oneline }
 
 function Set-SelectedLocation {
