@@ -40,7 +40,10 @@ Function Install-NonExistsModule {
     }
 }
 
-$names | Install-NonExistsModule | Out-Null
+function Install-Modules {
+    $names | Install-NonExistsModule | Out-Null
+}
+
 Import-Module -Name $completions
 
 Set-Alias ll ls -Option AllScope
