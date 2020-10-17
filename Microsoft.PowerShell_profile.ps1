@@ -159,9 +159,6 @@ if (Get-Module -Name GoogleCloud) {
     Import-Module -Name GoogleCloud
 }
 
-# Set ll.
-Set-Alias ll Get-ChildItem -Option AllScope
-
 # Helper function to change directory to my development workspace
 # Change c:\ws to your usual workspace and everytime you type
 # in cws from PowerShell it will take you directly there.
