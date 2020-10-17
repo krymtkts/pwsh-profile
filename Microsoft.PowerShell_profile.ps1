@@ -8,7 +8,6 @@ $completions = @(
 $names = @(
     # Prepare basic utilities
     'PSReadLine', 'ClipboardText',
-    # 'Get-ChildItemColor',
     'posh-git', 'oh-my-posh', 'PowerShellGet', 'poco', 'Get-GzipContent',
     # Prepare for PowerShell
     'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake',
@@ -160,9 +159,8 @@ if (Get-Module -Name GoogleCloud) {
     Import-Module -Name GoogleCloud
 }
 
-# Set l and ls alias to use the new Get-ChildItemColor cmdlets
-Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
-# Set-Alias ll Get-ChildItemColor -Option AllScope
+# Set ll.
+Set-Alias ll Get-ChildItem -Option AllScope
 
 # Helper function to change directory to my development workspace
 # Change c:\ws to your usual workspace and everytime you type
