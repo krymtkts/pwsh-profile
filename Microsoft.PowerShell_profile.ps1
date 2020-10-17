@@ -1,4 +1,5 @@
 $completions = @(
+    'Terminal-Icons',
     # Prepare for Maven
     'MavenAutoCompletion',
     # Prepare for Docker
@@ -6,7 +7,8 @@ $completions = @(
 )
 $names = @(
     # Prepare basic utilities
-    'PSReadLine', 'ClipboardText', 'Get-ChildItemColor',
+    'PSReadLine', 'ClipboardText',
+    # 'Get-ChildItemColor',
     'posh-git', 'oh-my-posh', 'PowerShellGet', 'poco', 'Get-GzipContent',
     # Prepare for PowerShell
     'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake',
