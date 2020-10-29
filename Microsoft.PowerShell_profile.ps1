@@ -112,7 +112,7 @@ function Open-VSCodeWorkspace {
             }
         }
         "Open" {
-            $ws = Get-Content -Path $file | Select-Poco -CaseSensitive | Select-Object -First 1
+            $ws = Get-Content -Path $file | Where-Object { !$_.StartsWith('#') } | Select-Poco -CaseSensitive | Select-Object -First 1
             if ($ws) {
                 code $ws
             }
