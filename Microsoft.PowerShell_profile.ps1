@@ -12,9 +12,8 @@ $names = @(
     # Prepare for PowerShell
     'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake',
     # Prepare for GitHub
-    'PowerShellForGitHub'
-    # Prepare for AWS https://dev.classmethod.jp/server-side/problem-about-awspowershell-netcore-not-autoloaded/
-    # 'AWSPowerShell.NetCore'
+    'PowerShellForGitHub',
+    'AWS.Tools.Installer'
 ) + $completions
 
 Function Install-NonExistsModule {
@@ -40,8 +39,13 @@ Function Install-NonExistsModule {
     }
 }
 
+function Install-AWSModules {
+    Install-AWSToolsModule -Name EC2, S3, Lambda, CloudFormation, SecretsManager, IdentityManagement, Amplify -Scope AllUsers
+}
+
 function Install-Modules {
     $names | Install-NonExistsModule | Out-Null
+    Install-AWSModules | Out-Null
 }
 
 Import-Module -Name $completions
