@@ -191,7 +191,7 @@ function Update-PipModules {
 
 function Update-Packages {
     # Update PowerShell modules.
-    Get-InstalledModule | Update-Module -AllowPrerelease
+    Get-InstalledModule | Where-Object -Property Repository -eq 'PSGallery' | Update-Module -AllowPrerelease
 
     # Update Pip modules.
     Update-PipModules
