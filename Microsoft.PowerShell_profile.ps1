@@ -342,8 +342,8 @@ $awsCompleter = Get-Command -Name aws_completer -ErrorAction SilentlyContinue
 if ($awsCompleter) {
     Register-ArgumentCompleter -Native -CommandName aws -ScriptBlock {
         param($commandName, $wordToComplete, $cursorPosition)
-        Set-Item -Path Env:COMP_LINE -Value $wordToComplete
-        Set-Item -Path Env:COMP_POINT -Value $cursorPosition
+        $Env:COMP_LINE = $wordToComplete
+        $Env:COMP_POINT = $cursorPosition
         python $awsCompleter.Source | ForEach-Object {
             [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
         }
