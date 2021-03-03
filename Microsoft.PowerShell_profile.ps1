@@ -337,7 +337,8 @@ function New-Password {
     }
 }
 
-$awsCompleter = Get-Command -Name aws_completer
+# This idea was inspired by  https://github.com/aws/aws-cli/issues/5309#issuecomment-693941619
+$awsCompleter = Get-Command -Name aws_completer -ErrorAction SilentlyContinue
 if ($awsCompleter) {
     Register-ArgumentCompleter -Native -CommandName aws -ScriptBlock {
         param($commandName, $wordToComplete, $cursorPosition)
