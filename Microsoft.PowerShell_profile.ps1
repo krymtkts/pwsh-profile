@@ -13,10 +13,11 @@ $names = @(
     'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake',
     # Prepare for GitHub
     'PowerShellForGitHub',
+    # Prepare for AWS
     'AWS.Tools.Installer'
 ) + $completions
 
-Function Install-NonExistsModule {
+function Install-NonExistsModule {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $True,
@@ -53,6 +54,7 @@ Import-Module -Name $completions
 Set-Alias ll ls -Option AllScope
 
 Set-PSReadLineOption -PredictionSource History
+Set-PSReadLineOption -BellStyle Visual
 
 function gitlog { git log --graph --all --decorate --abbrev-commit --branches --oneline }
 
@@ -332,5 +334,17 @@ function New-Password {
 
     end {
         $password
+    }
+}
+
+$awsCompleter = Get-Command -Name aws_completer
+if ($awsCompleter) {
+    Register-ArgumentCompleter -Native -CommandName aws -ScriptBlock {
+        param($commandName, $wordToComplete, $cursorPosition)
+        Set-Item -Path Env:COMP_LINE -Value $wordToComplete
+        Set-Item -Path Env:COMP_POINT -Value $cursorPosition
+        python $awsCompleter.Source | ForEach-Object {
+            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+        }
     }
 }
