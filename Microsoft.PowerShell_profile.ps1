@@ -9,6 +9,7 @@ $names = @(
     # Prepare basic utilities
     'PSReadLine', 'ClipboardText',
     'posh-git', 'oh-my-posh', 'PowerShellGet', 'poco', 'Get-GzipContent',
+    'powershell-yaml',
     # Prepare for PowerShell
     'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake',
     # Prepare for GitHub
