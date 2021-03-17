@@ -42,7 +42,7 @@ function Install-NonExistsModule {
 }
 
 function Install-AWSModules {
-    Install-AWSToolsModule -Name EC2, S3, Lambda, CloudFormation, SecretsManager, IdentityManagement, Amplify -Scope AllUsers
+    Install-AWSToolsModule -Name EC2, S3, Lambda, CloudFormation, SecretsManager, IdentityManagement, Amplify, ECS, SecurityToken -Scope AllUsers
 }
 
 function Install-Modules {
