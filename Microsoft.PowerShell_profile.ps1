@@ -57,7 +57,23 @@ Set-Alias ll ls -Option AllScope
 Set-PSReadLineOption -PredictionSource History
 Set-PSReadLineOption -BellStyle Visual
 
-function gitlog { git log --graph --all --decorate --abbrev-commit --branches --oneline }
+function Remove-GitGoneBranches {
+    [CmdletBinding()]
+    param (
+        [switch]$Force
+    )
+    $deleteFlag = '--delete'
+    if ($Force) {
+        $deleteFlag = '-D'
+    }
+    git branch --format "%(refname:short)=%(upstream:track)"  |  Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object  -ExpandProperty Keys | % { git branch $deleteFlag $_ }
+}
+
+function Get-GitGraph {
+    git log --graph --all --decorate --abbrev-commit --branches --oneline
+}
+
+Set-Alias gitgraph Get-GitGraph -Option AllScope
 
 function Set-SelectedLocation {
     param(
