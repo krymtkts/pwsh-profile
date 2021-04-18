@@ -199,6 +199,10 @@ function Edit-Hosts {
     Start-Process notepad c:\windows\system32\drivers\etc\hosts -verb runas
 }
 
+function Update-InstalledModules {
+    Get-InstalledModule | Where-Object -Property Repository -eq 'PSGallery' | Update-Module -AllowPrerelease
+}
+
 function Update-PipModules {
     python -m pip install --upgrade pip
     pip list --outdated | ForEach-Object { [string]::Join(',', $_ -split "\s+") } | `
@@ -209,16 +213,12 @@ function Update-PipModules {
 # Helper function to execute choco upgrade.
 
 function Update-Packages {
-    # Update PowerShell modules.
-    Get-InstalledModule | Where-Object -Property Repository -eq 'PSGallery' | Update-Module -AllowPrerelease
-
-    # Update Pip modules.
+    Update-InstalledModules
     Update-PipModules
-
-    choco upgrade chocolatey -y
-    # finish to install faster than other apps.
-    choco upgrade GoogleChrome vscode microsoft-windows-terminal -y
-    choco upgrade all -y
+    # choco upgrade chocolatey -y
+    # # finish to install faster than other apps.
+    # choco upgrade GoogleChrome vscode microsoft-windows-terminal -y
+    # choco upgrade all -y
 }
 
 function New-EmptyFIle([parameter(mandatory)][string]$Name) {
@@ -234,21 +234,48 @@ function New-TemporaryDirectory {
 Set-Alias tmpdir New-TemporaryDirectory -Option AllScope
 
 # Helper function to show Unicode character
-function global:U {
-    param
-    (
-        [int] $Code
+function U {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = "Path to one or more locations.")]
+        [ValidateNotNullOrEmpty()]
+        [int[]] $Code
     )
-
-    if ((0 -le $Code) -and ($Code -le 0xFFFF)) {
-        return [char] $Code
+    process {
+        foreach ($c in $Code) {
+            if ((0 -le $c) -and ($c -le 0xFFFF)) {
+                [char] $c
+            }
+            elseif ((0x10000 -le $c) -and ($c -le 0x10FFFF)) {
+                [char]::ConvertFromUtf32($c)
+            }
+            else {
+                throw "Invalid character code $c"
+            }
+        }
     }
+}
 
-    if ((0x10000 -le $Code) -and ($Code -le 0x10FFFF)) {
-        return [char]::ConvertFromUtf32($Code)
+function UC {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = "Path to one or more locations.")]
+        [ValidateNotNullOrEmpty()]
+        [String[]]$s
+    )
+    process {
+        foreach ($c in $s) {
+            [Convert]::ToInt32($c -as [char]).ToString("x")
+        }
     }
-
-    throw "Invalid character code $Code"
 }
 
 # install ssh-agent service if not exists.
