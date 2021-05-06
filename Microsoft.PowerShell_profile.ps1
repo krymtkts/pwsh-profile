@@ -240,8 +240,7 @@ function U {
         [Parameter(Mandatory = $true,
             Position = 0,
             ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            HelpMessage = "Path to one or more locations.")]
+            ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [int[]] $Code
     )
@@ -266,8 +265,7 @@ function UC {
         [Parameter(Mandatory = $true,
             Position = 0,
             ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            HelpMessage = "Path to one or more locations.")]
+            ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
         [String[]]$s
     )
