@@ -11,7 +11,7 @@ $names = @(
     'posh-git', 'oh-my-posh', 'PowerShellGet', 'poco', 'Get-GzipContent',
     'powershell-yaml',
     # Prepare for PowerShell
-    'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake',
+    'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake', 'PSProfiler',
     # Prepare for GitHub
     'PowerShellForGitHub',
     # Prepare for AWS
@@ -200,7 +200,7 @@ function Edit-Hosts {
 }
 
 function Update-InstalledModules {
-    Get-InstalledModule | Where-Object -Property Repository -eq 'PSGallery' | Update-Module -AllowPrerelease
+    Get-InstalledModule | Where-Object -Property Repository -eq 'PSGallery' | Update-Module -AllowPrerelease -Scope AllUsers
 }
 
 function Update-PipModules {
@@ -390,4 +390,8 @@ if ($awsCompleter) {
             [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
         }
     }
+}
+
+function Remove-GitGoneBranches {
+    git branch --format '%(refname:short)=%(upstream:track)' | Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object -ExpandProperty Keys | ForEach-Object { git branch --delete $_ }
 }
