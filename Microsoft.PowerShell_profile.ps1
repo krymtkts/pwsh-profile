@@ -55,6 +55,7 @@ Import-Module -Name $completions
 Set-Alias ll ls -Option AllScope
 
 Set-PSReadLineOption -PredictionSource History
+Set-PSReadLineOption -PredictionViewStyle ListView
 Set-PSReadLineOption -BellStyle Visual
 
 function Remove-GitGoneBranches {
