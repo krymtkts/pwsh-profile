@@ -437,3 +437,30 @@ if ($awsCompleter) {
 function Remove-GitGoneBranches {
     git branch --format '%(refname:short)=%(upstream:track)' | Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object -ExpandProperty Keys | ForEach-Object { git branch --delete $_ }
 }
+
+function New-PsakeFile {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [String]
+        $Name = 'psakefile',
+        [Parameter()]
+        [String[]]
+        $Tasks = @('Init', 'Clean', 'Compile', 'Test')
+    )
+    $psakeFileName = "$Name.ps1"
+    New-Item -Name $psakeFileName -ItemType File
+    @"
+Task default -Depends TestAll
+
+Task TestAll -Depends $($Tasks -join ',')
+"@ > $psakeFileName
+    foreach ($task in $Tasks) {
+        @"
+
+Task $task {
+    '$task is running!'
+}
+"@ >> $psakeFileName
+    }
+}
