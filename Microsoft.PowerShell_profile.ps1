@@ -17,6 +17,23 @@ $names = @(
     # Prepare for AWS
     'AWS.Tools.Installer'
 ) + $completions
+$awsServices = @(
+    'CertificateManager',
+    'CloudFormation',
+    'CloudWatchLogs',
+    'DynamoDBv2',
+    'EC2',
+    'ECR',
+    'ECS',
+    'ElasticLoadBalancingV2',
+    'EventBridge',
+    'IdentityManagement',
+    'Lambda',
+    'S3',
+    'SecretsManager',
+    'SecurityToken',
+    'StepFunctions'
+)
 
 function Install-NonExistsModule {
     [CmdletBinding()]
@@ -42,7 +59,7 @@ function Install-NonExistsModule {
 }
 
 function Install-AWSModules {
-    Install-AWSToolsModule -Name EC2, S3, Lambda, CloudFormation, SecretsManager, IdentityManagement, Amplify, ECS, SecurityToken -Scope AllUsers
+    Install-AWSToolsModule -Name $awsServices -Scope AllUsers
 }
 
 function Install-Modules {
@@ -215,6 +232,7 @@ function Update-PipModules {
 
 function Update-Packages {
     Update-InstalledModules
+    Update-AWSToolsModule -Scope AllUsers
     Update-PipModules
     # choco upgrade chocolatey -y
     # # finish to install faster than other apps.
@@ -273,6 +291,23 @@ function UC {
     process {
         foreach ($c in $s) {
             [Convert]::ToInt32($c -as [char]).ToString("x")
+        }
+    }
+}
+
+function Convert-0xTo10 {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]$0x
+    )
+    process {
+        foreach ($c in $0x) {
+            [Convert]::ToInt32($c, 16)
         }
     }
 }
@@ -383,11 +418,17 @@ function New-Password {
 # This idea was inspired by  https://github.com/aws/aws-cli/issues/5309#issuecomment-693941619
 $awsCompleter = Get-Command -Name aws_completer -ErrorAction SilentlyContinue
 if ($awsCompleter) {
+    if ($awsCompleter.Name -like '*.py' ) {
+        $f = { python $awsCompleter.Source }
+    }
+    else {
+        $f = { & $awsCompleter.Name }
+    }
     Register-ArgumentCompleter -Native -CommandName aws -ScriptBlock {
         param($commandName, $wordToComplete, $cursorPosition)
         $Env:COMP_LINE = $wordToComplete
         $Env:COMP_POINT = $cursorPosition
-        python $awsCompleter.Source | ForEach-Object {
+        & $f | ForEach-Object {
             [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
         }
     }
