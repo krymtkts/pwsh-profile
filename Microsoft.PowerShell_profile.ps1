@@ -84,7 +84,7 @@ function Remove-GitGoneBranches {
     if ($Force) {
         $deleteFlag = '-D'
     }
-    git branch --format "%(refname:short)=%(upstream:track)"  |  Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object  -ExpandProperty Keys | % { git branch $deleteFlag $_ }
+    git branch --format "%(refname:short)=%(upstream:track)" | Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object  -ExpandProperty Keys | % { git branch $deleteFlag $_ }
 }
 
 function Get-GitGraph {
@@ -418,7 +418,8 @@ function New-Password {
 # This idea was inspired by  https://github.com/aws/aws-cli/issues/5309#issuecomment-693941619
 $awsCompleter = Get-Command -Name aws_completer -ErrorAction SilentlyContinue
 if ($awsCompleter) {
-    if ($awsCompleter.Name -like '*.py' ) {
+    # for PyPI installation.
+    if ($awsCompleter.Name -notlike '*.exe' ) {
         $f = { python $awsCompleter.Source }
     }
     else {
