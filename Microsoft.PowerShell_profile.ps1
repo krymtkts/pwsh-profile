@@ -426,11 +426,20 @@ if ($awsCompleter) {
     }
     Register-ArgumentCompleter -Native -CommandName aws -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
-        $Env:COMP_LINE = $commandAst
-        $Env:COMP_POINT = $cursorPosition
+        if ("$commandAst" -eq 'aws') {
+            # complement the deleted space so that aws_completer lists all services.
+            $compLine = "$commandAst "
+        }
+        else {
+            $compLine = $commandAst
+        }
+        $env:COMP_LINE = $compLine
+        $env:COMP_POINT = $cursorPosition
         & $f | ForEach-Object {
             [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
         }
+        Remove-Item env:\COMP_LINE
+        Remove-Item env:\COMP_POINT
     }
 }
 
@@ -462,5 +471,25 @@ Task $task {
     '$task is running!'
 }
 "@ >> $psakeFileName
+    }
+}
+
+$psake = Get-Command -Name Invoke-psake -ErrorAction SilentlyContinue
+if ($psake) {
+    Register-ArgumentCompleter -Native -CommandName $psake.Name -ScriptBlock {
+        param($wordToComplete, $commandAst, $cursorPosition)
+        Get-ChildItem "$wordToComplete*.ps1" | Select-Object -ExpandProperty Name
+    }
+
+    Register-ArgumentCompleter -CommandName $psake.Name -ParameterName taskList -ScriptBlock {
+        param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+        if ($commandAst -match '(?<domain>[^\.]*\.ps1)') {
+            $file = $Matches.file
+        }
+        else {
+            $file = 'psakefile.ps1'
+        }
+        & $commandName -buildFile $file -docs -nologo | Out-String -Stream | ForEach-Object { if ($_ -match "^[^ ]*") { $matches[0] } } | `
+            Where-Object { $_ -notin ('Name', '----', '') } | Where-Object { !$wordToComplete -or $_ -like "$wordToComplete*" }
     }
 }
