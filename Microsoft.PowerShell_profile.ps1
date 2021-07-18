@@ -474,20 +474,25 @@ Task $task {
     }
 }
 
-$psake = Get-Command -Name Invoke-psake -ErrorAction SilentlyContinue
-if ($psake) {
-    Register-ArgumentCompleter -Native -CommandName $psake.Name -ScriptBlock {
+# Don't use '$psake' named variable because Invoke-psake has broken if uses the '$psake'.
+$psakeCommand = Get-Command -Name Invoke-psake -ErrorAction SilentlyContinue
+if ($psakeCommand) {
+    Register-ArgumentCompleter -CommandName $psakeCommand.Name -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
+        "$wordToComplete, $commandAst, $cursorPosition" >> test.log
         Get-ChildItem "$wordToComplete*.ps1" | Select-Object -ExpandProperty Name
     }
 
-    Register-ArgumentCompleter -CommandName $psake.Name -ParameterName taskList -ScriptBlock {
+    Register-ArgumentCompleter -CommandName $psakeCommand.Name -ParameterName taskList -ScriptBlock {
         param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-        if ($commandAst -match '(?<domain>[^\.]*\.ps1)') {
+        "$commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters" >> test.log
+        if ($commandAst -match '(?<file>[^\.]*\.ps1)') {
             $file = $Matches.file
+            "NOWAY" >> test.log
         }
         else {
             $file = 'psakefile.ps1'
+            "HELP ME" >> test.log
         }
         & $commandName -buildFile $file -docs -nologo | Out-String -Stream | ForEach-Object { if ($_ -match "^[^ ]*") { $matches[0] } } | `
             Where-Object { $_ -notin ('Name', '----', '') } | Where-Object { !$wordToComplete -or $_ -like "$wordToComplete*" }
