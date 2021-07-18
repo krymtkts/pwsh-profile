@@ -425,8 +425,8 @@ if ($awsCompleter) {
         $f = { & $awsCompleter.Name }
     }
     Register-ArgumentCompleter -Native -CommandName aws -ScriptBlock {
-        param($commandName, $wordToComplete, $cursorPosition)
-        $Env:COMP_LINE = $wordToComplete
+        param($wordToComplete, $commandAst, $cursorPosition)
+        $Env:COMP_LINE = $commandAst
         $Env:COMP_POINT = $cursorPosition
         & $f | ForEach-Object {
             [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
