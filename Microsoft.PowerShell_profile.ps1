@@ -35,6 +35,9 @@ $awsServices = @(
     'StepFunctions'
 )
 
+# change display language for gpg.
+$env:LANG = 'en'
+
 function Install-NonExistsModule {
     [CmdletBinding()]
     param(
