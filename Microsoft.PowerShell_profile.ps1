@@ -394,26 +394,24 @@ function New-Password {
     }
 
     process {
-        $uppers = "ABCDEFGHJKLMNPQRSTUVWXYZ".ToCharArray()
-        $lowers = "abcdefghijkmnopqrstuvwxyz".ToCharArray()
-        $digits = "23456789".ToCharArray()
-        $symbols = "_-+=@$%".ToCharArray()
-
-        $chars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789_-+=@$%".ToCharArray()
+        $uppers = "ABCDEFGHIJKLMNPQRSTUVWXYZ"
+        $lowers = $uppers.ToLower()
+        $digits = "123456789"
+        $symbols = "!@#$%^&*()-=[];',./_+{}:`"<>?\|``~"
+        $chars = ($uppers + $lowers + $digits + $symbols).ToCharArray()
 
         do {
             $pwdChars = "".ToCharArray()
             $goodPassword = $false
             $hasDigit = $false
             $hasSymbol = $false
-            $pwdChars += (Get-Random -InputObject $uppers -Count 1)
+            $pwdChars += (Get-Random -InputObject $uppers.ToCharArray() -Count 1)
             for ($i = 1; $i -lt $length; $i++) {
                 $char = Get-Random -InputObject $chars -Count 1
-                if ($digits -contains $char) { $hasDigit = $true }
-                if ($symbols -contains $char) { $hasSymbol = $true }
+                if ($digits.Contains($char)) { $hasDigit = $true }
+                if ($symbols.Contains($char)) { $hasSymbol = $true }
                 $pwdChars += $char
             }
-            $pwdChars += (Get-Random -InputObject $lowers -Count 1)
             $password = $pwdChars -join ""
             $goodPassword = $hasDigit -and $hasSymbol
         } until ($goodPassword)
