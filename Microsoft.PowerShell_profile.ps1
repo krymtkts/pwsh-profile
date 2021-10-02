@@ -231,8 +231,14 @@ function Update-PipModules {
         Select-Object -Property Package -Skip 2 | `
         ForEach-Object { pip install -U $_.Package }
 }
-# Helper function to execute choco upgrade.
 
+function Install-GoModules {
+    if (-not (get-command *ghq* -ErrorAction SilentlyContinue)) {
+        go install github.com/x-motemen/ghq@latest
+    }
+}
+
+# Helper function to execute choco upgrade.
 function Update-Packages {
     Update-InstalledModules
     Update-AWSToolsModule -Scope AllUsers
