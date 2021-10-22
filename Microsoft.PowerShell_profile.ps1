@@ -4,6 +4,7 @@ $completions = @(
     'MavenAutoCompletion',
     # Prepare for Docker
     'DockerCompletion', 'DockerComposeCompletion', 'DockerMachineCompletion'
+    'posh-git'
 )
 $names = @(
     # Prepare basic utilities
