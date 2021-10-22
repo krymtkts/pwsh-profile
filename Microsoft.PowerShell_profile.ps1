@@ -63,7 +63,9 @@ function Install-NonExistsModule {
 }
 
 function Install-AWSModules {
-    Install-AWSToolsModule -Name $awsServices -Scope AllUsers
+    if ($awsServices) {
+        Install-AWSToolsModule -Name $awsServices -Scope AllUsers
+    }
 }
 
 function Install-Modules {
@@ -339,6 +341,7 @@ else {
 
 # Default the prompt to agnoster oh-my-posh theme
 Set-Theme krymtkts
+# Set-PoshPrompt -Theme jv_sitecorian
 
 $Horns = [char]::ConvertFromUtf32(0x1f918)
 Write-Host "$Horns posh $($PSVersionTable.PSVersion.ToString()) is ready $Horns"
