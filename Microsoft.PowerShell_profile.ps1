@@ -339,13 +339,13 @@ else {
     Start-Service ssh-agent
 }
 
-if (Get-Command Set-Theme -ErrorAction SilentlyContinue) {
-    Set-Theme krymtkts
-}
-else {
-    $env:POSH_GIT_ENABLED = $true
+if (Get-Command Set-PoshPrompt -ErrorAction SilentlyContinue) {
     Set-PoshPrompt -Theme ~/.oh-my-posh.omp.json
 }
+else {
+    Set-Theme krymtkts
+}
+
 $Horns = [char]::ConvertFromUtf32(0x1f918)
 Write-Host "$Horns posh $($PSVersionTable.PSVersion.ToString()) is ready $Horns"
 # Chocolatey profile
