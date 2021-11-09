@@ -3,13 +3,13 @@ $completions = @(
     # Prepare for Maven
     'MavenAutoCompletion',
     # Prepare for Docker
-    'DockerCompletion', 'DockerComposeCompletion', 'DockerMachineCompletion'
+    'DockerCompletion', 'DockerComposeCompletion', 'DockerMachineCompletion',
     'posh-git'
 )
 $names = @(
     # Prepare basic utilities
     'PSReadLine', 'ClipboardText',
-    'posh-git', 'oh-my-posh', 'PowerShellGet', 'poco', 'Get-GzipContent',
+    'oh-my-posh', 'PowerShellGet', 'poco', 'Get-GzipContent',
     'powershell-yaml',
     # Prepare for PowerShell
     'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake', 'PSProfiler',
@@ -512,4 +512,9 @@ if ($psakeCommand) {
         & $commandName -buildFile $file -docs -nologo | Out-String -Stream | ForEach-Object { if ($_ -match "^[^ ]*") { $matches[0] } } | `
             Where-Object { $_ -notin ('Name', '----', '') } | Where-Object { !$wordToComplete -or $_ -like "$wordToComplete*" }
     }
+}
+
+if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
+    fnm env --use-on-cd | Out-String | Invoke-Expression
+    fnm completions --shell powershell | Out-String | Invoke-Expression
 }
