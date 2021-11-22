@@ -235,6 +235,25 @@ function Update-PipModules {
         ForEach-Object { pip install -U $_.Package }
 }
 
+function Install-NodeModules {
+    if ((Get-Command npm -ErrorAction SilentlyContinue)) {
+        npm install -g fast serverless textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good
+    }
+    if (-not (Test-Path ~/.textlint)) {
+        @"
+{
+  "filters": {},
+  "rules": {
+    "preset-ja-technical-writing": true,
+    "date-weekday-mismatch": true,
+    "terminology": true,
+    "write-good": true
+  }
+}
+"@ | Set-Content ~/.textlintrc -Encoding utf8
+    }
+}
+
 function Install-GoModules {
     if (-not (get-command *ghq* -ErrorAction SilentlyContinue)) {
         go install github.com/x-motemen/ghq@latest
@@ -246,10 +265,6 @@ function Update-Packages {
     Update-InstalledModules
     Update-AWSToolsModule -Scope AllUsers
     Update-PipModules
-    # choco upgrade chocolatey -y
-    # # finish to install faster than other apps.
-    # choco upgrade GoogleChrome vscode microsoft-windows-terminal -y
-    # choco upgrade all -y
 }
 
 function New-EmptyFIle([parameter(mandatory)][string]$Name) {
