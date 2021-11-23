@@ -237,7 +237,7 @@ function Update-PipModules {
 
 function Install-NodeModules {
     if ((Get-Command npm -ErrorAction SilentlyContinue)) {
-        npm install -g fast serverless textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good
+        npm install -g fast-cli serverless textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good
     }
     if (-not (Test-Path ~/.textlint)) {
         @"
