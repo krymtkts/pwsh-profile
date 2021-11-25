@@ -255,8 +255,16 @@ function Install-NodeModules {
 }
 
 function Install-GoModules {
-    if (-not (get-command *ghq* -ErrorAction SilentlyContinue)) {
-        go install github.com/x-motemen/ghq@latest
+    $mods = @(
+        'github.com/x-motemen/ghq@latest',
+        'mvdan.cc/sh/v3/cmd/shfmt@latest'
+    )
+    $mods | ForEach-Object {
+        $start = $_.LastIndexOf('/') + 1
+        $name = $_.Substring($start, $_.Length - '@latest'.Length - $start)
+        if (-not (get-command "*$name*" -ErrorAction SilentlyContinue)) {
+            go install $_
+        }
     }
 }
 
@@ -518,11 +526,9 @@ if ($psakeCommand) {
         "$commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters" >> test.log
         if ($commandAst -match '(?<file>[^\.]*\.ps1)') {
             $file = $Matches.file
-            "NOWAY" >> test.log
         }
         else {
             $file = 'psakefile.ps1'
-            "HELP ME" >> test.log
         }
         & $commandName -buildFile $file -docs -nologo | Out-String -Stream | ForEach-Object { if ($_ -match "^[^ ]*") { $matches[0] } } | `
             Where-Object { $_ -notin ('Name', '----', '') } | Where-Object { !$wordToComplete -or $_ -like "$wordToComplete*" }
