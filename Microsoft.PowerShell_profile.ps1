@@ -538,4 +538,5 @@ if ($psakeCommand) {
 if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
     fnm env --use-on-cd | Out-String | Invoke-Expression
     fnm completions --shell powershell | Out-String | Invoke-Expression
+    Get-ChildItem "$env:FNM_MULTISHELL_PATH/../" | Where-Object -Property CreationTime -LE (Get-Date).AddDays(-1) | Remove-Item
 }
