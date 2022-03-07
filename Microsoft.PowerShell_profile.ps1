@@ -1,38 +1,38 @@
 $completions = @(
-    'Terminal-Icons',
+    'Terminal-Icons'
     # Prepare for Maven
-    'MavenAutoCompletion',
+    'MavenAutoCompletion'
     # Prepare for Docker
-    'DockerCompletion', 'DockerComposeCompletion', 'DockerMachineCompletion',
+    'DockerCompletion', 'DockerComposeCompletion', 'DockerMachineCompletion'
     'posh-git'
 )
 $names = @(
     # Prepare basic utilities
-    'PSReadLine', 'ClipboardText',
-    'oh-my-posh', 'PowerShellGet', 'poco', 'Get-GzipContent',
-    'powershell-yaml',
+    'PSReadLine', 'ClipboardText'
+    'oh-my-posh', 'PowerShellGet', 'poco', 'Get-GzipContent'
+    'powershell-yaml'
     # Prepare for PowerShell
-    'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake', 'PSProfiler',
+    'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake', 'PSProfiler'
     # Prepare for GitHub
-    'PowerShellForGitHub',
+    'PowerShellForGitHub'
     # Prepare for AWS
     'AWS.Tools.Installer'
 ) + $completions
 $awsServices = @(
-    'CertificateManager',
-    'CloudFormation',
-    'CloudWatchLogs',
-    'DynamoDBv2',
-    'EC2',
-    'ECR',
-    'ECS',
-    'ElasticLoadBalancingV2',
-    'EventBridge',
-    'IdentityManagement',
-    'Lambda',
-    'S3',
-    'SecretsManager',
-    'SecurityToken',
+    'CertificateManager'
+    'CloudFormation'
+    'CloudWatchLogs'
+    'DynamoDBv2'
+    'EC2'
+    'ECR'
+    'ECS'
+    'ElasticLoadBalancingV2'
+    'EventBridge'
+    'IdentityManagement'
+    'Lambda'
+    'S3'
+    'SecretsManager'
+    'SecurityToken'
     'StepFunctions'
 )
 
@@ -64,11 +64,18 @@ function Install-NonExistsModule {
 
 function Install-AWSModules {
     if ($awsServices) {
-        Install-AWSToolsModule -Name $awsServices -Scope AllUsers
+        Install-AWSToolsModule -Name $awsServices -Scope AllUsers -Force
     }
 }
 
+function Initialize-PackageSource {
+    Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+    $url = "https://api.nuget.org/v3/index.json"
+    Register-PackageSource -Name NuGet -Location $url -ProviderName NuGet -Trusted
+}
+
 function Install-Modules {
+    Initialize-PackageSource
     $names | Install-NonExistsModule | Out-Null
     Install-AWSModules | Out-Null
 }
@@ -215,8 +222,8 @@ if (Get-Module -Name GoogleCloud) {
 # function cws { Set-Location c:\workspace }
 
 # Helper function to set location to the User Profile directory
-function cuserprofile { Set-Location ~ }
-Set-Alias ~ cuserprofile -Option AllScope
+function cu { Set-Location ~ }
+Set-Alias ~ cu -Option AllScope
 
 # Helper function to edit hosts file.
 function Edit-Hosts {
@@ -228,11 +235,28 @@ function Update-InstalledModules {
 }
 
 function Update-PipModules {
+    $firstTime = -not (Get-Command pip -ErrorAction SilentlyContinue) -and
+        (Get-Command pyenv -ErrorAction SilentlyContinue)
+    if ($firstTime) {
+        $latest = pyenv install -l | Where-Object -FilterScript { -not ($_ -match '[a-zA-Z]') } | Select-Object -Last 1
+        pyenv install $latest
+        pyenv global $latest
+    }
     python -m pip install --upgrade pip
-    pip list --outdated | ForEach-Object { [string]::Join(',', $_ -split "\s+") } | `
-        ConvertFrom-Csv -Header Package, Version, Latest, Type | `
-        Select-Object -Property Package -Skip 2 | `
-        ForEach-Object { pip install -U $_.Package }
+    if ($firstTime) {
+        $list = @(
+            'boto3'
+            'cfn-lint'
+            'poetry'
+        )
+        pip install ($list -join ' ')
+    }
+    else {
+        pip list --outdated | ForEach-Object { [string]::Join(',', $_ -split "\s+") } | `
+            ConvertFrom-Csv -Header Package, Version, Latest, Type | `
+            Select-Object -Property Package -Skip 2 | `
+            ForEach-Object { pip install -U $_.Package }
+    }
 }
 
 function Install-NodeModules {
@@ -271,7 +295,7 @@ function Install-GoModules {
 # Helper function to execute choco upgrade.
 function Update-Packages {
     Update-InstalledModules
-    Update-AWSToolsModule -Scope AllUsers
+    Update-AWSToolsModule -Scope AllUsers -Force
     Update-PipModules
 }
 
