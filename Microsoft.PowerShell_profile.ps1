@@ -174,6 +174,7 @@ function Set-GitGlobalConfig {
     git config --global core.excludesfile ~/.gitignore_global
     git config --global push.default simple
     git config --global ghq.root ~/dev
+    git config --global init.defaultBranch main
     # TODO: add user configuration.
 }
 
