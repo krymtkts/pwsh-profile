@@ -80,6 +80,52 @@ function Install-Modules {
     Install-AWSModules | Out-Null
 }
 
+function Update-Profile {
+    $params = @{
+        Uri     = https://gist.githubusercontent.com/krymtkts/f8af667c32b16fc28a815243b316c5be/raw/Microsoft.PowerShell_profile.ps1
+        OutFile = ~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1
+    }
+    Invoke-WebRequest @params
+}
+
+function Edit-TerminalIcons {
+    $ti = Get-Module Terminal-Icons -ErrorAction SilentlyContinue
+    if (-not $ti) {
+        Write-Error 'Terminal-Icons not found. install it!'
+        return
+    }
+    $params = @{
+        Uri     = 'https://gist.githubusercontent.com/krymtkts/4457a23124b2db860a6b32eba6490b03/raw/glyphs.ps1'
+        OutFile = "$(Split-Path $ti.Path -Parent)\Data\glyphs.ps1"
+    }
+    Invoke-WebRequest @params
+}
+
+function Update-PoshTheme {
+    $params = @{
+        Uri     = 'https://gist.githubusercontent.com/krymtkts/d320ff5ec30fa47b138c2df018f95423/raw/.oh-my-posh.omp.json'
+        OutFile = '~/.oh-my-posh.omp.json'
+    }
+    Invoke-WebRequest @params
+}
+
+function Update-GUIRegistryValues {
+    $path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects3'
+    $key = 'Settings'
+    $org = Get-ItemProperty $path | Select-Object -ExpandProperty $key
+
+    $new = @() + $org
+    $new[12] = 0x01
+    Set-ItemProperty $path -name $key -Value $new
+
+    $path = 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32'
+    New-Item -Path $path -Force
+    Split-Path $path -Parent | Get-ChildItem
+    Set-ItemProperty -Path $path -Name '(Default)' -Value ''
+
+    Stop-Process -Name explorer -Force
+}
+
 Import-Module -Name $completions
 
 Set-Alias ll ls -Option AllScope
