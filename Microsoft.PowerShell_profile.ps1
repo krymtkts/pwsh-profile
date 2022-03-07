@@ -101,6 +101,19 @@ function Edit-TerminalIcons {
     Invoke-WebRequest @params
 }
 
+function Edit-EverMonkey {
+    $evermonkey = '~\.vscode\extensions\michalyao.evermonkey-2.4.5'
+    if (-not $evermonkey) {
+        Write-Verbose 'There is no evermonkey.'
+        return
+    }
+    $params = @{
+        Uri     = 'https://gist.githubusercontent.com/krymtkts/8a5a3a5a7e1efe9db7f2c6bbda337571/raw/converterplus.js'
+        OutFile = "$evermonkey\out\src\converterplus.js"
+    }
+    Invoke-WebRequest @params
+}
+
 function Update-PoshTheme {
     $params = @{
         Uri     = 'https://gist.githubusercontent.com/krymtkts/d320ff5ec30fa47b138c2df018f95423/raw/.oh-my-posh.omp.json'
@@ -151,6 +164,18 @@ function Get-GitGraph {
 }
 
 Set-Alias gitgraph Get-GitGraph -Option AllScope
+
+function Set-GitGlobalConfig {
+    git config --global core.autocrlf input
+    git config --global core.ignorecase false
+    git config --global core.quotepath false
+    git config --global core.pager LESSCHARSET=utf-8 less
+    git config --global core.sshcommand "'C:\Program Files\OpenSSH-Win64\ssh.exe'"
+    git config --global core.excludesfile ~/.gitignore_global
+    git config --global push.default simple
+    git config --global ghq.root ~/dev
+    # TODO: add user configuration.
+}
 
 function Set-SelectedLocation {
     param(
