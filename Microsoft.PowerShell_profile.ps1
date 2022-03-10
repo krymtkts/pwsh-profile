@@ -156,7 +156,7 @@ function Remove-GitGoneBranches {
     if ($Force) {
         $deleteFlag = '-D'
     }
-    git branch --format "%(refname:short)=%(upstream:track)" | Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object  -ExpandProperty Keys | % { git branch $deleteFlag $_ }
+    git branch --format "%(refname:short)=%(upstream:track)" | Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object  -ExpandProperty Keys | ForEach-Object { git branch $deleteFlag $_ }
 }
 
 function Get-GitGraph {
@@ -575,10 +575,6 @@ if ($awsCompleter) {
         Remove-Item env:\COMP_LINE
         Remove-Item env:\COMP_POINT
     }
-}
-
-function Remove-GitGoneBranches {
-    git branch --format '%(refname:short)=%(upstream:track)' | Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object -ExpandProperty Keys | ForEach-Object { git branch --delete $_ }
 }
 
 function New-PsakeFile {
