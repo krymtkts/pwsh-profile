@@ -86,6 +86,11 @@ function Update-Profile {
         OutFile = ~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1
     }
     Invoke-WebRequest @params
+
+    $profilehome = ($PROFILE | Split-Path -Parent)
+    if (-not (Test-Path "$profilehome\Microsoft.VSCode_profile.ps1")) {
+        New-Item -ItemType HardLink -Path $profilehome -Name 'Microsoft.VSCode_profile.ps1' -Value "$profilehome\Microsoft.PowerShell_profile.ps1"
+    }
 }
 
 function Edit-TerminalIcons {
