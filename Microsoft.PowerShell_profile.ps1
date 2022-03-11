@@ -604,6 +604,35 @@ Task $task {
     }
 }
 
+function New-TextFile {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [string]
+        $Name,
+        [Parameter()]
+        [int]
+        $Byte = [Math]::Pow(1024, 3),
+        [Parameter()]
+        [int]
+        $Basis = [Math]::Pow(1024, 2)
+    )
+    begin {
+        if (Test-Path $Name) {
+            Write-Error 'overrides currently not supported.'
+            return
+        }
+        $Remains = $Byte % $Basis
+        $Per = $Byte / $Basis
+    }
+    process {
+        1..$Per | ForEach-Object { 'x' * $Basis | Add-Content $Name -Encoding ascii -NoNewline }
+        if ($Remains -ne 0) {
+            'x' * $Remains | Add-Content $Name -Encoding ascii -NoNewline
+        }
+    }
+}
+
 # Don't use '$psake' named variable because Invoke-psake has broken if uses the '$psake'.
 $psakeCommand = Get-Command -Name Invoke-psake -ErrorAction SilentlyContinue
 if ($psakeCommand) {
