@@ -312,8 +312,11 @@ function Update-InstalledModules {
 }
 
 function Update-PipModules {
-    $firstTime = -not (Get-Command pip -ErrorAction SilentlyContinue) -and
-        (Get-Command pyenv -ErrorAction SilentlyContinue)
+    if (-not (Get-Command pyenv -ErrorAction SilentlyContinue)) {
+        Write-Error "Install pyenv with command below. 'choco install pyenv-win -y'"
+        return
+    }
+    $firstTime = -not (Get-Command pip -ErrorAction SilentlyContinue)
     if ($firstTime) {
         $latest = pyenv install -l | Where-Object -FilterScript { -not ($_ -match '[a-zA-Z]') } | Select-Object -Last 1
         pyenv install $latest
