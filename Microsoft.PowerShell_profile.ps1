@@ -174,7 +174,7 @@ function Set-GitGlobalConfig {
     git config --global core.autocrlf input
     git config --global core.ignorecase false
     git config --global core.quotepath false
-    git config --global core.pager LESSCHARSET=utf-8 less
+    git config --global core.pager 'LESSCHARSET=utf-8 less'
     git config --global core.sshcommand "'C:\Program Files\OpenSSH-Win64\ssh.exe'"
     git config --global core.excludesfile ~/.gitignore_global
     git config --global push.default simple
