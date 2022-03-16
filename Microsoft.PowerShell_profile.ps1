@@ -82,7 +82,7 @@ function Install-Modules {
 
 function Update-Profile {
     $params = @{
-        Uri     = https://gist.githubusercontent.com/krymtkts/f8af667c32b16fc28a815243b316c5be/raw/Microsoft.PowerShell_profile.ps1
+        Uri     = 'https://gist.githubusercontent.com/krymtkts/f8af667c32b16fc28a815243b316c5be/raw/Microsoft.PowerShell_profile.ps1'
         OutFile = ~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1
     }
     Invoke-WebRequest @params
