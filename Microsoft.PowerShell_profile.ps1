@@ -183,6 +183,20 @@ function Set-GitGlobalConfig {
     # TODO: add user configuration.
 }
 
+function Set-GPGConfig {
+    @'
+default-cache-ttl 86400
+max-cache-ttl 86400
+'@ | Set-Content "$env:APPDATA/gnupg/gpg-agent.conf"
+
+    # currently unused.
+    @'
+# loopback is not work with VS Code.
+# VS Code hang up if you commit with signing.
+# pinentry-mode loopback
+'@ | set-content "$env:APPDATA/gnupg/gpg.conf"
+}
+
 function Set-SelectedLocation {
     param(
         [ValidateSet("Add", "Move", "Open")]$Mode = "Move",
