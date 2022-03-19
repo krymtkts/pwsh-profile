@@ -81,13 +81,13 @@ function Install-Modules {
 }
 
 function Update-Profile {
+    $profilehome = ($PROFILE | Split-Path -Parent)
     $params = @{
         Uri     = 'https://gist.githubusercontent.com/krymtkts/f8af667c32b16fc28a815243b316c5be/raw/Microsoft.PowerShell_profile.ps1'
-        OutFile = ~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1
+        OutFile = "$profilehome/Microsoft.PowerShell_profile.ps1"
     }
     Invoke-WebRequest @params
 
-    $profilehome = ($PROFILE | Split-Path -Parent)
     if (-not (Test-Path "$profilehome\Microsoft.VSCode_profile.ps1")) {
         New-Item -ItemType HardLink -Path $profilehome -Name 'Microsoft.VSCode_profile.ps1' -Value "$profilehome\Microsoft.PowerShell_profile.ps1"
     }
