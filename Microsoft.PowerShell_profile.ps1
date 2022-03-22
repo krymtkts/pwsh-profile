@@ -546,7 +546,10 @@ function New-Password {
         # Length is password length.
         [Parameter(Mandatory = $True)]
         [int]
-        $Length
+        $Length,
+        [Parameter(Mandatory = $True)]
+        [switch]
+        $NoSymbol
     )
 
     begin {
@@ -558,7 +561,12 @@ function New-Password {
         $lowers = $uppers.ToLower()
         $digits = "123456789"
         $symbols = "!@#$%^&*()-=[];',./_+{}:`"<>?\|``~"
-        $chars = ($uppers + $lowers + $digits + $symbols).ToCharArray()
+        $chars = if ($NoSymbol) {
+            ($uppers + $lowers + $digits).ToCharArray()
+        }
+        else {
+            ($uppers + $lowers + $digits + $symbols).ToCharArray()
+        }
 
         do {
             $pwdChars = "".ToCharArray()
@@ -573,7 +581,7 @@ function New-Password {
                 $pwdChars += $char
             }
             $password = $pwdChars -join ""
-            $goodPassword = $hasDigit -and $hasSymbol
+            $goodPassword = $hasDigit -and ($NoSymbol -or $hasSymbol)
         } until ($goodPassword)
     }
 
