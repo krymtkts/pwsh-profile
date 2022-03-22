@@ -547,7 +547,7 @@ function New-Password {
         [Parameter(Mandatory = $True)]
         [int]
         $Length,
-        [Parameter(Mandatory = $True)]
+        [Parameter()]
         [switch]
         $NoSymbol
     )
