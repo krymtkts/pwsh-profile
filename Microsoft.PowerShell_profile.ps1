@@ -653,7 +653,7 @@ function New-TextFile {
         [string]
         $Name,
         [Parameter()]
-        [int]
+        [long]
         $Byte = [Math]::Pow(1024, 3),
         [Parameter()]
         [int]
