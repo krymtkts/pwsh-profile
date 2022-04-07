@@ -675,6 +675,44 @@ function New-TextFile {
     }
 }
 
+function ConvertFrom-Base64 {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]$Value
+    )
+    process {
+        $Value | ForEach-Object {
+            $bytes = [System.Convert]::FromBase64String($_)
+            $output = [System.Text.Encoding]::Default.GetString($bytes)
+            $output
+        }
+    }
+}
+
+function ConvertTo-Base64 {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]$Value
+    )
+    process {
+        $Value | ForEach-Object {
+            $bytes = [System.Convert]::FromBase64String($_)
+            $output = [System.Text.Encoding]::Default.GetString($bytes)
+            $output
+        }
+    }
+}
+
 # Don't use '$psake' named variable because Invoke-psake has broken if uses the '$psake'.
 $psakeCommand = Get-Command -Name Invoke-psake -ErrorAction SilentlyContinue
 if ($psakeCommand) {
