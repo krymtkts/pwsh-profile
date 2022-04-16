@@ -718,21 +718,23 @@ $psakeCommand = Get-Command -Name Invoke-psake -ErrorAction SilentlyContinue
 if ($psakeCommand) {
     Register-ArgumentCompleter -CommandName $psakeCommand.Name -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
-        "$wordToComplete, $commandAst, $cursorPosition" >> test.log
-        Get-ChildItem "$wordToComplete*.ps1" | Select-Object -ExpandProperty Name
+        # "invoke=> [$wordToComplete], [$commandAst], [$cursorPosition]" >> test.log
+        Get-ChildItem "$wordToComplete*.ps1" | Resolve-Path -Relative
     }
 
     Register-ArgumentCompleter -CommandName $psakeCommand.Name -ParameterName taskList -ScriptBlock {
         param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-        "$commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters" >> test.log
-        if ($commandAst -match '(?<file>[^\.]*\.ps1)') {
+        # "invoke tasklist=> [$commandName], [$parameterName], [$wordToComplete], [$commandAst], [$($fakeBoundParameters|Out-String)]" >> test.log
+        if ($commandAst -match '(?<file>[^ ]*\.ps1)') {
             $file = $Matches.file
         }
         else {
             $file = 'psakefile.ps1'
         }
-        & $commandName -buildFile $file -docs -nologo | Out-String -Stream | ForEach-Object { if ($_ -match "^[^ ]*") { $matches[0] } } | `
-            Where-Object { $_ -notin ('Name', '----', '') } | Where-Object { !$wordToComplete -or $_ -like "$wordToComplete*" }
+        # "psakefile tasklist=> [$file]" >> test.log
+        & $commandName -buildFile $file -docs -nologo | Out-String -Stream | Select-Object -Skip 3 | `
+            ForEach-Object { if ($_ -match "^[^ ]+") { $matches[0] } } | `
+            Where-Object { !$wordToComplete -or $_ -like "$wordToComplete*" }
     }
 }
 
