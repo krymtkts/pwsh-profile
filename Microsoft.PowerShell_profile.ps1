@@ -713,6 +713,34 @@ function ConvertTo-Base64 {
     }
 }
 
+function Remove-CurrentVirtualenv {
+    if (Test-Path pyproject.toml) {
+        poetry env list | Where-Object { $_ -like "*$(Get-Location | Split-Path -Leaf)*" } | Select-Object -First 1 | ForEach-Object { ($_ -split ' ')[0] }
+    }
+}
+
+function Set-AWSTemporaryCredential {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]$UserName
+    )
+    $env:AWS_REGION = 'ap-northeast-1'
+    $params = @{
+        SerialNumber = (Get-IAMMFADevice -UserName $UserName -ProfileName $UserName).SerialNumber
+        TokenCode    = (op item get 'AWS LLT' --otp)
+        ProfileName  = $UserName
+    }
+    $c = Get-STSSessionToken @params
+    $env:AWS_ACCESS_KEY_ID = $c.AccessKeyId
+    $env:AWS_SECRET_ACCESS_KEY = $c.SecretAccessKey
+    $env:AWS_SESSION_TOKEN = $c.SessionToken
+}
+
 # Don't use '$psake' named variable because Invoke-psake has broken if uses the '$psake'.
 $psakeCommand = Get-Command -Name Invoke-psake -ErrorAction SilentlyContinue
 if ($psakeCommand) {
