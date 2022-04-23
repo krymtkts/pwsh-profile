@@ -732,7 +732,7 @@ function Set-AWSTemporaryCredential {
     $env:AWS_REGION = 'ap-northeast-1'
     $params = @{
         SerialNumber = (Get-IAMMFADevice -UserName $UserName -ProfileName $UserName).SerialNumber
-        TokenCode    = (op item get 'AWS LLT' --otp)
+        TokenCode    = (op item get $UserName --otp)
         ProfileName  = $UserName
     }
     $c = Get-STSSessionToken @params
