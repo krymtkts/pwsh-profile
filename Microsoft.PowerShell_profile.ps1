@@ -719,26 +719,34 @@ function Remove-CurrentVirtualenv {
     }
 }
 
-function Set-AWSTemporaryCredential {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true,
-            Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String]$UserName
-    )
-    $env:AWS_REGION = 'ap-northeast-1'
-    $params = @{
-        SerialNumber = (Get-IAMMFADevice -UserName $UserName -ProfileName $UserName).SerialNumber
-        TokenCode    = (op item get $UserName --otp)
-        ProfileName  = $UserName
+if (Get-Command -Name op -ErrorAction SilentlyContinue) {
+    function Set-AWSTemporaryCredential {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory = $true,
+                Position = 0,
+                ValueFromPipeline = $true,
+                ValueFromPipelineByPropertyName = $true)]
+            [ValidateNotNullOrEmpty()]
+            [String]$UserName,
+            [Parameter(Mandatory = $true,
+                Position = 1,
+                ValueFromPipeline = $true,
+                ValueFromPipelineByPropertyName = $true)]
+            [ValidateNotNullOrEmpty()]
+            [String]$AWSLogin = 'AWS'
+        )
+        $env:AWS_REGION = 'ap-northeast-1'
+        $params = @{
+            SerialNumber = (Get-IAMMFADevice -UserName $UserName -ProfileName $UserName).SerialNumber
+            TokenCode    = (op item get $AWSLogin --otp)
+            ProfileName  = $UserName
+        }
+        $c = Get-STSSessionToken @params
+        $env:AWS_ACCESS_KEY_ID = $c.AccessKeyId
+        $env:AWS_SECRET_ACCESS_KEY = $c.SecretAccessKey
+        $env:AWS_SESSION_TOKEN = $c.SessionToken
     }
-    $c = Get-STSSessionToken @params
-    $env:AWS_ACCESS_KEY_ID = $c.AccessKeyId
-    $env:AWS_SECRET_ACCESS_KEY = $c.SecretAccessKey
-    $env:AWS_SESSION_TOKEN = $c.SessionToken
 }
 
 function Get-IAMPolicyDocument {
