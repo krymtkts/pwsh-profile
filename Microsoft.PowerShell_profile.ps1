@@ -741,6 +741,63 @@ function Set-AWSTemporaryCredential {
     $env:AWS_SESSION_TOKEN = $c.SessionToken
 }
 
+function Get-IAMPolicyDocument {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]$PolicyArn
+    )
+    $d = Get-IAMPolicy -PolicyArn $PolicyArn | ForEach-Object {
+        Get-IAMPolicyVersion -PolicyArn $_.Arn -VersionId $_.DefaultVersionId
+    }
+    [System.Reflection.Assembly]::LoadWithPartialName("System.Web.HttpUtility") | Out-Null
+    [System.Web.HttpUtility]::UrlDecode($d.Document)
+}
+
+function Get-IAMRolePolicyDocument {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]$RoleName
+    )
+    $i = Get-IAMRole -RoleName $RoleName
+    [System.Reflection.Assembly]::LoadWithPartialName("System.Web.HttpUtility") | Out-Null
+    [System.Web.HttpUtility]::UrlDecode($i.AssumeRolePolicyDocument) | ConvertFrom-Json | ConvertTo-Json -Depth 10
+}
+
+function tail {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [System.Text.Encoding]
+        $Encoding = [System.Text.Encoding]::UTF8,
+        # Specifies a path to one or more locations.
+        [Parameter(
+            Position = 0,
+            ParameterSetName = "Path",
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = "Path to one or more locations.")]
+        [Alias("PSPath")]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Path,
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [int]
+        $N = 10
+    )
+    Get-Content -Path $Path -Wait -Encoding $Encoding -Tail $N
+}
+
 # Don't use '$psake' named variable because Invoke-psake has broken if uses the '$psake'.
 $psakeCommand = Get-Command -Name Invoke-psake -ErrorAction SilentlyContinue
 if ($psakeCommand) {
