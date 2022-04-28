@@ -54,7 +54,7 @@ function Install-NonExistsModule {
     process {
         foreach ($n in $Name) {
             Write-Debug $n
-            if (!($modules | Where-Object -Property Name -eq $n)) {
+            if (!($modules | Where-Object -Property Name -EQ $n)) {
                 Install-Module -Name $n -AllowPrerelease -AllowClobber -Scope AllUsers
             }
             $n
@@ -70,7 +70,7 @@ function Install-AWSModules {
 
 function Initialize-PackageSource {
     Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-    $url = "https://api.nuget.org/v3/index.json"
+    $url = 'https://api.nuget.org/v3/index.json'
     Register-PackageSource -Name NuGet -Location $url -ProviderName NuGet -Trusted
 }
 
@@ -134,7 +134,7 @@ function Update-GUIRegistryValues {
 
     $new = @() + $org
     $new[12] = 0x01
-    Set-ItemProperty $path -name $key -Value $new
+    Set-ItemProperty $path -Name $key -Value $new
 
     $path = 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32'
     New-Item -Path $path -Force
@@ -161,7 +161,7 @@ function Remove-GitGoneBranches {
     if ($Force) {
         $deleteFlag = '-D'
     }
-    git branch --format "%(refname:short)=%(upstream:track)" | Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object  -ExpandProperty Keys | ForEach-Object { git branch $deleteFlag $_ }
+    git branch --format '%(refname:short)=%(upstream:track)' | Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object  -ExpandProperty Keys | ForEach-Object { git branch $deleteFlag $_ }
 }
 
 function Get-GitGraph {
@@ -194,31 +194,31 @@ max-cache-ttl 86400
 # loopback is not work with VS Code.
 # VS Code hang up if you commit with signing.
 # pinentry-mode loopback
-'@ | set-content "$env:APPDATA/gnupg/gpg.conf"
+'@ | Set-Content "$env:APPDATA/gnupg/gpg.conf"
 }
 
 function Set-SelectedLocation {
     param(
-        [ValidateSet("Add", "Move", "Open")]$Mode = "Move",
+        [ValidateSet('Add', 'Move', 'Open')]$Mode = 'Move',
         [string]$Location,
         [switch]$Here
     )
     switch ($Mode) {
-        "Add" {
+        'Add' {
             if ($Location) {
-                Write-Output "$Location" | Out-File -Append -Encoding UTF8 "~/.poco-cd"
+                Write-Output "$Location" | Out-File -Append -Encoding UTF8 '~/.poco-cd'
                 break
             }
             elseif ($Here) {
-                Write-Output "$(Get-Location)" | Out-File -Append -Encoding UTF8 "~/.poco-cd"
+                Write-Output "$(Get-Location)" | Out-File -Append -Encoding UTF8 '~/.poco-cd'
             }
         }
-        "Move" {
-            Get-Content -Path "~/.poco-cd" | Select-Poco -CaseSensitive | Select-Object -First 1 | Set-Location
+        'Move' {
+            Get-Content -Path '~/.poco-cd' | Select-Poco -CaseSensitive | Select-Object -First 1 | Set-Location
             break
         }
-        "Open" {
-            Get-Content -Path "~/.poco-cd" | Select-Poco -CaseSensitive | Select-Object -First 1 | Invoke-Item
+        'Open' {
+            Get-Content -Path '~/.poco-cd' | Select-Poco -CaseSensitive | Select-Object -First 1 | Invoke-Item
             break
         }
     }
@@ -232,22 +232,22 @@ Set-Alias pii Invoke-SelectedLocation -Option AllScope
 
 function Open-VSCodeWorkspace {
     param(
-        [ValidateSet("Add", "Open")]$Mode = "Open",
+        [ValidateSet('Add', 'Open')]$Mode = 'Open',
         # Specifies a path to one or more locations.
         [Parameter(
             Position = 0,
-            ParameterSetName = "Path",
+            ParameterSetName = 'Path',
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = "Path to one or more locations.")]
-        [Alias("PSPath")]
+            HelpMessage = 'Path to one or more locations.')]
+        [Alias('PSPath')]
         [ValidateNotNullOrEmpty()]
         [string[]]
         $Path
     )
-    $file = "~/.code-ws"
+    $file = '~/.code-ws'
     switch ($Mode) {
-        "Add" {
+        'Add' {
             if ($Path -and (Test-Path($Path))) {
                 (Resolve-Path $Path).Path | Out-File -Append -Encoding UTF8 $file
                 break
@@ -256,7 +256,7 @@ function Open-VSCodeWorkspace {
                 Write-Host 'no .code-workspace found.'
             }
         }
-        "Open" {
+        'Open' {
             $ws = Get-Content -Path $file | Where-Object { !$_.StartsWith('#') } | Select-Poco -CaseSensitive | Select-Object -First 1
             if ($ws) {
                 code $ws
@@ -269,7 +269,7 @@ Set-Alias codeof Open-VSCodeWorkspace -Option AllScope
 
 
 function Set-SelectedRepository {
-    ghq list | Select-Poco | Select-Object -First 1 | % { Set-Location "$(ghq root)/$_" }
+    ghq list | Select-Poco | Select-Object -First 1 | ForEach-Object { Set-Location "$(ghq root)/$_" }
 }
 Set-Alias gcd Set-SelectedRepository -Option AllScope
 
@@ -318,11 +318,11 @@ Set-Alias ~ cu -Option AllScope
 
 # Helper function to edit hosts file.
 function Edit-Hosts {
-    Start-Process notepad c:\windows\system32\drivers\etc\hosts -verb runas
+    Start-Process notepad c:\windows\system32\drivers\etc\hosts -Verb runas
 }
 
 function Update-InstalledModules {
-    Get-InstalledModule | Where-Object -Property Repository -eq 'PSGallery' | Update-Module -AllowPrerelease -Scope AllUsers
+    Get-InstalledModule | Where-Object -Property Repository -EQ 'PSGallery' | Update-Module -AllowPrerelease -Scope AllUsers
 }
 
 function Update-PipModules {
@@ -346,10 +346,10 @@ function Update-PipModules {
         pip install ($list -join ' ')
     }
     else {
-        pip list --outdated | ForEach-Object { [string]::Join(',', $_ -split "\s+") } | `
-            ConvertFrom-Csv -Header Package, Version, Latest, Type | `
-            Select-Object -Property Package -Skip 2 | `
-            ForEach-Object { pip install -U $_.Package }
+        pip list --outdated | ForEach-Object { [string]::Join(',', $_ -split '\s+') } | `
+                ConvertFrom-Csv -Header Package, Version, Latest, Type | `
+                Select-Object -Property Package -Skip 2 | `
+                ForEach-Object { pip install -U $_.Package }
     }
 }
 
@@ -370,7 +370,7 @@ function Update-NodeModules {
         # TODO:
     }
     if (-not (Test-Path ~/.textlint)) {
-        @"
+        @'
 {
   "filters": {},
   "rules": {
@@ -380,7 +380,7 @@ function Update-NodeModules {
     "write-good": true
   }
 }
-"@ | Set-Content ~/.textlintrc -Encoding utf8
+'@ | Set-Content ~/.textlintrc -Encoding utf8
     }
 }
 
@@ -392,7 +392,7 @@ function Install-GoModules {
     $mods | ForEach-Object {
         $start = $_.LastIndexOf('/') + 1
         $name = $_.Substring($start, $_.Length - '@latest'.Length - $start)
-        if (-not (get-command "*$name*" -ErrorAction SilentlyContinue)) {
+        if (-not (Get-Command "*$name*" -ErrorAction SilentlyContinue)) {
             go install $_
         }
     }
@@ -455,7 +455,7 @@ function UC {
     )
     process {
         foreach ($c in $s) {
-            [Convert]::ToInt32($c -as [char]).ToString("x")
+            [Convert]::ToInt32($c -as [char]).ToString('x')
         }
     }
 }
@@ -481,11 +481,11 @@ function Convert-0xTo10 {
 # it will happend after updating Windows OpenSSH.
 if (! ($SshAgent = (Get-Service -Name 'ssh-agent' -ErrorAction SilentlyContinue))) {
     install-sshd.ps1
-    Set-Service -Name "ssh-agent" -StartupType Automatic
+    Set-Service -Name 'ssh-agent' -StartupType Automatic
     Start-Service ssh-agent
 }
 elseif ($SshAgent.StartType -eq 'Disabled') {
-    Set-Service -Name "ssh-agent" -StartupType Automatic
+    Set-Service -Name 'ssh-agent' -StartupType Automatic
     Start-Service ssh-agent
 }
 else {
@@ -528,10 +528,10 @@ function find {
     process {
         foreach ($n in $Name) {
             if ($delete) {
-                Get-ChildItem -Recurse -Path $path | Where-Object -Property Name -like $n | Remove-Item
+                Get-ChildItem -Recurse -Path $path | Where-Object -Property Name -Like $n | Remove-Item
             }
             else {
-                Get-ChildItem -Recurse -Path $path | Where-Object -Property Name -like $n
+                Get-ChildItem -Recurse -Path $path | Where-Object -Property Name -Like $n
             }
         }
     }
@@ -557,9 +557,9 @@ function New-Password {
     }
 
     process {
-        $uppers = "ABCDEFGHIJKLMNPQRSTUVWXYZ"
+        $uppers = 'ABCDEFGHIJKLMNPQRSTUVWXYZ'
         $lowers = $uppers.ToLower()
-        $digits = "123456789"
+        $digits = '123456789'
         $symbols = "!@#$%^&*()-=[];',./_+{}:`"<>?\|``~"
         $chars = if ($NoSymbol) {
             ($uppers + $lowers + $digits).ToCharArray()
@@ -569,7 +569,7 @@ function New-Password {
         }
 
         do {
-            $pwdChars = "".ToCharArray()
+            $pwdChars = ''.ToCharArray()
             $goodPassword = $false
             $hasDigit = $false
             $hasSymbol = $false
@@ -580,7 +580,7 @@ function New-Password {
                 if ($symbols.Contains($char)) { $hasSymbol = $true }
                 $pwdChars += $char
             }
-            $password = $pwdChars -join ""
+            $password = $pwdChars -join ''
             $goodPassword = $hasDigit -and ($NoSymbol -or $hasSymbol)
         } until ($goodPassword)
     }
@@ -706,9 +706,8 @@ function ConvertTo-Base64 {
     )
     process {
         $Value | ForEach-Object {
-            $bytes = [System.Convert]::FromBase64String($_)
-            $output = [System.Text.Encoding]::Default.GetString($bytes)
-            $output
+            # TODO: add encoding.
+            [System.Convert]::ToBase64String($_.ToCharArray())
         }
     }
 }
@@ -762,7 +761,7 @@ function Get-IAMPolicyDocument {
     $d = Get-IAMPolicy -PolicyArn $PolicyArn | ForEach-Object {
         Get-IAMPolicyVersion -PolicyArn $_.Arn -VersionId $_.DefaultVersionId
     }
-    [System.Reflection.Assembly]::LoadWithPartialName("System.Web.HttpUtility") | Out-Null
+    [System.Reflection.Assembly]::LoadWithPartialName('System.Web.HttpUtility') | Out-Null
     [System.Web.HttpUtility]::UrlDecode($d.Document)
 }
 
@@ -777,7 +776,7 @@ function Get-IAMRolePolicyDocument {
         [String]$RoleName
     )
     $i = Get-IAMRole -RoleName $RoleName
-    [System.Reflection.Assembly]::LoadWithPartialName("System.Web.HttpUtility") | Out-Null
+    [System.Reflection.Assembly]::LoadWithPartialName('System.Web.HttpUtility') | Out-Null
     [System.Web.HttpUtility]::UrlDecode($i.AssumeRolePolicyDocument) | ConvertFrom-Json | ConvertTo-Json -Depth 10
 }
 
@@ -790,11 +789,11 @@ function tail {
         # Specifies a path to one or more locations.
         [Parameter(
             Position = 0,
-            ParameterSetName = "Path",
+            ParameterSetName = 'Path',
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = "Path to one or more locations.")]
-        [Alias("PSPath")]
+            HelpMessage = 'Path to one or more locations.')]
+        [Alias('PSPath')]
         [ValidateNotNullOrEmpty()]
         [string]
         $Path,
@@ -826,8 +825,8 @@ if ($psakeCommand) {
         }
         # "psakefile tasklist=> [$file]" >> test.log
         & $commandName -buildFile $file -docs -nologo | Out-String -Stream | Select-Object -Skip 3 | `
-            ForEach-Object { if ($_ -match "^[^ ]+") { $matches[0] } } | `
-            Where-Object { !$wordToComplete -or $_ -like "$wordToComplete*" }
+                ForEach-Object { if ($_ -match '^[^ ]+') { $matches[0] } } | `
+                Where-Object { !$wordToComplete -or $_ -like "$wordToComplete*" }
     }
 }
 
