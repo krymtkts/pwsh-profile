@@ -9,7 +9,7 @@ $completions = @(
 $names = @(
     # Prepare basic utilities
     'PSReadLine', 'ClipboardText'
-    'oh-my-posh', 'PowerShellGet', 'poco', 'Get-GzipContent'
+    'PowerShellGet', 'poco', 'Get-GzipContent'
     'powershell-yaml'
     # Prepare for PowerShell
     'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake', 'PSProfiler'
@@ -492,13 +492,6 @@ else {
     Start-Service ssh-agent
 }
 
-if (Get-Command Set-PoshPrompt -ErrorAction SilentlyContinue) {
-    Set-PoshPrompt -Theme ~/.oh-my-posh.omp.json
-}
-else {
-    Set-Theme krymtkts
-}
-
 $Horns = [char]::ConvertFromUtf32(0x1f918)
 Write-Host "$Horns posh $($PSVersionTable.PSVersion.ToString()) is ready $Horns"
 # Chocolatey profile
@@ -806,7 +799,7 @@ function tail {
 }
 
 # Don't use '$psake' named variable because Invoke-psake has broken if uses the '$psake'.
-$psakeCommand = Get-Command -Name Invoke-psake -ErrorAction SilentlyContinue
+$psakeCommand = Get-Command -Name Invoke-cpsake -ErrorAction SilentlyContinue
 if ($psakeCommand) {
     Register-ArgumentCompleter -CommandName $psakeCommand.Name -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
@@ -834,4 +827,9 @@ if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
     fnm env --use-on-cd | Out-String | Invoke-Expression
     fnm completions --shell powershell | Out-String | Invoke-Expression
     Get-ChildItem "$env:FNM_MULTISHELL_PATH/../" | Where-Object -Property CreationTime -LE (Get-Date).AddDays(-1) | Remove-Item
+}
+
+# set a prompt theme.
+if (Get-Command -Name oh-my-posh -ErrorAction SilentlyContinue) {
+    oh-my-posh init pwsh --config ~/.oh-my-posh.omp.json | Invoke-Expression
 }
