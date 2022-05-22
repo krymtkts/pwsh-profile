@@ -83,7 +83,7 @@ function Install-Modules {
 function Update-Profile {
     $profilehome = ($PROFILE | Split-Path -Parent)
     $params = @{
-        Uri     = 'https://gist.githubusercontent.com/krymtkts/f8af667c32b16fc28a815243b316c5be/raw/Microsoft.PowerShell_profile.ps1'
+        Uri = 'https://gist.githubusercontent.com/krymtkts/f8af667c32b16fc28a815243b316c5be/raw/Microsoft.PowerShell_profile.ps1'
         OutFile = "$profilehome/Microsoft.PowerShell_profile.ps1"
     }
     Invoke-WebRequest @params
@@ -100,7 +100,7 @@ function Edit-TerminalIcons {
         return
     }
     $params = @{
-        Uri     = 'https://gist.githubusercontent.com/krymtkts/4457a23124b2db860a6b32eba6490b03/raw/glyphs.ps1'
+        Uri = 'https://gist.githubusercontent.com/krymtkts/4457a23124b2db860a6b32eba6490b03/raw/glyphs.ps1'
         OutFile = "$(Split-Path $ti.Path -Parent)\Data\glyphs.ps1"
     }
     Invoke-WebRequest @params
@@ -113,7 +113,7 @@ function Edit-EverMonkey {
         return
     }
     $params = @{
-        Uri     = 'https://gist.githubusercontent.com/krymtkts/8a5a3a5a7e1efe9db7f2c6bbda337571/raw/converterplus.js'
+        Uri = 'https://gist.githubusercontent.com/krymtkts/8a5a3a5a7e1efe9db7f2c6bbda337571/raw/converterplus.js'
         OutFile = "$evermonkey\out\src\converterplus.js"
     }
     Invoke-WebRequest @params
@@ -121,7 +121,7 @@ function Edit-EverMonkey {
 
 function Update-PoshTheme {
     $params = @{
-        Uri     = 'https://gist.githubusercontent.com/krymtkts/d320ff5ec30fa47b138c2df018f95423/raw/.oh-my-posh.omp.json'
+        Uri = 'https://gist.githubusercontent.com/krymtkts/d320ff5ec30fa47b138c2df018f95423/raw/.oh-my-posh.omp.json'
         OutFile = '~/.oh-my-posh.omp.json'
     }
     Invoke-WebRequest @params
@@ -161,7 +161,7 @@ function Remove-GitGoneBranches {
     if ($Force) {
         $deleteFlag = '-D'
     }
-    git branch --format '%(refname:short)=%(upstream:track)' | Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object  -ExpandProperty Keys | ForEach-Object { git branch $deleteFlag $_ }
+    git branch --format '%(refname:short)=%(upstream:track)' | Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object -ExpandProperty Keys | ForEach-Object { git branch $deleteFlag $_ }
 }
 
 function Get-GitGraph {
@@ -206,12 +206,15 @@ function Set-SelectedLocation {
     switch ($Mode) {
         'Add' {
             if ($Location) {
-                Write-Output "$Location" | Out-File -Append -Encoding UTF8 '~/.poco-cd'
-                break
+                $current = Get-Content '~/.poco-cd'
+                $current += "$Location"
+
             }
             elseif ($Here) {
-                Write-Output "$(Get-Location)" | Out-File -Append -Encoding UTF8 '~/.poco-cd'
+                $current = Get-Content '~/.poco-cd'
+                $current += "$(Get-Location)"
             }
+            $current | Get-Unique | Out-File -Encoding UTF8 '~/.poco-cd'
         }
         'Move' {
             Get-Content -Path '~/.poco-cd' | Select-Poco -CaseSensitive | Select-Object -First 1 | Set-Location
@@ -249,7 +252,9 @@ function Open-VSCodeWorkspace {
     switch ($Mode) {
         'Add' {
             if ($Path -and (Test-Path($Path))) {
-                (Resolve-Path $Path).Path | Out-File -Append -Encoding UTF8 $file
+                $current = Get-Content $file
+                $current += (Resolve-Path $Path).Path
+                $current | Get-Unique | Out-File -Encoding UTF8 $file
                 break
             }
             else {
@@ -278,7 +283,7 @@ function Show-Paths() {
 }
 
 function Show-ReadLineHistory() {
-    Get-Content -Path (Get-PSReadlineOption).HistorySavePath | Select-Object -Unique | Select-Poco -CaseSensitive
+    Get-Content -Path (Get-PSReadLineOption).HistorySavePath | Select-Object -Unique | Select-Poco -CaseSensitive
 }
 Set-Alias pghy Show-ReadLineHistory -Option AllScope
 
@@ -731,8 +736,8 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
         $env:AWS_REGION = 'ap-northeast-1'
         $params = @{
             SerialNumber = (Get-IAMMFADevice -UserName $UserName -ProfileName $UserName).SerialNumber
-            TokenCode    = (op item get $AWSLogin --otp)
-            ProfileName  = $UserName
+            TokenCode = (op item get $AWSLogin --otp)
+            ProfileName = $UserName
         }
         $c = Get-STSSessionToken @params
         $env:AWS_ACCESS_KEY_ID = $c.AccessKeyId
