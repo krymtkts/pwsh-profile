@@ -373,7 +373,7 @@ function Update-NodeModules {
         npm install -g fast-cli serverless textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good yarn
     }
     else {
-        # TODO:
+        npm update -g
     }
     if (-not (Test-Path ~/.textlint)) {
         @'
@@ -404,11 +404,23 @@ function Install-GoModules {
     }
 }
 
+function Update-GoModules {
+    ll $env:GOPATH/bin | ForEach-Object {
+        go version -m $_
+    } | Where-Object {
+        $_ -like '*path*'
+    } | ConvertFrom-StringData -Delimiter "`t" | Select-Object -ExpandProperty Values | ForEach-Object {
+        go install "${_}@latest"
+    }
+}
+
 # Helper function to execute choco upgrade.
 function Update-Packages {
     Update-InstalledModules
-    Update-AWSToolsModule -Scope AllUsers -Force
+    Update-AWSToolsModule -Scope AllUsers -Force -CleanUp
     Update-PipModules
+    Update-NodeModules
+    Update-GoModules
 }
 
 function New-EmptyFIle([parameter(mandatory)][string]$Name) {
