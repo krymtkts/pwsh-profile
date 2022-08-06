@@ -64,7 +64,8 @@ function Install-NonExistsModule {
 
 function Install-AWSModules {
     if ($awsServices) {
-        Install-AWSToolsModule -Name $awsServices -Scope AllUsers -Force
+        Find-Module -Name Get-GzipContent | Out-Null # for workaround.
+        Install-AWSToolsModule -Name $awsServices -Scope AllUsers -Force -CleanUp
     }
 }
 
@@ -720,20 +721,19 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
     function Set-AWSTemporaryCredential {
         [CmdletBinding()]
         param (
-            [Parameter(Mandatory = $true,
-                Position = 0,
-                ValueFromPipeline = $true,
-                ValueFromPipelineByPropertyName = $true)]
+            [Parameter(Mandatory)]
             [ValidateNotNullOrEmpty()]
             [String]$UserName,
-            [Parameter(Mandatory = $true,
-                Position = 1,
-                ValueFromPipeline = $true,
-                ValueFromPipelineByPropertyName = $true)]
+            [Parameter()]
             [ValidateNotNullOrEmpty()]
-            [String]$AWSLogin = 'AWS'
+            [String]$ProfileName = $UserName,
+            [Parameter(Mandatory)]
+            [ValidateNotNullOrEmpty()]
+            [String]$AWSLogin,
+            [Parameter()]
+            $AWSRegion = 'ap-northeast-1'
         )
-        $env:AWS_REGION = 'ap-northeast-1'
+        $env:AWS_REGION = $AWSRegion
         $params = @{
             SerialNumber = (Get-IAMMFADevice -UserName $UserName -ProfileName $UserName).SerialNumber
             TokenCode = (op item get $AWSLogin --otp)
@@ -743,6 +743,24 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
         $env:AWS_ACCESS_KEY_ID = $c.AccessKeyId
         $env:AWS_SECRET_ACCESS_KEY = $c.SecretAccessKey
         $env:AWS_SESSION_TOKEN = $c.SessionToken
+    }
+}
+
+if (Get-Command -Name cdk -ErrorAction SilentlyContinue) {
+    function Invoke-CdkBootstrap {
+        [CmdletBinding()]
+        param (
+            [Parameter()]
+            [String]$ProfileName
+        )
+        $env:AWS_REGION = 'ap-northeast-1'
+        $ci = Get-STSCallerIdentity
+        if ($ProfileName) {
+            cdk bootstrap "aws://$($ci.Account)/$($env:AWS_REGION)" --profile $ProfileName
+        }
+        else {
+            cdk bootstrap "aws://$($ci.Account)/$($env:AWS_REGION)"
+        }
     }
 }
 
@@ -778,6 +796,27 @@ function Get-IAMRolePolicyDocument {
     [System.Web.HttpUtility]::UrlDecode($i.AssumeRolePolicyDocument) | ConvertFrom-Json | ConvertTo-Json -Depth 10
 }
 
+function ConvertFrom-CloudFrontAccessLog {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Path to one or more locations.')]
+        [Alias('PSPath')]
+        [ValidateNotNullOrEmpty()]
+        [string[]]
+        $Path
+    )
+    begin {
+        $header = 'date', 'time', 'x-edge-location', 'sc-bytes', 'c-ip', 'cs-method', 'cs(Host)', 'cs-uri-stem', 'sc-status', 'cs(Referer)', 'cs(User-Agent)', 'cs-uri-query', 'cs(Cookie)', 'x-edge-result-type', 'x-edge-request-id', 'x-host-header', 'cs-protocol', 'cs-bytes', 'time-taken', 'x-forwarded-for', 'ssl-protocol', 'ssl-cipher', 'x-edge-response-result-type', 'cs-protocol-version', 'fle-status', 'fle-encrypted-fields', 'c-port', 'time-to-first-byte', 'x-edge-detailed-result-type', 'sc-content-type', 'sc-content-len', 'sc-range-start', 'sc-range-end'
+    }
+    process {
+        $Path | ForEach-Object { (zcat $_) -split "`n" } | ConvertFrom-Csv -Delimiter "`t" -Header $header
+    }
+}
+
 function tail {
     [CmdletBinding()]
     param (
@@ -801,6 +840,16 @@ function tail {
         $N = 10
     )
     Get-Content -Path $Path -Wait -Encoding $Encoding -Tail $N
+}
+
+function Get-UnixTimeSeconds {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [datetime]
+        $date = (Get-Date)
+    )
+    [Math]::Truncate(($date - (Get-Date -UnixTimeSeconds 0)).TotalSeconds)
 }
 
 # Don't use '$psake' named variable because Invoke-psake has broken if uses the '$psake'.
