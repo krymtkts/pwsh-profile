@@ -731,39 +731,39 @@ function Remove-CurrentVirtualenv {
 
 if (Get-Command -Name op -ErrorAction SilentlyContinue) {
     function Get-AWSTemporaryCredential {
-        [CmdletBinding()]
+        [CmdletBinding(DefaultParameterSetName = 'Default')]
         param (
-            [Parameter(Mandatory)]
-            [ValidateNotNullOrEmpty()]
-            [String]$UserName,
             [Parameter()]
             [ValidateNotNullOrEmpty()]
             [String]$ProfileName = $UserName,
-            [Parameter(Mandatory)]
+            [Parameter(ParameterSetName = 'MFA', Mandatory)]
             [ValidateNotNullOrEmpty()]
+            [String]$UserName,
+            [Parameter(ParameterSetName = 'MFA', Mandatory)]
             [String]$AWSLogin,
             [Parameter()]
             $AWSRegion = 'ap-northeast-1'
         )
         $params = @{
-            SerialNumber = (Get-IAMMFADevice -UserName $UserName -ProfileName $ProfileName -Region $AWSRegion).SerialNumber
-            TokenCode = (op item get $AWSLogin --otp)
             ProfileName = $ProfileName
             Region = $AWSRegion
+        }
+        if ($AWSLogin) {
+            $params.SerialNumber = (Get-IAMMFADevice -UserName $UserName -ProfileName $ProfileName -Region $AWSRegion).SerialNumber
+            $params.TokenCode = (op item get $AWSLogin --otp)
         }
         Get-STSSessionToken @params
     }
     function Set-AWSTemporaryCredential {
-        [CmdletBinding()]
+        [CmdletBinding(DefaultParameterSetName = 'Default')]
         param (
-            [Parameter(Mandatory)]
-            [ValidateNotNullOrEmpty()]
-            [String]$UserName,
             [Parameter()]
             [ValidateNotNullOrEmpty()]
             [String]$ProfileName = $UserName,
-            [Parameter(Mandatory)]
+            [Parameter(ParameterSetName = 'MFA', Mandatory)]
             [ValidateNotNullOrEmpty()]
+            [String]$UserName,
+            [Parameter(ParameterSetName = 'MFA', Mandatory)]
             [String]$AWSLogin,
             [Parameter()]
             $AWSRegion = 'ap-northeast-1'
@@ -781,54 +781,52 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
         $env:AWS_SESSION_TOKEN = $c.SessionToken
     }
     function Get-AWSRoleCredential {
-        [CmdletBinding()]
+        [CmdletBinding(DefaultParameterSetName = 'Default')]
         param (
             [Parameter(Mandatory)]
             [ValidateNotNullOrEmpty()]
+            [String]$RoleName,
+            [Parameter(Mandatory)]
+            [ValidateNotNullOrEmpty()]
+            [String]$RoleSessionName,
+            [Parameter(ParameterSetName = 'MFA', Mandatory)]
             [String]$UserName,
+            [Parameter(ParameterSetName = 'MFA', Mandatory)]
+            [String]$AWSLogin,
             [Parameter()]
             [ValidateNotNullOrEmpty()]
             [String]$ProfileName = $UserName,
-            [Parameter()]
-            [ValidateNotNullOrEmpty()]
-            [String]$RoleName,
-            [Parameter()]
-            [ValidateNotNullOrEmpty()]
-            [String]$RoleSessionName,
-            [Parameter(Mandatory)]
-            [ValidateNotNullOrEmpty()]
-            [String]$AWSLogin,
             [Parameter()]
             $AWSRegion = 'ap-northeast-1'
         )
         $params = @{
             RoleArn = "arn:aws:iam::$((Get-STSCallerIdentity -ProfileName $ProfileName -Region $AWSRegion).Account):role/$RoleName"
             RoleSessionName = $RoleSessionName
-            SerialNumber = (Get-IAMMFADevice -UserName $UserName -ProfileName $ProfileName -Region $AWSRegion).SerialNumber
-            TokenCode = (op item get 'AWS LLT' --otp)
             ProfileName = $ProfileName
             Region = $AWSRegion
+        }
+        if ($AWSLogin) {
+            $params.SerialNumber = (Get-IAMMFADevice -UserName $UserName -ProfileName $ProfileName -Region $AWSRegion).SerialNumber
+            $params.TokenCode = (op item get $AWSLogin --otp)
         }
         Use-STSRole @params | Select-Object -ExpandProperty Credentials
     }
     function Set-AWSRoleCredential {
-        [CmdletBinding()]
+        [CmdletBinding(DefaultParameterSetName = 'Default')]
         param (
             [Parameter(Mandatory)]
             [ValidateNotNullOrEmpty()]
+            [String]$RoleName,
+            [Parameter(Mandatory)]
+            [ValidateNotNullOrEmpty()]
+            [String]$RoleSessionName,
+            [Parameter(ParameterSetName = 'MFA', Mandatory)]
             [String]$UserName,
+            [Parameter(ParameterSetName = 'MFA', Mandatory)]
+            [String]$AWSLogin,
             [Parameter()]
             [ValidateNotNullOrEmpty()]
             [String]$ProfileName = $UserName,
-            [Parameter()]
-            [ValidateNotNullOrEmpty()]
-            [String]$RoleName,
-            [Parameter()]
-            [ValidateNotNullOrEmpty()]
-            [String]$RoleSessionName,
-            [Parameter(Mandatory)]
-            [ValidateNotNullOrEmpty()]
-            [String]$AWSLogin,
             [Parameter()]
             $AWSRegion = 'ap-northeast-1'
         )
