@@ -730,6 +730,29 @@ function Remove-CurrentVirtualenv {
 }
 
 if (Get-Command -Name op -ErrorAction SilentlyContinue) {
+    function Get-AWSTemporaryCredential {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory)]
+            [ValidateNotNullOrEmpty()]
+            [String]$UserName,
+            [Parameter()]
+            [ValidateNotNullOrEmpty()]
+            [String]$ProfileName = $UserName,
+            [Parameter(Mandatory)]
+            [ValidateNotNullOrEmpty()]
+            [String]$AWSLogin,
+            [Parameter()]
+            $AWSRegion = 'ap-northeast-1'
+        )
+        $params = @{
+            SerialNumber = (Get-IAMMFADevice -UserName $UserName -ProfileName $ProfileName -Region $AWSRegion).SerialNumber
+            TokenCode = (op item get $AWSLogin --otp)
+            ProfileName = $ProfileName
+            Region = $AWSRegion
+        }
+        Get-STSSessionToken @params
+    }
     function Set-AWSTemporaryCredential {
         [CmdletBinding()]
         param (
@@ -746,12 +769,79 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
             $AWSRegion = 'ap-northeast-1'
         )
         $env:AWS_REGION = $AWSRegion
-        $params = @{
-            SerialNumber = (Get-IAMMFADevice -UserName $UserName -ProfileName $UserName).SerialNumber
-            TokenCode = (op item get $AWSLogin --otp)
-            ProfileName = $UserName
+        $p = @{
+            UserName = $UserName
+            ProfileName = $ProfileName
+            AWSLogin = $AWSLogin
+            AWSRegion = $AWSRegion
         }
-        $c = Get-STSSessionToken @params
+        $c = Get-AWSTemporaryCredential @p
+        $env:AWS_ACCESS_KEY_ID = $c.AccessKeyId
+        $env:AWS_SECRET_ACCESS_KEY = $c.SecretAccessKey
+        $env:AWS_SESSION_TOKEN = $c.SessionToken
+    }
+    function Get-AWSRoleCredential {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory)]
+            [ValidateNotNullOrEmpty()]
+            [String]$UserName,
+            [Parameter()]
+            [ValidateNotNullOrEmpty()]
+            [String]$ProfileName = $UserName,
+            [Parameter()]
+            [ValidateNotNullOrEmpty()]
+            [String]$RoleName,
+            [Parameter()]
+            [ValidateNotNullOrEmpty()]
+            [String]$RoleSessionName,
+            [Parameter(Mandatory)]
+            [ValidateNotNullOrEmpty()]
+            [String]$AWSLogin,
+            [Parameter()]
+            $AWSRegion = 'ap-northeast-1'
+        )
+        $params = @{
+            RoleArn = "arn:aws:iam::$((Get-STSCallerIdentity -ProfileName $ProfileName -Region $AWSRegion).Account):role/$RoleName"
+            RoleSessionName = $RoleSessionName
+            SerialNumber = (Get-IAMMFADevice -UserName $UserName -ProfileName $ProfileName -Region $AWSRegion).SerialNumber
+            TokenCode = (op item get 'AWS LLT' --otp)
+            ProfileName = $ProfileName
+            Region = $AWSRegion
+        }
+        Use-STSRole @params | Select-Object -ExpandProperty Credentials
+    }
+    function Set-AWSRoleCredential {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory)]
+            [ValidateNotNullOrEmpty()]
+            [String]$UserName,
+            [Parameter()]
+            [ValidateNotNullOrEmpty()]
+            [String]$ProfileName = $UserName,
+            [Parameter()]
+            [ValidateNotNullOrEmpty()]
+            [String]$RoleName,
+            [Parameter()]
+            [ValidateNotNullOrEmpty()]
+            [String]$RoleSessionName,
+            [Parameter(Mandatory)]
+            [ValidateNotNullOrEmpty()]
+            [String]$AWSLogin,
+            [Parameter()]
+            $AWSRegion = 'ap-northeast-1'
+        )
+        $env:AWS_REGION = $AWSRegion
+        $p = @{
+            UserName = $UserName
+            ProfileName = $ProfileName
+            RoleName = $RoleName
+            RoleSessionName = $RoleSessionName
+            AWSLogin = $AWSLogin
+            AWSRegion = $AWSRegion
+        }
+        $c = Get-AWSRoleCredential @p
         $env:AWS_ACCESS_KEY_ID = $c.AccessKeyId
         $env:AWS_SECRET_ACCESS_KEY = $c.SecretAccessKey
         $env:AWS_SESSION_TOKEN = $c.SessionToken
