@@ -218,11 +218,11 @@ function Set-SelectedLocation {
             $current | Get-Unique | Out-File -Encoding UTF8 '~/.poco-cd'
         }
         'Move' {
-            Get-Content -Path '~/.poco-cd' | Select-Poco -CaseSensitive | Select-Object -First 1 | Set-Location
+            Get-Content -Path '~/.poco-cd' | Select-Pocof -CaseSensitive | Select-Object -First 1 | Set-Location
             break
         }
         'Open' {
-            Get-Content -Path '~/.poco-cd' | Select-Poco -CaseSensitive | Select-Object -First 1 | Invoke-Item
+            Get-Content -Path '~/.poco-cd' | Select-Pocof -CaseSensitive | Select-Object -First 1 | Invoke-Item
             break
         }
     }
@@ -263,8 +263,8 @@ function Open-VSCodeWorkspace {
             }
         }
         'Open' {
-            $ws = Get-Content -Path $file | Where-Object { !$_.StartsWith('#') } | Select-Poco -CaseSensitive | Select-Object -First 1
-            if ($ws) {
+            $ws = Get-Content -Path $file | Where-Object { !$_.StartsWith('#') } | Select-Pocof -CaseSensitive | Select-Object -First 1
+            if ($ws.Count -eq 1) {
                 code $ws
             }
             break
@@ -275,7 +275,7 @@ Set-Alias codeof Open-VSCodeWorkspace -Option AllScope
 
 
 function Set-SelectedRepository {
-    ghq list | Select-Poco | Select-Object -First 1 | ForEach-Object { Set-Location "$(ghq root)/$_" }
+    ghq list | Select-Pocof | Select-Object -First 1 | ForEach-Object { Set-Location "$(ghq root)/$_" }
 }
 Set-Alias gcd Set-SelectedRepository -Option AllScope
 
@@ -284,7 +284,7 @@ function Show-Paths() {
 }
 
 function Show-ReadLineHistory() {
-    Get-Content -Path (Get-PSReadLineOption).HistorySavePath | Select-Object -Unique | Select-Poco -CaseSensitive
+    Get-Content -Path (Get-PSReadLineOption).HistorySavePath | Select-Object -Unique | Select-Pocof -CaseSensitive
 }
 Set-Alias pghy Show-ReadLineHistory -Option AllScope
 
@@ -294,11 +294,11 @@ function Invoke-ReadLineHistory() {
 Set-Alias pihy Invoke-ReadLineHistory -Option AllScope
 
 function Start-VBoxMachine() {
-    vboxmanage list vms | Select-Poco -CaseSensitive | Out-String -Stream | Select-String -Pattern '\{(.+)\}' | ForEach-Object { vboxmanage startvm ($_.Matches[0].Groups['1'].Value) --type headless }
+    vboxmanage list vms | Select-Pocof -CaseSensitive | Out-String -Stream | Select-String -Pattern '\{(.+)\}' | ForEach-Object { vboxmanage startvm ($_.Matches[0].Groups['1'].Value) --type headless }
 }
 
 function Stop-VBoxMachine() {
-    vboxmanage list runningvms | Select-Poco -CaseSensitive | Out-String -Stream | Select-String -Pattern '\{(.+)\}' | ForEach-Object { vboxmanage controlvm ($_.Matches[0].Groups['1'].Value) poweroff }
+    vboxmanage list runningvms | Select-Pocof -CaseSensitive | Out-String -Stream | Select-String -Pattern '\{(.+)\}' | ForEach-Object { vboxmanage controlvm ($_.Matches[0].Groups['1'].Value) poweroff }
 }
 
 function Get-RunningVBoxMachines() {
