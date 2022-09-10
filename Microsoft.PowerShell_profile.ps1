@@ -9,7 +9,7 @@ $completions = @(
 $names = @(
     # Prepare basic utilities
     'PSReadLine', 'ClipboardText'
-    'PowerShellGet', 'poco', 'Get-GzipContent'
+    'PowerShellGet', 'pocof', 'Get-GzipContent'
     'powershell-yaml'
     # Prepare for PowerShell
     'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake', 'PSProfiler'
