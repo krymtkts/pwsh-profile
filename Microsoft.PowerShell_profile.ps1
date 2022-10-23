@@ -8,8 +8,7 @@ $completions = @(
 )
 $names = @(
     # Prepare basic utilities
-    'PSReadLine', 'ClipboardText'
-    'PowerShellGet', 'pocof', 'Get-GzipContent'
+    'PSReadLine', 'PowerShellGet', 'pocof', 'Get-GzipContent'
     'powershell-yaml'
     # Prepare for PowerShell
     'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake', 'PSProfiler'
@@ -144,14 +143,6 @@ function Update-GUIRegistryValues {
 
     Stop-Process -Name explorer -Force
 }
-
-Import-Module -Name $completions
-
-Set-Alias ll ls -Option AllScope
-
-Set-PSReadLineOption -PredictionSource History
-Set-PSReadLineOption -PredictionViewStyle ListView
-Set-PSReadLineOption -BellStyle Visual
 
 function Remove-GitGoneBranches {
     [CmdletBinding()]
@@ -292,35 +283,6 @@ function Invoke-ReadLineHistory() {
     Show-ReadLineHistory | Select-Object -First 1 | Invoke-Expression
 }
 Set-Alias pihy Invoke-ReadLineHistory -Option AllScope
-
-function Start-VBoxMachine() {
-    vboxmanage list vms | Select-Pocof -CaseSensitive | Out-String -Stream | Select-String -Pattern '\{(.+)\}' | ForEach-Object { vboxmanage startvm ($_.Matches[0].Groups['1'].Value) --type headless }
-}
-
-function Stop-VBoxMachine() {
-    vboxmanage list runningvms | Select-Pocof -CaseSensitive | Out-String -Stream | Select-String -Pattern '\{(.+)\}' | ForEach-Object { vboxmanage controlvm ($_.Matches[0].Groups['1'].Value) poweroff }
-}
-
-function Get-RunningVBoxMachines() {
-    vboxmanage list runningvms
-}
-
-# Prepare for Github
-Import-Module -Name PowerShellForGitHub
-
-# Prepare for Google Cloud
-if (Get-Module -Name GoogleCloud) {
-    Import-Module -Name GoogleCloud
-}
-
-# Helper function to change directory to my development workspace
-# Change c:\ws to your usual workspace and everytime you type
-# in cws from PowerShell it will take you directly there.
-# function cws { Set-Location c:\workspace }
-
-# Helper function to set location to the User Profile directory
-function cu { Set-Location ~ }
-Set-Alias ~ cu -Option AllScope
 
 # Helper function to edit hosts file.
 function Edit-Hosts {
@@ -495,62 +457,6 @@ function Convert-0xTo10 {
     }
 }
 
-# install ssh-agent service if not exists.
-# it will happend after updating Windows OpenSSH.
-if (! ($SshAgent = (Get-Service -Name 'ssh-agent' -ErrorAction SilentlyContinue))) {
-    install-sshd.ps1
-    Set-Service -Name 'ssh-agent' -StartupType Automatic
-    Start-Service ssh-agent
-}
-elseif ($SshAgent.StartType -eq 'Disabled') {
-    Set-Service -Name 'ssh-agent' -StartupType Automatic
-    Start-Service ssh-agent
-}
-else {
-    Start-Service ssh-agent
-}
-
-$Horns = [char]::ConvertFromUtf32(0x1f918)
-Write-Host "$Horns posh $($PSVersionTable.PSVersion.ToString()) is ready $Horns"
-# Chocolatey profile
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-    Import-Module "$ChocolateyProfile"
-}
-
-if (Test-Path("$PSScriptRoot\CustomScript.psm1")) {
-    # Import environment specific script from CustomScript.psm1.
-    Import-Module "$PSScriptRoot\CustomScript.psm1"
-}
-
-function find {
-    [CmdletBinding()]
-    param(
-        [string]$path = '.',
-        [Parameter(Mandatory = $True,
-            ValueFromPipeline = $True)]
-        [string[]]$name,
-        [switch]$delete
-    )
-
-    begin {
-    }
-
-    process {
-        foreach ($n in $Name) {
-            if ($delete) {
-                Get-ChildItem -Recurse -Path $path | Where-Object -Property Name -Like $n | Remove-Item
-            }
-            else {
-                Get-ChildItem -Recurse -Path $path | Where-Object -Property Name -Like $n
-            }
-        }
-    }
-
-    end {
-    }
-}
-
 function New-Password {
     [CmdletBinding()]
     param (
@@ -598,35 +504,6 @@ function New-Password {
 
     end {
         $password
-    }
-}
-
-# This idea was inspired by  https://github.com/aws/aws-cli/issues/5309#issuecomment-693941619
-$awsCompleter = Get-Command -Name aws_completer -ErrorAction SilentlyContinue
-if ($awsCompleter) {
-    # for PyPI installation.
-    if ($awsCompleter.Name -notlike '*.exe' ) {
-        $f = { python $awsCompleter.Source }
-    }
-    else {
-        $f = { & $awsCompleter.Name }
-    }
-    Register-ArgumentCompleter -Native -CommandName aws -ScriptBlock {
-        param($wordToComplete, $commandAst, $cursorPosition)
-        if ("$commandAst" -eq 'aws') {
-            # complement the deleted space so that aws_completer lists all services.
-            $compLine = "$commandAst "
-        }
-        else {
-            $compLine = $commandAst
-        }
-        $env:COMP_LINE = $compLine
-        $env:COMP_POINT = $cursorPosition
-        & $f | ForEach-Object {
-            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
-        }
-        Remove-Item env:\COMP_LINE
-        Remove-Item env:\COMP_POINT
     }
 }
 
@@ -726,6 +603,123 @@ function ConvertTo-Base64 {
 function Remove-CurrentVirtualenv {
     if (Test-Path pyproject.toml) {
         poetry env list | Where-Object { $_ -like "*$(Get-Location | Split-Path -Leaf)*" } | Select-Object -First 1 | ForEach-Object { ($_ -split ' ')[0] }
+    }
+}
+
+function Get-IAMPolicyDocument {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]$PolicyArn
+    )
+    $d = Get-IAMPolicy -PolicyArn $PolicyArn | ForEach-Object {
+        Get-IAMPolicyVersion -PolicyArn $_.Arn -VersionId $_.DefaultVersionId
+    }
+    [System.Reflection.Assembly]::LoadWithPartialName('System.Web.HttpUtility') | Out-Null
+    [System.Web.HttpUtility]::UrlDecode($d.Document)
+}
+
+function Get-IAMRolePolicyDocument {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]$RoleName
+    )
+    $i = Get-IAMRole -RoleName $RoleName
+    [System.Reflection.Assembly]::LoadWithPartialName('System.Web.HttpUtility') | Out-Null
+    [System.Web.HttpUtility]::UrlDecode($i.AssumeRolePolicyDocument) | ConvertFrom-Json | ConvertTo-Json -Depth 10
+}
+
+function ConvertFrom-CloudFrontAccessLog {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Path to one or more locations.')]
+        [Alias('PSPath')]
+        [ValidateNotNullOrEmpty()]
+        [string[]]
+        $Path
+    )
+    begin {
+        $header = 'date', 'time', 'x-edge-location', 'sc-bytes', 'c-ip', 'cs-method', 'cs(Host)', 'cs-uri-stem', 'sc-status', 'cs(Referer)', 'cs(User-Agent)', 'cs-uri-query', 'cs(Cookie)', 'x-edge-result-type', 'x-edge-request-id', 'x-host-header', 'cs-protocol', 'cs-bytes', 'time-taken', 'x-forwarded-for', 'ssl-protocol', 'ssl-cipher', 'x-edge-response-result-type', 'cs-protocol-version', 'fle-status', 'fle-encrypted-fields', 'c-port', 'time-to-first-byte', 'x-edge-detailed-result-type', 'sc-content-type', 'sc-content-len', 'sc-range-start', 'sc-range-end'
+    }
+    process {
+        $Path | ForEach-Object { (zcat $_) -split "`n" } | ConvertFrom-Csv -Delimiter "`t" -Header $header
+    }
+}
+
+function tail {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [System.Text.Encoding]
+        $Encoding = [System.Text.Encoding]::UTF8,
+        # Specifies a path to one or more locations.
+        [Parameter(
+            Position = 0,
+            ParameterSetName = 'Path',
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Path to one or more locations.')]
+        [Alias('PSPath')]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Path,
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [int]
+        $N = 10
+    )
+    Get-Content -Path $Path -Wait -Encoding $Encoding -Tail $N
+}
+
+function Get-UnixTimeSeconds {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [datetime]
+        $date = (Get-Date)
+    )
+    [Math]::Truncate(($date - (Get-Date -UnixTimeSeconds 0)).TotalSeconds)
+}
+
+# This idea was inspired by  https://github.com/aws/aws-cli/issues/5309#issuecomment-693941619
+$awsCompleter = Get-Command -Name aws_completer -ErrorAction SilentlyContinue
+if ($awsCompleter) {
+    # for PyPI installation.
+    if ($awsCompleter.Name -notlike '*.exe' ) {
+        $f = { python $awsCompleter.Source }
+    }
+    else {
+        $f = { & $awsCompleter.Name }
+    }
+    Register-ArgumentCompleter -Native -CommandName aws -ScriptBlock {
+        param($wordToComplete, $commandAst, $cursorPosition)
+        if ("$commandAst" -eq 'aws') {
+            # complement the deleted space so that aws_completer lists all services.
+            $compLine = "$commandAst "
+        }
+        else {
+            $compLine = $commandAst
+        }
+        $env:COMP_LINE = $compLine
+        $env:COMP_POINT = $cursorPosition
+        & $f | ForEach-Object {
+            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+        }
+        Remove-Item env:\COMP_LINE
+        Remove-Item env:\COMP_POINT
     }
 }
 
@@ -864,96 +858,8 @@ if (Get-Command -Name cdk -ErrorAction SilentlyContinue) {
     }
 }
 
-function Get-IAMPolicyDocument {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true,
-            Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String]$PolicyArn
-    )
-    $d = Get-IAMPolicy -PolicyArn $PolicyArn | ForEach-Object {
-        Get-IAMPolicyVersion -PolicyArn $_.Arn -VersionId $_.DefaultVersionId
-    }
-    [System.Reflection.Assembly]::LoadWithPartialName('System.Web.HttpUtility') | Out-Null
-    [System.Web.HttpUtility]::UrlDecode($d.Document)
-}
-
-function Get-IAMRolePolicyDocument {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true,
-            Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String]$RoleName
-    )
-    $i = Get-IAMRole -RoleName $RoleName
-    [System.Reflection.Assembly]::LoadWithPartialName('System.Web.HttpUtility') | Out-Null
-    [System.Web.HttpUtility]::UrlDecode($i.AssumeRolePolicyDocument) | ConvertFrom-Json | ConvertTo-Json -Depth 10
-}
-
-function ConvertFrom-CloudFrontAccessLog {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true,
-            Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Path to one or more locations.')]
-        [Alias('PSPath')]
-        [ValidateNotNullOrEmpty()]
-        [string[]]
-        $Path
-    )
-    begin {
-        $header = 'date', 'time', 'x-edge-location', 'sc-bytes', 'c-ip', 'cs-method', 'cs(Host)', 'cs-uri-stem', 'sc-status', 'cs(Referer)', 'cs(User-Agent)', 'cs-uri-query', 'cs(Cookie)', 'x-edge-result-type', 'x-edge-request-id', 'x-host-header', 'cs-protocol', 'cs-bytes', 'time-taken', 'x-forwarded-for', 'ssl-protocol', 'ssl-cipher', 'x-edge-response-result-type', 'cs-protocol-version', 'fle-status', 'fle-encrypted-fields', 'c-port', 'time-to-first-byte', 'x-edge-detailed-result-type', 'sc-content-type', 'sc-content-len', 'sc-range-start', 'sc-range-end'
-    }
-    process {
-        $Path | ForEach-Object { (zcat $_) -split "`n" } | ConvertFrom-Csv -Delimiter "`t" -Header $header
-    }
-}
-
-function tail {
-    [CmdletBinding()]
-    param (
-        [Parameter()]
-        [System.Text.Encoding]
-        $Encoding = [System.Text.Encoding]::UTF8,
-        # Specifies a path to one or more locations.
-        [Parameter(
-            Position = 0,
-            ParameterSetName = 'Path',
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Path to one or more locations.')]
-        [Alias('PSPath')]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $Path,
-        [Parameter()]
-        [ValidateNotNullOrEmpty()]
-        [int]
-        $N = 10
-    )
-    Get-Content -Path $Path -Wait -Encoding $Encoding -Tail $N
-}
-
-function Get-UnixTimeSeconds {
-    [CmdletBinding()]
-    param (
-        [Parameter()]
-        [datetime]
-        $date = (Get-Date)
-    )
-    [Math]::Truncate(($date - (Get-Date -UnixTimeSeconds 0)).TotalSeconds)
-}
-
 # Don't use '$psake' named variable because Invoke-psake has broken if uses the '$psake'.
-$psakeCommand = Get-Command -Name Invoke-cpsake -ErrorAction SilentlyContinue
+$psakeCommand = Get-Command -Name Invoke-psake -ErrorAction SilentlyContinue
 if ($psakeCommand) {
     Register-ArgumentCompleter -CommandName $psakeCommand.Name -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
@@ -987,3 +893,42 @@ if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
 if (Get-Command -Name oh-my-posh -ErrorAction SilentlyContinue) {
     oh-my-posh init pwsh --config ~/.oh-my-posh.omp.json | Invoke-Expression
 }
+
+# Prepare for completions.
+Import-Module -Name $completions
+# Prepare for Github
+Import-Module -Name PowerShellForGitHub
+# prepare for Chocolatey.
+$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+if (Test-Path($ChocolateyProfile)) {
+    Import-Module "$ChocolateyProfile"
+}
+
+Set-PSReadLineOption -PredictionSource History
+Set-PSReadLineOption -PredictionViewStyle ListView
+Set-PSReadLineOption -BellStyle Visual
+
+# install ssh-agent service if not exists.
+# it will happend after updating Windows OpenSSH.
+if (! ($SshAgent = (Get-Service -Name 'ssh-agent' -ErrorAction SilentlyContinue))) {
+    install-sshd.ps1
+    Set-Service -Name 'ssh-agent' -StartupType Automatic
+    Start-Service ssh-agent
+}
+elseif ($SshAgent.StartType -eq 'Disabled') {
+    Set-Service -Name 'ssh-agent' -StartupType Automatic
+    Start-Service ssh-agent
+}
+else {
+    Start-Service ssh-agent
+}
+
+# Helper function to set location to the User Profile directory.
+function cu { Set-Location ~ }
+Set-Alias ~ cu -Option AllScope
+# Set alias to ll.
+Set-Alias ll ls -Option AllScope
+
+# Show message.
+$Horns = [char]::ConvertFromUtf32(0x1f918)
+Write-Host "$Horns posh $($PSVersionTable.PSVersion.ToString()) is ready $Horns"
