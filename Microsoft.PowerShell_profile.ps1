@@ -366,11 +366,11 @@ function Update-NodeModules {
     }
     $firstTime = -not (Get-Command npm -ErrorAction SilentlyContinue)
     if ($firstTime) {
-        fnm install lts-gallium
-        fnm default lts-gallium
+        16, 18 | ForEach-Object { fnm install "v$_" }
+        fnm default v18
         fnm env --use-on-cd | Out-String | Invoke-Expression
         fnm completions --shell powershell | Out-String | Invoke-Expression
-        npm install -g fast-cli serverless textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good yarn
+        npm install -g aws-cdk serverless textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good yarn
     }
     else {
         npm update -g
