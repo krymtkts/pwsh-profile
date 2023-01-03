@@ -840,24 +840,6 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
     }
 }
 
-if (Get-Command -Name cdk -ErrorAction SilentlyContinue) {
-    function Invoke-CdkBootstrap {
-        [CmdletBinding()]
-        param (
-            [Parameter()]
-            [String]$ProfileName
-        )
-        $env:AWS_REGION = 'ap-northeast-1'
-        $ci = Get-STSCallerIdentity
-        if ($ProfileName) {
-            cdk bootstrap "aws://$($ci.Account)/$($env:AWS_REGION)" --profile $ProfileName
-        }
-        else {
-            cdk bootstrap "aws://$($ci.Account)/$($env:AWS_REGION)"
-        }
-    }
-}
-
 # Don't use '$psake' named variable because Invoke-psake has broken if uses the '$psake'.
 $psakeCommand = Get-Command -Name Invoke-psake -ErrorAction SilentlyContinue
 if ($psakeCommand) {
@@ -887,6 +869,24 @@ if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
     fnm env --use-on-cd | Out-String | Invoke-Expression
     fnm completions --shell powershell | Out-String | Invoke-Expression
     Get-ChildItem "$env:FNM_MULTISHELL_PATH/../" | Where-Object -Property CreationTime -LE (Get-Date).AddDays(-1) | Remove-Item
+}
+
+if (Get-Command -Name cdk -ErrorAction SilentlyContinue) {
+    function Invoke-CdkBootstrap {
+        [CmdletBinding()]
+        param (
+            [Parameter()]
+            [String]$ProfileName
+        )
+        $env:AWS_REGION = 'ap-northeast-1'
+        $ci = Get-STSCallerIdentity
+        if ($ProfileName) {
+            cdk bootstrap "aws://$($ci.Account)/$($env:AWS_REGION)" --profile $ProfileName
+        }
+        else {
+            cdk bootstrap "aws://$($ci.Account)/$($env:AWS_REGION)"
+        }
+    }
 }
 
 # set a prompt theme.
