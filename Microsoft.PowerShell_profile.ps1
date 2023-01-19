@@ -35,6 +35,9 @@ $awsServices = @(
     'StepFunctions'
 )
 
+# TLS versions.
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13
+
 # change display language for gpg.
 $env:LANG = 'en'
 
