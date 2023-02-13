@@ -40,6 +40,8 @@ $awsServices = @(
 
 # change display language for gpg.
 $env:LANG = 'en'
+# enable Python UTF-8 Mode.
+$env:PYTHONUTF8 = 1
 
 function Install-NonExistsModule {
     [CmdletBinding()]
@@ -335,7 +337,7 @@ function Update-NodeModules {
         fnm default v18
         fnm env --use-on-cd | Out-String | Invoke-Expression
         fnm completions --shell powershell | Out-String | Invoke-Expression
-        npm install -g @google-clasp @openapitools/openapi-generator-cli aws-cdk serverless textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good wrangler
+        npm install -g @google/clasp @openapitools/openapi-generator-cli aws-cdk serverless textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good wrangler
     }
     else {
         npm update -g
