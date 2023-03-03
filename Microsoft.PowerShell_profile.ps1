@@ -249,9 +249,9 @@ function Open-VSCodeWorkspace {
     switch ($Mode) {
         'Add' {
             if ($Path -and (Test-Path($Path))) {
-                $current = Get-Content $file
+                $current = @(Get-Content $file)
                 $current += (Resolve-Path $Path).Path
-                $current | Get-Unique | Out-File -Encoding UTF8 $file
+                $current | Get-Unique | Set-Content -Encoding UTF8 $file
                 break
             }
             else {
