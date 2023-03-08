@@ -202,16 +202,15 @@ function Set-SelectedLocation {
     )
     switch ($Mode) {
         'Add' {
+            $current = @(Get-Content '~/.poco-cd')
             if ($Location) {
-                $current = Get-Content '~/.poco-cd'
                 $current += "$Location"
 
             }
             elseif ($Here) {
-                $current = Get-Content '~/.poco-cd'
                 $current += "$(Get-Location)"
             }
-            $current | Get-Unique | Out-File -Encoding UTF8 '~/.poco-cd'
+            $current | Get-Unique | Set-Content -Encoding UTF8 '~/.poco-cd'
         }
         'Move' {
             Get-Content -Path '~/.poco-cd' | Select-Pocof -CaseSensitive | Select-Object -First 1 | Set-Location
