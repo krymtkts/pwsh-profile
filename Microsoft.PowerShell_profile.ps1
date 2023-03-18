@@ -1,4 +1,4 @@
-completions = @(
+$completions = @(
     'Terminal-Icons'
     # Prepare for Maven
     'MavenAutoCompletion'
