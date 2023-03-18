@@ -16,6 +16,7 @@ $names = @(
     'PowerShellForGitHub'
     # Prepare for AWS
     'AWS.Tools.Installer'
+    'PowerShellAI'
 ) + $completions
 $awsServices = @(
     'CertificateManager'
@@ -908,7 +909,7 @@ if (Test-Path($ChocolateyProfile)) {
     Import-Module "$ChocolateyProfile"
 }
 
-Set-PSReadLineOption -PredictionSource History
+Set-PSReadLineOption -PredictionSource HistoryAndPlugin
 Set-PSReadLineOption -PredictionViewStyle ListView
 Set-PSReadLineOption -BellStyle Visual
 
@@ -927,6 +928,38 @@ else {
     Start-Service ssh-agent
 }
 
+$script:OpenAIKeyPath = '~/.openaikey'
+function Set-OpenAIAuthentication {
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [PSCredential] $Credential
+    )
+
+    if (-not $Credential) {
+        $message = 'Please provide your OpenAI API key.'
+        $message = $message + "These credential is being cached into '${script:OpenAIKeyPath}'."
+        $Credential = Get-Credential -Message $message -UserName openai
+    }
+    if ($PSCmdlet.ShouldProcess($script:OpenAIKeyPath)) {
+        $script:OpenAIApiKey = $Credential.Password
+        New-Item -Path $script:OpenAIKeyPath -Force | Out-Null
+        $Credential.Password | ConvertFrom-SecureString | Set-Content -Path $script:OpenAIKeyPath -Force
+    }
+}
+
+if (Get-Command -Module PowerShellAI -ErrorAction SilentlyContinue) {
+    ForEach-Object {
+        if ($script:OpenAIApiKey) {
+            $script:OpenAIApiKey
+        }
+        elseif (Test-Path($script:OpenAIKeyPath)) {
+            Get-Content $script:OpenAIKeyPath | ConvertTo-SecureString
+        }
+    } | Where-Object { $_ } | ForEach-Object {
+        Set-OpenAIKey -Key $_
+    }
+}
+
 # Helper function to set location to the User Profile directory.
 function cu { Set-Location ~ }
 Set-Alias ~ cu -Option AllScope
@@ -935,4 +968,4 @@ Set-Alias ll ls -Option AllScope
 
 # Show message.
 $Horns = [char]::ConvertFromUtf32(0x1f918)
-Write-Host "$Horns posh $($PSVersionTable.PSVersion.ToString()) is ready $Horns"
+Write-Host "$Horns pwsh $($PSVersionTable.PSVersion.ToString()) is ready $Horns"
