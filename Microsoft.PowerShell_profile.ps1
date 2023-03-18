@@ -1,4 +1,4 @@
-$completions = @(
+completions = @(
     'Terminal-Icons'
     # Prepare for Maven
     'MavenAutoCompletion'
@@ -19,21 +19,7 @@ $names = @(
     'PowerShellAI'
 ) + $completions
 $awsServices = @(
-    'CertificateManager'
-    'CloudFormation'
-    'CloudWatchLogs'
-    'DynamoDBv2'
-    'EC2'
-    'ECR'
-    'ECS'
-    'ElasticLoadBalancingV2'
-    'EventBridge'
-    'IdentityManagement'
-    'Lambda'
-    'S3'
-    'SecretsManager'
-    'SecurityToken'
-    'StepFunctions'
+
 )
 
 # TLS versions.
