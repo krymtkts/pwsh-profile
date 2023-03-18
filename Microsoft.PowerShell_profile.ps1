@@ -298,9 +298,8 @@ function Update-PipModules {
     python -m pip install --upgrade pip
     if ($firstTime) {
         $list = @(
-            'boto3'
-            'cfn-lint'
             'poetry'
+            'openai'
         )
         pip install ($list -join ' ')
     }
