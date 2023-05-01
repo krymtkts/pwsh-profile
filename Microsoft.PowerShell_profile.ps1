@@ -29,6 +29,8 @@ $awsServices = @(
 $env:LANG = 'en'
 # enable Python UTF-8 Mode.
 $env:PYTHONUTF8 = 1
+[System.Console]::InputEncoding = [System.Text.Encoding]::UTF8
+[System.Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 function Install-NonExistsModule {
     [CmdletBinding()]
@@ -182,8 +184,9 @@ max-cache-ttl 86400
 }
 
 function Set-SelectedLocation {
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
-        [ValidateSet('Add', 'Move', 'Open')]$Mode = 'Move',
+        [ValidateSet('Add', 'Move', 'Open', 'Remove')]$Mode = 'Move',
         [string]$Location,
         [switch]$Here
     )
@@ -201,14 +204,19 @@ function Set-SelectedLocation {
         }
         'Move' {
             Get-Content -Path '~/.poco-cd' | Select-Pocof -CaseSensitive | Select-Object -First 1 | Set-Location
-            break
         }
         'Open' {
             Get-Content -Path '~/.poco-cd' | Select-Pocof -CaseSensitive | Select-Object -First 1 | Invoke-Item
-            break
+        }
+        'Remove' {
+            if (-not $Location) {
+                $Location = Get-Content -Path '~/.poco-cd' | Select-Pocof -CaseSensitive
+            }
+            Get-Content '~/.poco-cd' | Where-Object { $_ -ne $Location } | Get-Unique | Set-Content -Encoding UTF8 '~/.poco-cd'
         }
     }
 }
+
 Set-Alias pcd Set-SelectedLocation -Option AllScope
 function Invoke-SelectedLocation() {
     Set-SelectedLocation -Mode Open
@@ -262,7 +270,7 @@ function Set-SelectedRepository {
 Set-Alias gcd Set-SelectedRepository -Option AllScope
 
 function Show-Paths() {
-    ($Env:Path).split(';') | poco
+    ($Env:Path).split(';') | Select-Pocof
 }
 
 function Show-ReadLineHistory() {
@@ -786,6 +794,7 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
         $params = @{
             RoleArn = "arn:aws:iam::$((Get-STSCallerIdentity -ProfileName $ProfileName -Region $AWSRegion).Account):role/$RoleName"
             RoleSessionName = $RoleSessionName
+            DurationInSeconds = 43200
             ProfileName = $ProfileName
             Region = $AWSRegion
         }
