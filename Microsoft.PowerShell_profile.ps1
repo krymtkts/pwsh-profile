@@ -908,7 +908,7 @@ Set-PSReadLineOption -PredictionViewStyle ListView
 Set-PSReadLineOption -BellStyle Visual
 
 # install ssh-agent service if not exists.
-# it will happend after updating Windows OpenSSH.
+# it will be triggered after updating Windows OpenSSH.
 if (! ($SshAgent = (Get-Service -Name 'ssh-agent' -ErrorAction SilentlyContinue))) {
     install-sshd.ps1
     Set-Service -Name 'ssh-agent' -StartupType Automatic
