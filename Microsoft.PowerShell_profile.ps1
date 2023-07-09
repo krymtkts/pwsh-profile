@@ -41,14 +41,14 @@ function Install-NonExistsModule {
     )
 
     begin {
-        $modules = Get-InstalledModule
+        $modules = Get-InstalledPSResource
     }
 
     process {
         foreach ($n in $Name) {
             Write-Debug $n
             if (!($modules | Where-Object -Property Name -EQ $n)) {
-                Install-Module -Name $n -AllowPrerelease -AllowClobber -Scope AllUsers
+                Install-PSResource -Name $n -Prerelease -Scope AllUsers
             }
             $n
         }
@@ -57,15 +57,15 @@ function Install-NonExistsModule {
 
 function Install-AWSModules {
     if ($awsServices) {
-        Find-Module -Name Get-GzipContent | Out-Null # for workaround.
+        Find-Module -Name Get-GzipContent | Out-Null # NOTE: for workaround.
         Install-AWSToolsModule -Name $awsServices -Scope AllUsers -Force -CleanUp
     }
 }
 
 function Initialize-PackageSource {
-    Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+    Set-PSResourceRepository -Name PSGallery -Trusted
     $url = 'https://api.nuget.org/v3/index.json'
-    Register-PackageSource -Name NuGet -Location $url -ProviderName NuGet -Trusted
+    Register-PackageSource -Name NuGet -Location $url -ProviderName NuGet -Trusted -Force | Out-Null
 }
 
 function Install-Modules {
@@ -75,40 +75,51 @@ function Install-Modules {
 }
 
 function Update-Profile {
-    $profilehome = ($PROFILE | Split-Path -Parent)
+    $ProfileHome = ($PROFILE | Split-Path -Parent)
     $params = @{
         Uri = 'https://gist.githubusercontent.com/krymtkts/f8af667c32b16fc28a815243b316c5be/raw/Microsoft.PowerShell_profile.ps1'
-        OutFile = "$profilehome/Microsoft.PowerShell_profile.ps1"
+        OutFile = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
     }
     Invoke-WebRequest @params
 
-    if (-not (Test-Path "$profilehome\Microsoft.VSCode_profile.ps1")) {
-        New-Item -ItemType HardLink -Path $profilehome -Name 'Microsoft.VSCode_profile.ps1' -Value "$profilehome\Microsoft.PowerShell_profile.ps1"
+    if (-not (Test-Path "${ProfileHome}/Microsoft.VSCode_profile.ps1")) {
+        New-Item -ItemType HardLink -Path $ProfileHome -Name 'Microsoft.VSCode_profile.ps1' -Value "$profilehome\Microsoft.PowerShell_profile.ps1"
     }
 }
 
 function Edit-TerminalIcons {
-    $ti = Get-Module Terminal-Icons -ErrorAction SilentlyContinue
+    $ti = Get-PSResource Terminal-Icons -ErrorAction SilentlyContinue -Scope AllUsers
     if (-not $ti) {
         Write-Error 'Terminal-Icons not found. install it!'
         return
     }
     $params = @{
         Uri = 'https://gist.githubusercontent.com/krymtkts/4457a23124b2db860a6b32eba6490b03/raw/glyphs.ps1'
-        OutFile = "$(Split-Path $ti.Path -Parent)\Data\glyphs.ps1"
+        OutFile = "$($ti[0].InstalledLocation)\Data\glyphs.ps1"
     }
     Invoke-WebRequest @params
 }
 
 function Edit-EverMonkey {
-    $evermonkey = '~\.vscode\extensions\michalyao.evermonkey-2.4.5'
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [ValidateSet('Stable', 'Insider')]
+        [string]
+        $Channel = 'Insider'
+    )
+    $evermonkey = switch ($Channel) {
+        'Stable' { '~/.vscode/extensions/michalyao.evermonkey-2.4.5' }
+        'Insider' { '~/.vscode-insiders/extensions/michalyao.evermonkey-2.4.5' }
+        default { throw "Invalid channel $Channel" }
+    }
     if (-not $evermonkey) {
         Write-Verbose 'There is no evermonkey.'
         return
     }
     $params = @{
         Uri = 'https://gist.githubusercontent.com/krymtkts/8a5a3a5a7e1efe9db7f2c6bbda337571/raw/converterplus.js'
-        OutFile = "$evermonkey\out\src\converterplus.js"
+        OutFile = "$evermonkey/out/src/converterplus.js"
     }
     Invoke-WebRequest @params
 }
@@ -237,8 +248,16 @@ function Open-VSCodeWorkspace {
         [Alias('PSPath')]
         [ValidateNotNullOrEmpty()]
         [string[]]
-        $Path
+        $Path,
+        [Parameter()]
+        [ValidateSet('Stable', 'Insider')]
+        [string]
+        $Channel = 'Insider'
     )
+    $code = switch ($Channel) {
+        'Stable' { 'code' }
+        'Insider' { 'code-insiders' }
+    }
     $file = '~/.code-ws'
     switch ($Mode) {
         'Add' {
@@ -255,7 +274,7 @@ function Open-VSCodeWorkspace {
         'Open' {
             $ws = Get-Content -Path $file | Where-Object { !$_.StartsWith('#') } | Select-Pocof -CaseSensitive | Select-Object -First 1
             if ($ws.Count -eq 1) {
-                code $ws
+                & $code $ws
             }
             break
         }
@@ -268,6 +287,21 @@ function Set-SelectedRepository {
     ghq list | Select-Pocof | Select-Object -First 1 | ForEach-Object { Set-Location "$(ghq root)/$_" }
 }
 Set-Alias gcd Set-SelectedRepository -Option AllScope
+
+function Open-SelectedRepository {
+    param(
+        [Parameter()]
+        [ValidateSet('Stable', 'Insider')]
+        [string]
+        $Channel = 'Insider'
+    )
+    $code = switch ($Channel) {
+        'Stable' { 'code' }
+        'Insider' { 'code-insiders' }
+    }
+    Set-SelectedRepository && & $code .
+}
+Set-Alias gcode Open-SelectedRepository -Option AllScope
 
 function Show-Paths() {
     ($Env:Path).split(';') | Select-Pocof
@@ -289,7 +323,7 @@ function Edit-Hosts {
 }
 
 function Update-InstalledModules {
-    Get-InstalledModule | Where-Object -Property Repository -EQ 'PSGallery' | Update-Module -AllowPrerelease -Scope AllUsers
+    Get-InstalledPSResource | Where-Object -Property Repository -EQ 'PSGallery' | Update-PSResource -Prerelease -Scope AllUsers
 }
 
 function Update-PipModules {
