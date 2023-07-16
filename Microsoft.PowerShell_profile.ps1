@@ -6,18 +6,22 @@ $completions = @(
     'DockerCompletion', 'DockerComposeCompletion', 'DockerMachineCompletion'
     'posh-git'
 )
+$pinStable = @(
+    'PowerShellGet',
+    'platyPS'
+)
 $names = @(
     # Prepare basic utilities
-    'PSReadLine', 'PowerShellGet', 'pocof', 'Get-GzipContent'
+    'PSReadLine', 'pocof', 'Get-GzipContent'
     'powershell-yaml'
     # Prepare for PowerShell
-    'PowerShellGet', 'PSScriptAnalyzer', 'Pester', 'psake', 'PSProfiler'
+    'Microsoft.PowerShell.PSResourceGet', 'PSScriptAnalyzer', 'Pester', 'psake', 'PSProfiler'
     # Prepare for GitHub
     'PowerShellForGitHub'
     # Prepare for AWS
     'AWS.Tools.Installer'
     'PowerShellAI'
-) + $completions
+) + $pinStable + $completions
 $awsServices = @(
 
 )
@@ -41,14 +45,15 @@ function Install-NonExistsModule {
     )
 
     begin {
-        $modules = Get-InstalledPSResource
+        $modules = Get-InstalledPSResource -Scope AllUsers
     }
 
     process {
         foreach ($n in $Name) {
             Write-Debug $n
             if (!($modules | Where-Object -Property Name -EQ $n)) {
-                Install-PSResource -Name $n -Prerelease -Scope AllUsers
+                $Prerelease = $n -notin $pinStable
+                Install-PSResource -Name $n -Prerelease:$Prerelease -Scope AllUsers
             }
             $n
         }
@@ -323,7 +328,10 @@ function Edit-Hosts {
 }
 
 function Update-InstalledModules {
-    Get-InstalledPSResource | Where-Object -Property Repository -EQ 'PSGallery' | Update-PSResource -Prerelease -Scope AllUsers
+    Get-InstalledPSResource -Scope AllUsers | Where-Object -Property Repository -EQ 'PSGallery' | ForEach-Object {
+        $Prerelease = $n -notin $pinStable
+        $_.Name | Update-PSResource -Prerelease:$Prerelease -Scope AllUsers
+    }
 }
 
 function Update-PipModules {
