@@ -983,6 +983,21 @@ function Set-OpenAIAuthentication {
     }
 }
 
+function Get-OpenAIAPIKey {
+    [CmdletBinding()]
+    param(
+        [Parameter()]
+        [String] $KeyPath = $script:OpenAIKeyPath
+    )
+
+    if (Test-Path($KeyPath)) {
+        Get-Content $KeyPath | ConvertTo-SecureString
+    }
+    else {
+        $null
+    }
+}
+
 if (Get-Command -Module PowerShellAI -ErrorAction SilentlyContinue) {
     ForEach-Object {
         if ($script:OpenAIApiKey) {
