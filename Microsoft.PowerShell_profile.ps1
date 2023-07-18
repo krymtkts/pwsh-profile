@@ -169,6 +169,7 @@ function Remove-GitGoneBranches {
     if ($Force) {
         $deleteFlag = '-D'
     }
+    git remote prune origin
     git branch --format '%(refname:short)=%(upstream:track)' | Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object -ExpandProperty Keys | ForEach-Object { git branch $deleteFlag $_ }
 }
 
