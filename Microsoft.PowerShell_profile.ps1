@@ -313,6 +313,7 @@ function Open-SelectedRepository {
     Set-SelectedRepository && & $code .
 }
 Set-Alias gcode Open-SelectedRepository -Option AllScope
+Set-Alias code code-insiders -Option AllScope
 
 function Show-Paths() {
     ($Env:Path).split(';') | Select-Pocof
