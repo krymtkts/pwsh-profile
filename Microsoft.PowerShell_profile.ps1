@@ -916,7 +916,12 @@ if ($psakeCommand) {
 
 if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
     fnm env --use-on-cd | Out-String | Invoke-Expression
-    fnm completions --shell powershell | Out-String | Invoke-Expression
+    try {
+        fnm completions --shell power-shell 2>&1 | Out-String | Invoke-Expression
+    }
+    catch {
+        Write-Warning "fnm completions --shell power-shell failed. $($_)"
+    }
     Get-ChildItem "$env:FNM_MULTISHELL_PATH/../" | Where-Object -Property CreationTime -LE (Get-Date).AddDays(-1) | Remove-Item
 }
 
