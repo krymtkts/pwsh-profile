@@ -79,7 +79,7 @@ function Install-Modules {
     Install-AWSModules | Out-Null
 }
 
-function Uninstall-OldModules {
+function Uninstall-OutdatedModules {
     Get-InstalledPSResource -Scope AllUsers | Group-Object -Property name | Where-Object -Property Count -GT 1 | ForEach-Object {
         $_.Group | Sort-Object -Property Version -Descending | Select-Object -Skip 1
     } | Uninstall-PSResource -Scope AllUsers
