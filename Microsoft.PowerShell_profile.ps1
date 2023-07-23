@@ -37,7 +37,7 @@ $env:PYTHONUTF8 = 1
 [System.Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 function Install-NonExistsModule {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory = $True,
             ValueFromPipeline = $True)]
@@ -74,13 +74,15 @@ function Initialize-PackageSource {
 }
 
 function Install-Modules {
+    [CmdletBinding(SupportsShouldProcess)]
+    param()
     Initialize-PackageSource
     $names | Install-NonExistsModule | Out-Null
     Install-AWSModules | Out-Null
 }
 
 function Uninstall-OutdatedModules {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     param()
     Get-InstalledPSResource -Scope AllUsers | Group-Object -Property name | Where-Object -Property Count -GT 1 | ForEach-Object {
         $_.Group | Sort-Object -Property Version -Descending | Select-Object -Skip 1
@@ -338,8 +340,11 @@ function Edit-Hosts {
 }
 
 function Update-InstalledModules {
+    [CmdletBinding(SupportsShouldProcess)]
+    param()
+
     Get-InstalledPSResource -Scope AllUsers | Where-Object -Property Repository -EQ 'PSGallery' | ForEach-Object {
-        $Prerelease = $n -notin $pinStable
+        $Prerelease = $_.Name -notin $pinStable
         $_.Name | Update-PSResource -Prerelease:$Prerelease -Scope AllUsers
     }
 }
