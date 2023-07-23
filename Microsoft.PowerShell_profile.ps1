@@ -80,6 +80,8 @@ function Install-Modules {
 }
 
 function Uninstall-OutdatedModules {
+    [CmdletBinding()]
+    param()
     Get-InstalledPSResource -Scope AllUsers | Group-Object -Property name | Where-Object -Property Count -GT 1 | ForEach-Object {
         $_.Group | Sort-Object -Property Version -Descending | Select-Object -Skip 1
     } | Uninstall-PSResource -Scope AllUsers
