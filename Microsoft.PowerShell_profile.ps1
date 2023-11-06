@@ -377,8 +377,8 @@ function Update-PipModules {
 }
 
 function Install-NodeModules {
-    npm install -g @google/clasp @openapitools/openapi-generator-cli aws-cdk textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good wrangler
     npm update -g npm
+    npm install -g @google/clasp @openapitools/openapi-generator-cli aws-cdk textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good wrangler
 }
 
 function Update-NodeModules {
@@ -388,11 +388,11 @@ function Update-NodeModules {
     }
     $firstTime = -not (Get-Command npm -ErrorAction SilentlyContinue)
     if ($firstTime) {
-        16, 18 | ForEach-Object { fnm install "v$_" }
-        fnm default v18
+        18, 20 | ForEach-Object { fnm install "v$_" }
+        fnm default v20
         fnm env --use-on-cd | Out-String | Invoke-Expression
         fnm completions --shell powershell | Out-String | Invoke-Expression
-        npm install -g @google/clasp @openapitools/openapi-generator-cli aws-cdk serverless textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good wrangler
+        Install-NodeModules
     }
     else {
         npm update -g
