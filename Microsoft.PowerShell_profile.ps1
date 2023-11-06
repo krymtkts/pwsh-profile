@@ -973,6 +973,15 @@ if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
     Get-ChildItem "$env:FNM_MULTISHELL_PATH/../" | Where-Object -Property CreationTime -LE (Get-Date).AddDays(-1) | Remove-Item
 }
 
+if (Get-Command -Name dotnet -ErrorAction SilentlyContinue) {
+    Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
+        param($commandName, $wordToComplete, $cursorPosition)
+        dotnet complete --position $cursorPosition "$wordToComplete" | ForEach-Object {
+            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+        }
+    }
+}
+
 if (Get-Command -Name cdk -ErrorAction SilentlyContinue) {
     function Invoke-CdkBootstrap {
         [CmdletBinding()]
