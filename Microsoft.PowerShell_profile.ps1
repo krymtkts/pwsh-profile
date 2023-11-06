@@ -974,6 +974,7 @@ if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
 }
 
 if (Get-Command -Name dotnet -ErrorAction SilentlyContinue) {
+    # https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete#powershell
     Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
         param($commandName, $wordToComplete, $cursorPosition)
         dotnet complete --position $cursorPosition "$wordToComplete" | ForEach-Object {
