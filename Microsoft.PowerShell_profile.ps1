@@ -376,6 +376,11 @@ function Update-PipModules {
     }
 }
 
+function Install-NodeModules {
+    npm install -g @google/clasp @openapitools/openapi-generator-cli aws-cdk textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good wrangler
+    npm update -g npm
+}
+
 function Update-NodeModules {
     if (-not (Get-Command fnm -ErrorAction SilentlyContinue)) {
         Write-Error "Install fnm with command below. 'choco install fnm -y'"
@@ -846,12 +851,13 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
             [ValidateNotNullOrEmpty()]
             [String]$ProfileName = $UserName,
             [Parameter()]
-            $AWSRegion = 'ap-northeast-1'
+            $AWSRegion = 'ap-northeast-1',
+            [int]$DurationInSeconds = 3600
         )
         $params = @{
             RoleArn = "arn:aws:iam::$((Get-STSCallerIdentity -ProfileName $ProfileName -Region $AWSRegion).Account):role/$RoleName"
             RoleSessionName = $RoleSessionName
-            DurationInSeconds = 43200
+            DurationInSeconds = $DurationInSeconds
             ProfileName = $ProfileName
             Region = $AWSRegion
         }
@@ -860,6 +866,38 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
             $params.TokenCode = (op item get $AWSLogin --otp)
         }
         Use-STSRole @params | Select-Object -ExpandProperty Credentials
+    }
+    function Get-AWSRoleCredentialAsEnv {
+        [CmdletBinding(DefaultParameterSetName = 'Default')]
+        param (
+            [Parameter(Mandatory)]
+            [ValidateNotNullOrEmpty()]
+            [String]$RoleName,
+            [Parameter(Mandatory)]
+            [ValidateNotNullOrEmpty()]
+            [String]$RoleSessionName,
+            [Parameter(ParameterSetName = 'MFA', Mandatory)]
+            [String]$UserName,
+            [Parameter(ParameterSetName = 'MFA', Mandatory)]
+            [String]$AWSLogin,
+            [Parameter()]
+            [ValidateNotNullOrEmpty()]
+            [String]$ProfileName = $UserName,
+            [Parameter()]
+            $AWSRegion = 'ap-northeast-1',
+            [int]$DurationInSeconds = 3600
+        )
+        $p = @{
+            ProfileName = $ProfileName
+            RoleName = $RoleName
+            RoleSessionName = $RoleSessionName
+            AWSRegion = $AWSRegion
+        }
+        if ($AWSLogin) {
+            $p.UserName = $UserName
+            $p.AWSLogin = $AWSLogin
+        }
+        Get-AWSRoleCredential @p | ConvertTo-Json | ForEach-Object { $_ -replace '  "(.+)": ', "`$1=" -replace '(,|{|})', '' }
     }
     function Set-AWSRoleCredential {
         [CmdletBinding(DefaultParameterSetName = 'Default')]
@@ -882,13 +920,16 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
         )
         $env:AWS_REGION = $AWSRegion
         $p = @{
-            UserName = $UserName
             ProfileName = $ProfileName
             RoleName = $RoleName
             RoleSessionName = $RoleSessionName
-            AWSLogin = $AWSLogin
             AWSRegion = $AWSRegion
         }
+        if ($AWSLogin) {
+            $p.UserName = $UserName
+            $p.AWSLogin = $AWSLogin
+        }
+
         $c = Get-AWSRoleCredential @p
         $env:AWS_ACCESS_KEY_ID = $c.AccessKeyId
         $env:AWS_SECRET_ACCESS_KEY = $c.SecretAccessKey
