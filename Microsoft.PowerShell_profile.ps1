@@ -983,6 +983,10 @@ if (Get-Command -Name dotnet -ErrorAction SilentlyContinue) {
     }
 }
 
+if (Get-Command -Name gh -ErrorAction SilentlyContinue) {
+    Invoke-Expression -Command $(gh completion -s powershell | Out-String)
+}
+
 if (Get-Command -Name cdk -ErrorAction SilentlyContinue) {
     function Invoke-CdkBootstrap {
         [CmdletBinding()]
