@@ -383,7 +383,6 @@ function Install-NodeModules {
     npm update -g npm
     npm install -g @google/clasp @openapitools/openapi-generator-cli aws-cdk textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good wrangler
 }
-
 function Update-NodeModules {
     if (-not (Get-Command fnm -ErrorAction SilentlyContinue)) {
         Write-Error "Install fnm with command below. 'choco install fnm -y'"
@@ -991,7 +990,7 @@ if (Get-Command -Name gh -ErrorAction SilentlyContinue) {
 }
 
 if (Get-Command -Name dvm -ErrorAction SilentlyContinue) {
-    dvm completions powershell | Out-String | Invoke-Expression -Command
+    dvm completions powershell | Out-String | Invoke-Expression
 }
 
 if (Get-Command -Name cdk -ErrorAction SilentlyContinue) {
