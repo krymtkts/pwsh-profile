@@ -315,7 +315,10 @@ function Open-SelectedRepository {
         'Stable' { 'code' }
         'Insider' { 'code-insiders' }
     }
-    Set-SelectedRepository && & $code .
+    ghq list | Select-Pocof | Select-Object -First 1 | ForEach-Object {
+        Set-Location "$(ghq root)/$_"
+        & $code .
+    }
 }
 Set-Alias gcode Open-SelectedRepository -Option AllScope
 Set-Alias code code-insiders -Option AllScope
@@ -984,7 +987,11 @@ if (Get-Command -Name dotnet -ErrorAction SilentlyContinue) {
 }
 
 if (Get-Command -Name gh -ErrorAction SilentlyContinue) {
-    Invoke-Expression -Command $(gh completion -s powershell | Out-String)
+    gh completion -s powershell | Out-String | Invoke-Expression
+}
+
+if (Get-Command -Name dvm -ErrorAction SilentlyContinue) {
+    dvm completions powershell | Out-String | Invoke-Expression -Command
 }
 
 if (Get-Command -Name cdk -ErrorAction SilentlyContinue) {
