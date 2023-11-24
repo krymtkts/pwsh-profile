@@ -1011,6 +1011,36 @@ if (Get-Command -Name cdk -ErrorAction SilentlyContinue) {
     }
 }
 
+if (Get-Command -Name docker -ErrorAction SilentlyContinue) {
+    function Start-DockerSession {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory)]
+            [ValidateNotNullOrEmpty()]
+            [ArgumentCompleter({
+                    [OutputType([System.Management.Automation.CompletionResult])]
+                    param(
+                        [string] $CommandName,
+                        [string] $ParameterName,
+                        [string] $WordToComplete,
+                        [System.Management.Automation.Language.CommandAst] $CommandAst,
+                        [System.Collections.IDictionary] $FakeBoundParameters
+                    )
+                    docker container ls --format json | ConvertFrom-Json | Where-Object -Property Names -Like "$WordToComplete*" | ForEach-Object {
+                        [System.Management.Automation.CompletionResult]::new($_.Names, $_.Names, 'ParameterValue', $_.Names)
+                    }
+                })]
+            [String]
+            $Container,
+            [Parameter(Mandatory)]
+            [ValidateNotNullOrEmpty()]
+            [String]
+            $Command
+        )
+        docker exec --interactive --tty $Container $Command
+    }
+}
+
 # set a prompt theme.
 if (Get-Command -Name oh-my-posh -ErrorAction SilentlyContinue) {
     oh-my-posh init pwsh --config ~/.oh-my-posh.omp.json | Invoke-Expression
