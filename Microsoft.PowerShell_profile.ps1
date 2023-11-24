@@ -1013,6 +1013,38 @@ if (Get-Command -Name cdk -ErrorAction SilentlyContinue) {
     }
 }
 
+if ((Get-Command -Name ssh -ErrorAction SilentlyContinue) -and (Test-Path "${env:USERPROFILE}/.ssh/config")) {
+    function Get-SshHosts {
+        Get-Content "${env:USERPROFILE}/.ssh/config" | Where-Object {
+            ($_ -ne '') -and ($_ -notlike '#*')
+        } | ForEach-Object -Begin {
+            $configs = @()
+            $tmp = $null
+        } -Process {
+            $propertyName, $value = $_.Trim() -split '\s+', 2
+
+            if ($propertyName -eq 'Host') {
+                if ($tmp) {
+                    $configs += $tmp
+                }
+                $tmp = New-Object PSObject
+            }
+            $tmp | Add-Member -MemberType NoteProperty -Name $propertyName -Value $value
+        } -End {
+            if ($tmp) {
+                $configs += $tmp
+            }
+            $configs
+        }
+    }
+    Register-ArgumentCompleter -Native -CommandName ssh -ScriptBlock {
+        param($wordToComplete, $commandAst, $cursorPosition)
+        Get-SshHosts | Where-Object -Property Host -Like "$wordToComplete*" | ForEach-Object {
+            [System.Management.Automation.CompletionResult]::new($_.Host, $_.Host, 'ParameterValue', $_.Host)
+        }
+    }
+}
+
 if (Get-Command -Name docker -ErrorAction SilentlyContinue) {
     function Start-DockerSession {
         [CmdletBinding()]
