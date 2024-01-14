@@ -1,3 +1,9 @@
+$start = Get-Date
+$totalSeconds = {
+    $end = Get-Date
+    $loadTime = $end - $start
+    $loadTime.TotalSeconds
+}
 $completions = @(
     'Terminal-Icons'
     # Prepare for Maven
@@ -15,7 +21,8 @@ $names = @(
     'PSReadLine', 'pocof', 'Get-GzipContent'
     'powershell-yaml'
     # Prepare for PowerShell
-    'Microsoft.PowerShell.PSResourceGet', 'PSScriptAnalyzer', 'Pester', 'psake', 'PSProfiler'
+    'Microsoft.PowerShell.PSResourceGet', 'PSScriptAnalyzer', 'Pester'
+    'psake', 'PSProfiler', 'Microsoft.WinGet.Client'
     # Prepare for GitHub
     'PowerShellForGitHub'
     # Prepare for AWS
@@ -416,8 +423,9 @@ function Update-NodeModules {
 
 function Install-GoModules {
     $mods = @(
-        'github.com/x-motemen/ghq@latest',
+        'github.com/x-motemen/ghq@latest'
         'mvdan.cc/sh/v3/cmd/shfmt@latest'
+        'github.com/jonhadfield/sn-cli/cmd/sncli@latest'
     )
     $mods | ForEach-Object {
         $start = $_.LastIndexOf('/') + 1
@@ -1075,6 +1083,36 @@ if (Get-Command -Name docker -ErrorAction SilentlyContinue) {
     }
 }
 
+# NOTE: command name will be 'sncli' when built with go install.
+Set-Alias sn -Value sncli -Option AllScope
+if (Get-Command -Name sn -ErrorAction SilentlyContinue) {
+    Register-ArgumentCompleter -Native -Command sn -ScriptBlock {
+        param($wordToComplete, $commandAst, $cursorPosition)
+        Invoke-Expression "$commandAst --generate-bash-completion" | ForEach-Object {
+            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+        }
+    }
+
+    # NOTE: require `sncli session --add` before use this.
+    function Open-SnNotes {
+        param (
+            [Parameter(Mandatory,
+                Position = 0,
+                ValueFromPipeline = $true,
+                ValueFromPipelineByPropertyName = $true)]
+            [ValidateNotNullOrEmpty()]
+            [String]
+            $Title
+        )
+        $n = sn --use-session get note --title $Title
+        if ($n -and ($n -notlike 'no matches*')) {
+            $n | ConvertFrom-Json | Select-Object -ExpandProperty items | ForEach-Object {
+                $_.content.text
+            } | code -
+        }
+    }
+}
+
 # set a prompt theme.
 if (Get-Command -Name oh-my-posh -ErrorAction SilentlyContinue) {
     oh-my-posh init pwsh --config ~/.oh-my-posh.omp.json | Invoke-Expression
@@ -1094,20 +1132,9 @@ Set-PSReadLineOption -PredictionSource HistoryAndPlugin
 Set-PSReadLineOption -PredictionViewStyle ListView
 Set-PSReadLineOption -BellStyle Visual
 
-# install ssh-agent service if not exists.
-# it will be triggered after updating Windows OpenSSH.
-if (! ($SshAgent = (Get-Service -Name 'ssh-agent' -ErrorAction SilentlyContinue))) {
-    install-sshd.ps1
-    Set-Service -Name 'ssh-agent' -StartupType Automatic
-    Start-Service ssh-agent
-}
-elseif ($SshAgent.StartType -eq 'Disabled') {
-    Set-Service -Name 'ssh-agent' -StartupType Automatic
-    Start-Service ssh-agent
-}
-else {
-    Start-Service ssh-agent
-}
+# NOTE: to install ssh-agent service, run below command.
+# `choco install openssh -params '"/SSHAgentFeature"' -y`
+# don't use `install-sshd.ps1` to prevent from installing sshd service.
 
 $script:OpenAIKeyPath = '~/.openaikey'
 function Set-OpenAIAuthentication {
@@ -1143,16 +1170,15 @@ function Get-OpenAIAPIKey {
     }
 }
 
-if (Get-Command -Module PowerShellAI -ErrorAction SilentlyContinue) {
-    ForEach-Object {
-        if ($script:OpenAIApiKey) {
-            $script:OpenAIApiKey
+if (Get-Command -Name winget -ErrorAction SilentlyContinue) {
+    Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
+        param($wordToComplete, $commandAst, $cursorPosition)
+        [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [System.Text.Utf8Encoding]::new()
+        $Local:word = $wordToComplete.Replace('"', '""')
+        $Local:ast = $commandAst.ToString().Replace('"', '""')
+        winget complete --word="$Local:word" --commandline "$Local:ast" --position $cursorPosition | ForEach-Object {
+            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
         }
-        elseif (Test-Path($script:OpenAIKeyPath)) {
-            Get-Content $script:OpenAIKeyPath | ConvertTo-SecureString
-        }
-    } | Where-Object { $_ } | ForEach-Object {
-        Set-OpenAIKey -Key $_
     }
 }
 
@@ -1162,6 +1188,13 @@ Set-Alias ~ cu -Option AllScope
 # Set alias to ll.
 Set-Alias ll ls -Option AllScope
 
+# NOTE: PowerToys CommandNotFound module requires PSFeedbackProvider and PSCommandNotFoundSuggestion.
+## Enable-ExperimentalFeature -Name PSFeedbackProvider
+## Enable-ExperimentalFeature -Name PSCommandNotFoundSuggestion
+#34de4b3d-13a8-4540-b76d-b9e8d3851756 PowerToys CommandNotFound module
+Import-Module "$env:ProgramFiles\PowerToys\WinGetCommandNotFound.psd1"
+#34de4b3d-13a8-4540-b76d-b9e8d3851756
+
 # Show message.
 $Horns = [char]::ConvertFromUtf32(0x1f918)
-Write-Host "$Horns pwsh $($PSVersionTable.PSVersion.ToString()) is ready $Horns"
+Write-Host "$Horns pwsh $($PSVersionTable.PSVersion.ToString()) is ready $Horns User profile loaded in $(&$totalSeconds) seconds"
