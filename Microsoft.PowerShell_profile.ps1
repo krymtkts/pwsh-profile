@@ -19,7 +19,7 @@ $pinStable = @(
 $names = @(
     # Prepare basic utilities
     'PSReadLine', 'pocof', 'Get-GzipContent'
-    'powershell-yaml'
+    'powershell-yaml', 'PSToml'
     # Prepare for PowerShell
     'Microsoft.PowerShell.PSResourceGet', 'PSScriptAnalyzer', 'Pester'
     'psake', 'PSProfiler', 'Microsoft.WinGet.Client'
@@ -437,6 +437,10 @@ function Install-GoModules {
 }
 
 function Update-GoModules {
+    if (-not (Get-Command go -ErrorAction SilentlyContinue)) {
+        Write-Error "Install go with command below. 'choco install golang -y'"
+        return
+    }
     ll $env:GOPATH/bin | ForEach-Object {
         go version -m $_
     } | Where-Object {
@@ -449,7 +453,9 @@ function Update-GoModules {
 # Helper function to execute choco upgrade.
 function Update-Packages {
     Update-InstalledModules
-    Update-AWSToolsModule -Scope AllUsers -Force -CleanUp
+    if (Get-Command -Name Update-AWSToolsModule -ErrorAction SilentlyContinue) {
+        Update-AWSToolsModule -Scope AllUsers -Force -CleanUp
+    }
     Update-PipModules
     Update-NodeModules
     Update-GoModules
