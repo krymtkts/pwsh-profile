@@ -1115,7 +1115,7 @@ if (Get-Command -Name sn -ErrorAction SilentlyContinue) {
 
 # set a prompt theme.
 if (Get-Command -Name oh-my-posh -ErrorAction SilentlyContinue) {
-    oh-my-posh init pwsh --config ~/.oh-my-posh.omp.json | Invoke-Expression
+    oh-my-posh init pwsh --config ~/.oh-my-posh.omp.yaml | Invoke-Expression
 }
 
 # Prepare for completions.
