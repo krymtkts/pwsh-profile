@@ -334,11 +334,11 @@ Set-Alias gcode Open-SelectedRepository -Option AllScope
 Set-Alias code code-insiders -Option AllScope
 
 function Show-Paths() {
-    ($Env:Path).split(';') | Select-Pocof
+    ($Env:Path).split(';') | Select-Pocof -Layout TopDown
 }
 
 function Show-ReadLineHistory() {
-    Get-Content -Path (Get-PSReadLineOption).HistorySavePath | Select-Object -Unique | Select-Pocof -CaseSensitive
+    Get-Content -Path (Get-PSReadLineOption).HistorySavePath | Select-Object -Unique | Select-Pocof -CaseSensitive -Layout TopDown
 }
 Set-Alias pghy Show-ReadLineHistory -Option AllScope
 
