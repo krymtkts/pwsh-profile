@@ -34,8 +34,11 @@ $awsServices = @(
 )
 
 # Set default parameter values.
-$PSDefaultParameterValues = @{'Select-Pocof:Layout' = 'TopDownHalf' }
-
+# Set default parameter values.
+$PSDefaultParameterValues = @{
+    'Select-Pocof:Layout' = 'TopDownHalf'
+    'Select-Pocof:Prompt' = ''
+}
 # TLS versions.
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13
 
