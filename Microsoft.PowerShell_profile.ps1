@@ -34,7 +34,6 @@ $awsServices = @(
 )
 
 # Set default parameter values.
-# Set default parameter values.
 $PSDefaultParameterValues = @{
     'Select-Pocof:Layout' = 'TopDownHalf'
     'Select-Pocof:Prompt' = ''
