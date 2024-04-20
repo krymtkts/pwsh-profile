@@ -16,12 +16,10 @@ function local:Complete {
 }
 
 function local:Set-FunctionsForPSResources {
-    $completions = @(
+    $importRequired = @(
         'Terminal-Icons'
-        # Prepare for Maven
         'MavenAutoCompletion'
-        # Prepare for Docker
-        'DockerCompletion', 'DockerComposeCompletion', 'DockerMachineCompletion'
+        'DockerCompletion', 'DockerComposeCompletion'
         'posh-git'
     )
     $pinStable = @(
@@ -29,22 +27,21 @@ function local:Set-FunctionsForPSResources {
         'platyPS'
     )
     $names = @(
-        # Prepare basic utilities
+        # basic utilities
         'PSReadLine', 'pocof', 'Get-GzipContent'
         'powershell-yaml', 'PSToml'
-        # Prepare for PowerShell
+        # for PowerShell
         'Microsoft.PowerShell.PSResourceGet', 'PSScriptAnalyzer', 'Pester'
         'psake', 'PSProfiler', 'Microsoft.WinGet.Client'
-        # Prepare for GitHub
+        # for GitHub
         'PowerShellForGitHub'
-        # Prepare for AWS
+        # for AWS
         'AWS.Tools.Installer'
+        # others
         'PowerShellAI'
-    ) + $pinStable + $completions
+    ) + $pinStable + $importRequired
 
-    # Prepare for completions.
-    Import-Module -Name $completions
-    # Import-Module -Name PowerShellForGitHub
+    Import-Module -Name $importRequired
 
     function global:Install-NonExistsModule {
         [CmdletBinding(SupportsShouldProcess)]
@@ -882,6 +879,10 @@ function local:Set-FunctionsForSsh {
             }
         }
     }
+
+    # NOTE: to install ssh-agent service, run below command.
+    # `choco install openssh -params '"/SSHAgentFeature"' -y`
+    # don't use `install-sshd.ps1` to prevent from installing sshd service.
 }
 
 function local:Set-FunctionsForDocker {
@@ -1020,7 +1021,235 @@ function local:Set-FunctionsForWinget {
     }
 }
 
-# Helper function to execute choco upgrade.
+function local:Set-MiscellaneousFunctions {
+    function global:Edit-Hosts {
+        Start-Process notepad c:\windows\system32\drivers\etc\hosts -Verb runas
+    }
+
+    function global:New-EmptyFIle([parameter(mandatory)][string]$Name) {
+        New-Item -Name $Name -ItemType File
+    }
+    Set-Alias touch New-EmptyFile -Option ReadOnly -Force -Scope Global
+
+    function global:New-TemporaryDirectory {
+        $parent = [System.IO.Path]::GetTempPath()
+        [string] $name = [System.Guid]::NewGuid()
+        New-Item -ItemType Directory -Path (Join-Path $parent $name)
+    }
+    Set-Alias tmpdir New-TemporaryDirectory -Option ReadOnly -Force -Scope Global
+
+    # Helper function to show Unicode character
+    function global:Convert-CodeToUnicode {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory = $true,
+                Position = 0,
+                ValueFromPipeline = $true,
+                ValueFromPipelineByPropertyName = $true)]
+            [ValidateNotNullOrEmpty()]
+            [int[]] $Code
+        )
+        process {
+            foreach ($c in $Code) {
+                if ((0 -le $c) -and ($c -le 0xFFFF)) {
+                    [char] $c
+                }
+                elseif ((0x10000 -le $c) -and ($c -le 0x10FFFF)) {
+                    [char]::ConvertFromUtf32($c)
+                }
+                else {
+                    throw "Invalid character code $c"
+                }
+            }
+        }
+    }
+
+    function global:Convert-UnicodeToCode {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory = $true,
+                Position = 0,
+                ValueFromPipeline = $true,
+                ValueFromPipelineByPropertyName = $true)]
+            [ValidateNotNullOrEmpty()]
+            [String[]]$s
+        )
+        process {
+            foreach ($c in $s) {
+                [Convert]::ToInt32($c -as [char]).ToString('x')
+            }
+        }
+    }
+
+    function global:Convert-0xTo10 {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory = $true,
+                Position = 0,
+                ValueFromPipeline = $true,
+                ValueFromPipelineByPropertyName = $true)]
+            [ValidateNotNullOrEmpty()]
+            [String[]]$0x
+        )
+        process {
+            foreach ($c in $0x) {
+                [Convert]::ToInt32($c, 16)
+            }
+        }
+    }
+
+    function global:New-Password {
+        [CmdletBinding()]
+        param (
+            # Length is password length.
+            [Parameter(Mandatory = $True)]
+            [int]
+            $Length,
+            [Parameter()]
+            [switch]
+            $NoSymbol
+        )
+
+        process {
+            $uppers = 'ABCDEFGHIJKLMNPQRSTUVWXYZ'
+            $lowers = $uppers.ToLower()
+            $digits = '123456789'
+            $symbols = "!@#$%^&*()-=[];',./_+{}:`"<>?\|``~"
+            $chars = if ($NoSymbol) {
+            ($uppers + $lowers + $digits).ToCharArray()
+            }
+            else {
+            ($uppers + $lowers + $digits + $symbols).ToCharArray()
+            }
+
+            do {
+                $pwdChars = ''.ToCharArray()
+                $goodPassword = $false
+                $hasDigit = $false
+                $hasSymbol = $false
+                $pwdChars += (Get-Random -InputObject $uppers.ToCharArray() -Count 1)
+                for ($i = 1; $i -lt $length; $i++) {
+                    $char = Get-Random -InputObject $chars -Count 1
+                    if ($digits.Contains($char)) { $hasDigit = $true }
+                    if ($symbols.Contains($char)) { $hasSymbol = $true }
+                    $pwdChars += $char
+                }
+                $password = $pwdChars -join ''
+                $goodPassword = $hasDigit -and ($NoSymbol -or $hasSymbol)
+            } until ($goodPassword)
+        }
+
+        end {
+            $password
+        }
+    }
+
+    function global:New-TextFile {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory)]
+            [string]
+            $Name,
+            [Parameter()]
+            [long]
+            $Byte = [Math]::Pow(1024, 3),
+            [Parameter()]
+            [int]
+            $Basis = [Math]::Pow(1024, 2)
+        )
+        begin {
+            if (Test-Path $Name) {
+                Write-Error 'overrides currently not supported.'
+                return
+            }
+            $Remains = $Byte % $Basis
+            $Per = $Byte / $Basis
+        }
+        process {
+            1..$Per | ForEach-Object { 'x' * $Basis | Add-Content $Name -Encoding ascii -NoNewline }
+            if ($Remains -ne 0) {
+                'x' * $Remains | Add-Content $Name -Encoding ascii -NoNewline
+            }
+        }
+    }
+
+    function global:ConvertFrom-Base64 {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory = $true,
+                Position = 0,
+                ValueFromPipeline = $true,
+                ValueFromPipelineByPropertyName = $true)]
+            [ValidateNotNullOrEmpty()]
+            [String[]]$Value
+        )
+        process {
+            $Value | ForEach-Object {
+                $bytes = [System.Convert]::FromBase64String($_)
+                $output = [System.Text.Encoding]::Default.GetString($bytes)
+                $output
+            }
+        }
+    }
+
+    function global:ConvertTo-Base64 {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory = $true,
+                Position = 0,
+                ValueFromPipeline = $true,
+                ValueFromPipelineByPropertyName = $true)]
+            [ValidateNotNullOrEmpty()]
+            [String[]]$Value
+        )
+        process {
+            $Value | ForEach-Object {
+                # TODO: add encoding.
+                [System.Convert]::ToBase64String($_.ToCharArray())
+            }
+        }
+    }
+
+    function global:tail {
+        [CmdletBinding()]
+        param (
+            [Parameter()]
+            [System.Text.Encoding]
+            $Encoding = [System.Text.Encoding]::UTF8,
+            # Specifies a path to one or more locations.
+            [Parameter(
+                Position = 0,
+                ParameterSetName = 'Path',
+                ValueFromPipeline = $true,
+                ValueFromPipelineByPropertyName = $true,
+                HelpMessage = 'Path to one or more locations.')]
+            [Alias('PSPath')]
+            [ValidateNotNullOrEmpty()]
+            [string]
+            $Path,
+            [Parameter()]
+            [ValidateNotNullOrEmpty()]
+            [int]
+            $N = 10
+        )
+        Get-Content -Path $Path -Wait -Encoding $Encoding -Tail $N
+    }
+
+    function global:Get-UnixTimeSeconds {
+        [CmdletBinding()]
+        param (
+            [Parameter()]
+            [datetime]
+            $date = (Get-Date)
+        )
+        [Math]::Truncate(($date - (Get-Date -UnixTimeSeconds 0)).TotalSeconds)
+    }
+
+    Set-Alias ll ls -Option ReadOnly -Force -Scope Global
+}
+
+# NOTE: setting section of Microsoft.PowerShell_profile.ps1
+
 function Update-Packages {
     @(
         'Update-InstalledModules'
@@ -1050,6 +1279,7 @@ Set-FunctionsForDocker
 Set-FunctionsForStandardNotes
 Set-FunctionsForOpenAI
 Set-FunctionsForWinget
+Set-MiscellaneousFunctions
 
 # change display language for gpg.
 $env:LANG = 'en'
@@ -1077,9 +1307,6 @@ $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 if (Test-Path($ChocolateyProfile)) {
     Import-Module "$ChocolateyProfile"
 }
-# NOTE: to install ssh-agent service, run below command.
-# `choco install openssh -params '"/SSHAgentFeature"' -y`
-# don't use `install-sshd.ps1` to prevent from installing sshd service.
 
 if (Test-Path "$env:ProgramFiles\PowerToys") {
     # NOTE: PowerToys CommandNotFound module requires PSFeedbackProvider and PSCommandNotFoundSuggestion.
@@ -1095,240 +1322,5 @@ if (Get-Command -Name oh-my-posh -ErrorAction SilentlyContinue) {
     oh-my-posh init pwsh --config ~/.oh-my-posh.omp.yaml | Invoke-Expression
 }
 
-# TODO: below are work in progress. --------------------------------------------
-
-# Helper function to edit hosts file.
-function Edit-Hosts {
-    Start-Process notepad c:\windows\system32\drivers\etc\hosts -Verb runas
-}
-
-function New-EmptyFIle([parameter(mandatory)][string]$Name) {
-    New-Item -Name $Name -ItemType File
-}
-Set-Alias touch New-EmptyFile -Option ReadOnly -Force -Scope Global
-
-function New-TemporaryDirectory {
-    $parent = [System.IO.Path]::GetTempPath()
-    [string] $name = [System.Guid]::NewGuid()
-    New-Item -ItemType Directory -Path (Join-Path $parent $name)
-}
-Set-Alias tmpdir New-TemporaryDirectory -Option ReadOnly -Force -Scope Global
-
-# Helper function to show Unicode character
-function U {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true,
-            Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
-        [ValidateNotNullOrEmpty()]
-        [int[]] $Code
-    )
-    process {
-        foreach ($c in $Code) {
-            if ((0 -le $c) -and ($c -le 0xFFFF)) {
-                [char] $c
-            }
-            elseif ((0x10000 -le $c) -and ($c -le 0x10FFFF)) {
-                [char]::ConvertFromUtf32($c)
-            }
-            else {
-                throw "Invalid character code $c"
-            }
-        }
-    }
-}
-
-function UC {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true,
-            Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String[]]$s
-    )
-    process {
-        foreach ($c in $s) {
-            [Convert]::ToInt32($c -as [char]).ToString('x')
-        }
-    }
-}
-
-function Convert-0xTo10 {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true,
-            Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String[]]$0x
-    )
-    process {
-        foreach ($c in $0x) {
-            [Convert]::ToInt32($c, 16)
-        }
-    }
-}
-
-function New-Password {
-    [CmdletBinding()]
-    param (
-        # Length is password length.
-        [Parameter(Mandatory = $True)]
-        [int]
-        $Length,
-        [Parameter()]
-        [switch]
-        $NoSymbol
-    )
-
-    begin {
-
-    }
-
-    process {
-        $uppers = 'ABCDEFGHIJKLMNPQRSTUVWXYZ'
-        $lowers = $uppers.ToLower()
-        $digits = '123456789'
-        $symbols = "!@#$%^&*()-=[];',./_+{}:`"<>?\|``~"
-        $chars = if ($NoSymbol) {
-            ($uppers + $lowers + $digits).ToCharArray()
-        }
-        else {
-            ($uppers + $lowers + $digits + $symbols).ToCharArray()
-        }
-
-        do {
-            $pwdChars = ''.ToCharArray()
-            $goodPassword = $false
-            $hasDigit = $false
-            $hasSymbol = $false
-            $pwdChars += (Get-Random -InputObject $uppers.ToCharArray() -Count 1)
-            for ($i = 1; $i -lt $length; $i++) {
-                $char = Get-Random -InputObject $chars -Count 1
-                if ($digits.Contains($char)) { $hasDigit = $true }
-                if ($symbols.Contains($char)) { $hasSymbol = $true }
-                $pwdChars += $char
-            }
-            $password = $pwdChars -join ''
-            $goodPassword = $hasDigit -and ($NoSymbol -or $hasSymbol)
-        } until ($goodPassword)
-    }
-
-    end {
-        $password
-    }
-}
-
-function New-TextFile {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory)]
-        [string]
-        $Name,
-        [Parameter()]
-        [long]
-        $Byte = [Math]::Pow(1024, 3),
-        [Parameter()]
-        [int]
-        $Basis = [Math]::Pow(1024, 2)
-    )
-    begin {
-        if (Test-Path $Name) {
-            Write-Error 'overrides currently not supported.'
-            return
-        }
-        $Remains = $Byte % $Basis
-        $Per = $Byte / $Basis
-    }
-    process {
-        1..$Per | ForEach-Object { 'x' * $Basis | Add-Content $Name -Encoding ascii -NoNewline }
-        if ($Remains -ne 0) {
-            'x' * $Remains | Add-Content $Name -Encoding ascii -NoNewline
-        }
-    }
-}
-
-function ConvertFrom-Base64 {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true,
-            Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String[]]$Value
-    )
-    process {
-        $Value | ForEach-Object {
-            $bytes = [System.Convert]::FromBase64String($_)
-            $output = [System.Text.Encoding]::Default.GetString($bytes)
-            $output
-        }
-    }
-}
-
-function ConvertTo-Base64 {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true,
-            Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String[]]$Value
-    )
-    process {
-        $Value | ForEach-Object {
-            # TODO: add encoding.
-            [System.Convert]::ToBase64String($_.ToCharArray())
-        }
-    }
-}
-
-function tail {
-    [CmdletBinding()]
-    param (
-        [Parameter()]
-        [System.Text.Encoding]
-        $Encoding = [System.Text.Encoding]::UTF8,
-        # Specifies a path to one or more locations.
-        [Parameter(
-            Position = 0,
-            ParameterSetName = 'Path',
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Path to one or more locations.')]
-        [Alias('PSPath')]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $Path,
-        [Parameter()]
-        [ValidateNotNullOrEmpty()]
-        [int]
-        $N = 10
-    )
-    Get-Content -Path $Path -Wait -Encoding $Encoding -Tail $N
-}
-
-function Get-UnixTimeSeconds {
-    [CmdletBinding()]
-    param (
-        [Parameter()]
-        [datetime]
-        $date = (Get-Date)
-    )
-    [Math]::Truncate(($date - (Get-Date -UnixTimeSeconds 0)).TotalSeconds)
-}
-
-# Helper function to set location to the User Profile directory.
-function cu { Set-Location ~ }
-Set-Alias ~ cu -Option ReadOnly -Force -Scope Global
-# Set alias to ll.
-Set-Alias ll ls -Option ReadOnly -Force -Scope Global
-
+# NOTE: end of Microsoft.PowerShell_profile.ps1
 local:Complete
