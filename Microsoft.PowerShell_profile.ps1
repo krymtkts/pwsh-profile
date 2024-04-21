@@ -369,6 +369,8 @@ function local:Set-FunctionsForAWS {
                 [Parameter()]
                 [String]$ProfileName
             )
+            # NOTE: workaround for certificate issue.
+            $env:NODE_TLS_REJECT_UNAUTHORIZED = 0
             $env:AWS_REGION = 'ap-northeast-1'
             $ci = Get-STSCallerIdentity
             if ($ProfileName) {
@@ -377,6 +379,7 @@ function local:Set-FunctionsForAWS {
             else {
                 cdk bootstrap "aws://$($ci.Account)/$($env:AWS_REGION)"
             }
+            $env:NODE_TLS_REJECT_UNAUTHORIZED = 1
         }
     }
 
@@ -442,6 +445,12 @@ max-cache-ttl 86400
 
     if (Get-Command -Name gh -ErrorAction SilentlyContinue) {
         gh completion -s powershell | Out-String | Invoke-Expression
+    }
+
+    if (Get-Command -Name 'gpg-connect-agent' -ErrorAction SilentlyContinue) {
+        Start-Job -ScriptBlock {
+            gpg-connect-agent updatestartuptty /bye
+        } | Out-Null
     }
 }
 
@@ -697,8 +706,11 @@ function local:Set-FunctionsForPython {
 
 function local:Set-FunctionsForNodeJs {
     function global:Install-NodeModules {
+        # NOTE: workaround for certificate issue.
+        $env:NODE_TLS_REJECT_UNAUTHORIZED = 0
         npm update -g npm
         npm install -g @google/clasp @openapitools/openapi-generator-cli aws-cdk textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good wrangler
+        $env:NODE_TLS_REJECT_UNAUTHORIZED = 1
     }
     function global:Update-NodeModules {
         if (-not (Get-Command fnm -ErrorAction SilentlyContinue)) {
