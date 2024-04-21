@@ -504,7 +504,7 @@ function local:Set-FunctionsForEnvironment {
         Invoke-WebRequest @params
     }
 
-    # No longer used. It can only be used with the old version of Windows 11.
+    # TODO: No longer used. It can only be used with the old version of Windows 11.
     # function global:Update-GUIRegistryValues {
     #     $path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects3'
     #     $key = 'Settings'
@@ -914,7 +914,7 @@ function local:Set-FunctionsForDocker {
             docker exec --interactive --tty $Container $Command
         }
 
-        # TODO: now work.
+        # TODO: not work for now.
         function global:Optimize-DockerUsage {
             # Docker Desktop も dockerd も立ち上がってない前提
             Start-Process 'C:\Program Files\Docker\Docker\resources\dockerd.exe' -WindowStyle Hidden
