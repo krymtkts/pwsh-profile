@@ -449,7 +449,7 @@ function local:Set-FunctionsForEnvironment {
     function global:Update-Profile {
         $ProfileHome = ($PROFILE | Split-Path -Parent)
         $params = @{
-            Uri = 'https://gist.githubusercontent.com/krymtkts/f8af667c32b16fc28a815243b316c5be/raw/Microsoft.PowerShell_profile.ps1'
+            Uri = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main/Microsoft.PowerShell_profile.ps1'
             OutFile = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
         }
         Invoke-WebRequest @params
@@ -496,11 +496,10 @@ function local:Set-FunctionsForEnvironment {
         Invoke-WebRequest @params
     }
 
-    # TODO: update to yaml version.
     function global:Update-PoshTheme {
         $params = @{
-            Uri = 'https://gist.githubusercontent.com/krymtkts/d320ff5ec30fa47b138c2df018f95423/raw/.oh-my-posh.omp.json'
-            OutFile = '~/.oh-my-posh.omp.json'
+            Uri = 'https://gist.githubusercontent.com/krymtkts/d320ff5ec30fa47b138c2df018f95423/raw/bf406fbf181413c62f0228e56f63db9c57017093/.oh-my-posh.omp.yaml'
+            OutFile = '~/.oh-my-posh.omp.yaml'
         }
         Invoke-WebRequest @params
     }
