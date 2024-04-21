@@ -209,15 +209,21 @@ function local:Set-FunctionsForAWS {
         function global:Get-AWSRoleCredential {
             [CmdletBinding(DefaultParameterSetName = 'Default')]
             param (
-                [Parameter(Mandatory)]
-                [ValidateNotNullOrEmpty()]
+                [Parameter(ParameterSetName = 'Default', Mandatory)]
+                [Parameter(ParameterSetName = 'MFA', Mandatory)]
+                # [ValidateNotNullOrEmpty()]
                 [String]$RoleName,
+                [Parameter(ParameterSetName = 'Cross', Mandatory)]
+                # [ValidateNotNullOrEmpty()]
+                [String]$RoleArn,
                 [Parameter(Mandatory)]
                 [ValidateNotNullOrEmpty()]
                 [String]$RoleSessionName,
                 [Parameter(ParameterSetName = 'MFA', Mandatory)]
+                [Parameter(ParameterSetName = 'Cross', Mandatory)]
                 [String]$UserName,
                 [Parameter(ParameterSetName = 'MFA', Mandatory)]
+                [Parameter(ParameterSetName = 'Cross', Mandatory)]
                 [String]$AWSLogin,
                 [Parameter()]
                 [ValidateNotNullOrEmpty()]
@@ -227,7 +233,7 @@ function local:Set-FunctionsForAWS {
                 [int]$DurationInSeconds = 3600
             )
             $params = @{
-                RoleArn = "arn:aws:iam::$((Get-STSCallerIdentity -ProfileName $ProfileName -Region $AWSRegion).Account):role/$RoleName"
+                RoleArn = if ($RoleArn) { $RoleArn } else { "arn:aws:iam::$((Get-STSCallerIdentity -ProfileName $ProfileName -Region $AWSRegion).Account):role/$RoleName" }
                 RoleSessionName = $RoleSessionName
                 DurationInSeconds = $DurationInSeconds
                 ProfileName = $ProfileName
@@ -242,15 +248,21 @@ function local:Set-FunctionsForAWS {
         function global:Get-AWSRoleCredentialAsEnv {
             [CmdletBinding(DefaultParameterSetName = 'Default')]
             param (
-                [Parameter(Mandatory)]
-                [ValidateNotNullOrEmpty()]
+                [Parameter(ParameterSetName = 'Default', Mandatory)]
+                [Parameter(ParameterSetName = 'MFA', Mandatory)]
+                # [ValidateNotNullOrEmpty()]
                 [String]$RoleName,
+                [Parameter(ParameterSetName = 'Cross', Mandatory)]
+                # [ValidateNotNullOrEmpty()]
+                [String]$RoleArn,
                 [Parameter(Mandatory)]
                 [ValidateNotNullOrEmpty()]
                 [String]$RoleSessionName,
                 [Parameter(ParameterSetName = 'MFA', Mandatory)]
+                [Parameter(ParameterSetName = 'Cross', Mandatory)]
                 [String]$UserName,
                 [Parameter(ParameterSetName = 'MFA', Mandatory)]
+                [Parameter(ParameterSetName = 'Cross', Mandatory)]
                 [String]$AWSLogin,
                 [Parameter()]
                 [ValidateNotNullOrEmpty()]
@@ -261,28 +273,40 @@ function local:Set-FunctionsForAWS {
             )
             $p = @{
                 ProfileName = $ProfileName
-                RoleName = $RoleName
                 RoleSessionName = $RoleSessionName
                 AWSRegion = $AWSRegion
+            }
+            if ($RoleName) {
+                $p.RoleName = $RoleName
+            }
+            if ($RoleArn) {
+                $p.RoleArn = $RoleArn
             }
             if ($AWSLogin) {
                 $p.UserName = $UserName
                 $p.AWSLogin = $AWSLogin
             }
+
             Get-AWSRoleCredential @p | ConvertTo-Json | ForEach-Object { $_ -replace '  "(.+)": ', "`$1=" -replace '(,|{|})', '' }
         }
         function global:Set-AWSRoleCredential {
             [CmdletBinding(DefaultParameterSetName = 'Default')]
             param (
-                [Parameter(Mandatory)]
-                [ValidateNotNullOrEmpty()]
+                [Parameter(ParameterSetName = 'Default', Mandatory)]
+                [Parameter(ParameterSetName = 'MFA', Mandatory)]
+                # [ValidateNotNullOrEmpty()]
                 [String]$RoleName,
+                [Parameter(ParameterSetName = 'Cross', Mandatory)]
+                # [ValidateNotNullOrEmpty()]
+                [String]$RoleArn,
                 [Parameter(Mandatory)]
                 [ValidateNotNullOrEmpty()]
                 [String]$RoleSessionName,
                 [Parameter(ParameterSetName = 'MFA', Mandatory)]
+                [Parameter(ParameterSetName = 'Cross', Mandatory)]
                 [String]$UserName,
                 [Parameter(ParameterSetName = 'MFA', Mandatory)]
+                [Parameter(ParameterSetName = 'Cross', Mandatory)]
                 [String]$AWSLogin,
                 [Parameter()]
                 [ValidateNotNullOrEmpty()]
@@ -293,9 +317,14 @@ function local:Set-FunctionsForAWS {
             $env:AWS_REGION = $AWSRegion
             $p = @{
                 ProfileName = $ProfileName
-                RoleName = $RoleName
                 RoleSessionName = $RoleSessionName
                 AWSRegion = $AWSRegion
+            }
+            if ($RoleName) {
+                $p.RoleName = $RoleName
+            }
+            if ($RoleArn) {
+                $p.RoleArn = $RoleArn
             }
             if ($AWSLogin) {
                 $p.UserName = $UserName
