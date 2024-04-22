@@ -23,6 +23,7 @@ function local:Set-FunctionsForPSResources {
         'posh-git'
     )
     $pinStable = @(
+        # NOTE: use stable to avoid error in AWS.Tools.Installer.
         'PowerShellGet',
         'platyPS'
     )
@@ -97,6 +98,7 @@ function local:Set-FunctionsForPSResources {
         [CmdletBinding(SupportsShouldProcess)]
         param()
 
+        Uninstall-OutdatedPSResources
         Get-InstalledPSResource -Scope AllUsers | Where-Object -Property Repository -EQ 'PSGallery' | Group-Object -Property Name | ForEach-Object {
             $Prerelease = $_.Name -notin $pinStable
             Write-Host "Update $($_.Name) $(if ($Prerelease) {'Prerelease'} else {''})"
@@ -107,7 +109,7 @@ function local:Set-FunctionsForPSResources {
 }
 
 function local:Set-FunctionsForAWS {
-    $installServicesForAwsToolsForPowerShell = @(
+    $global:installServicesForAwsToolsForPowerShell = @(
 
     )
     function global:Install-AWSModules {
