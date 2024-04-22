@@ -1299,7 +1299,7 @@ function Update-Packages {
         'Update-GoModules'
     ) | ForEach-Object {
         if (Get-Command -Name $_ -ErrorAction SilentlyContinue) {
-            $_
+            &$_
         }
     }
 }
