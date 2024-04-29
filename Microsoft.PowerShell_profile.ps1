@@ -486,6 +486,8 @@ max-cache-ttl 86400
 }
 
 function local:Set-FunctionsForEnvironment {
+    Get-ChildItem "$($PROFILE | Split-Path -Parent)/Scripts" -Recurse -File -Filter *.psm1 | Import-Module
+
     function global:Update-Profile {
         $ProfileHome = ($PROFILE | Split-Path -Parent)
         $ProfilePath = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
@@ -515,7 +517,6 @@ function local:Set-FunctionsForEnvironment {
             Invoke-WebRequest @params | Out-Null
         }
         . $ProfilePath
-        Get-ChildItem "${ProfileHome}/Scripts" -Recurse -File -Filter *.psm1 | Import-Module
     }
 
     function global:Edit-TerminalIcons {
