@@ -115,3 +115,99 @@ function New-Password {
     }
 }
 
+# Helper function to show Unicode character
+function Convert-CodeToUnicode {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [int[]] $Code
+    )
+    process {
+        foreach ($c in $Code) {
+            if ((0 -le $c) -and ($c -le 0xFFFF)) {
+                [char] $c
+            }
+            elseif ((0x10000 -le $c) -and ($c -le 0x10FFFF)) {
+                [char]::ConvertFromUtf32($c)
+            }
+            else {
+                throw "Invalid character code $c"
+            }
+        }
+    }
+}
+
+function Convert-UnicodeToCode {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]$s
+    )
+    process {
+        foreach ($c in $s) {
+            [Convert]::ToInt32($c -as [char]).ToString('x')
+        }
+    }
+}
+
+function Convert-0xTo10 {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]$0x
+    )
+    process {
+        foreach ($c in $0x) {
+            [Convert]::ToInt32($c, 16)
+        }
+    }
+}
+
+function ConvertFrom-Base64 {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]$Value
+    )
+    process {
+        $Value | ForEach-Object {
+            $bytes = [System.Convert]::FromBase64String($_)
+            $output = [System.Text.Encoding]::Default.GetString($bytes)
+            $output
+        }
+    }
+}
+
+function ConvertTo-Base64 {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]$Value
+    )
+    process {
+        $Value | ForEach-Object {
+            # TODO: add encoding.
+            [System.Convert]::ToBase64String($_.ToCharArray())
+        }
+    }
+}
