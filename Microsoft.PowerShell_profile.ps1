@@ -488,15 +488,34 @@ max-cache-ttl 86400
 function local:Set-FunctionsForEnvironment {
     function global:Update-Profile {
         $ProfileHome = ($PROFILE | Split-Path -Parent)
+        $ProfilePath = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
+        $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main/'
         $params = @{
-            Uri = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main/Microsoft.PowerShell_profile.ps1'
-            OutFile = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
+            Uri = "${baseUrl}/Microsoft.PowerShell_profile.ps1"
+            OutFile = $ProfilePath
         }
-        Invoke-WebRequest @params
+        Invoke-WebRequest @params | Out-Null
 
         if (-not (Test-Path "${ProfileHome}/Microsoft.VSCode_profile.ps1")) {
-            New-Item -ItemType HardLink -Path $ProfileHome -Name 'Microsoft.VSCode_profile.ps1' -Value "$profilehome\Microsoft.PowerShell_profile.ps1"
+            New-Item -ItemType HardLink -Path $ProfileHome -Name 'Microsoft.VSCode_profile.ps1' -Value $ProfilePath
         }
+
+        @(
+            'Get-Hash/Get-Hash.psm1'
+            'Strings/Strings.psm1'
+        ) | ForEach-Object {
+            $scriptPath = "${ProfileHome}/Scripts/${_}"
+            if (-not (Split-Path $scriptPath -Parent | Test-Path)) {
+                New-Item -ItemType Directory -Path (Split-Path $scriptPath -Parent) -Force
+            }
+            $params = @{
+                Uri = "${baseUrl}/Scripts/${_}"
+                OutFile = "${ProfileHome}/Scripts/${_}"
+            }
+            Invoke-WebRequest @params | Out-Null
+        }
+        . $ProfilePath
+        Get-ChildItem "${ProfileHome}/Scripts" -Recurse -File -Filter *.psm1 | Import-Module
     }
 
     function global:Edit-TerminalIcons {
