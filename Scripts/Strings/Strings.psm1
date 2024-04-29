@@ -69,3 +69,49 @@ function ConvertTo-RegexReplacedString {
     }
 }
 
+function New-Password {
+    [CmdletBinding()]
+    param (
+        # Length is password length.
+        [Parameter(Mandatory = $True)]
+        [int]
+        $Length,
+        [Parameter()]
+        [switch]
+        $NoSymbol
+    )
+
+    process {
+        $uppers = 'ABCDEFGHIJKLMNPQRSTUVWXYZ'
+        $lowers = $uppers.ToLower()
+        $digits = '123456789'
+        $symbols = "!@#$%^&*()-=[];',./_+{}:`"<>?\|``~"
+        $chars = if ($NoSymbol) {
+        ($uppers + $lowers + $digits).ToCharArray()
+        }
+        else {
+        ($uppers + $lowers + $digits + $symbols).ToCharArray()
+        }
+
+        do {
+            $pwdChars = ''.ToCharArray()
+            $goodPassword = $false
+            $hasDigit = $false
+            $hasSymbol = $false
+            $pwdChars += (Get-Random -InputObject $uppers.ToCharArray() -Count 1)
+            for ($i = 1; $i -lt $length; $i++) {
+                $char = Get-Random -InputObject $chars -Count 1
+                if ($digits.Contains($char)) { $hasDigit = $true }
+                if ($symbols.Contains($char)) { $hasSymbol = $true }
+                $pwdChars += $char
+            }
+            $password = $pwdChars -join ''
+            $goodPassword = $hasDigit -and ($NoSymbol -or $hasSymbol)
+        } until ($goodPassword)
+    }
+
+    end {
+        $password
+    }
+}
+
