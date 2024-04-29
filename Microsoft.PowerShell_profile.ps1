@@ -22,12 +22,12 @@ function local:Set-FunctionsForPSResources {
         'DockerCompletion', 'DockerComposeCompletion'
         'posh-git'
     )
-    $pinStable = @(
+    $global:pinStable = @(
         # NOTE: use stable to avoid error in AWS.Tools.Installer.
         'PowerShellGet',
         'platyPS'
     )
-    $names = @(
+    $global:names = @(
         # basic utilities
         'PSReadLine', 'pocof', 'Get-GzipContent'
         'powershell-yaml', 'PSToml'
