@@ -43,3 +43,29 @@ function ConvertTo-UpperCase {
     }
 }
 
+function ConvertTo-RegexReplacedString {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory,
+            Position = 0)]
+        [string]
+        $Pattern,
+        [Parameter(Mandatory,
+            Position = 1)]
+        [string]
+        $Replacement,
+        [Parameter(Mandatory,
+            Position = 2,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName)]
+        [string]
+        $InputString
+    )
+    begin {
+        $Regex = [regex]::new($Pattern)
+    }
+    process {
+        $Regex.Replace($InputString, $Replacement)
+    }
+}
+
