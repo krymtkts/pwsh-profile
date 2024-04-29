@@ -486,7 +486,7 @@ max-cache-ttl 86400
 }
 
 function local:Set-FunctionsForEnvironment {
-    Get-ChildItem "$($PROFILE | Split-Path -Parent)/Scripts" -Recurse -File -Filter *.psm1 | Import-Module
+    Get-ChildItem "$($PROFILE | Split-Path -Parent)/Scripts" -Recurse -File -Filter *.psm1 | Import-Module -Force
 
     function global:Update-Profile {
         $ProfileHome = ($PROFILE | Split-Path -Parent)
