@@ -503,6 +503,7 @@ function local:Set-FunctionsForEnvironment {
         }
 
         @(
+            'Functions/Functions.psm1'
             'Get-Hash/Get-Hash.psm1'
             'Strings/Strings.psm1'
         ) | ForEach-Object {
