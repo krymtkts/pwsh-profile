@@ -506,6 +506,7 @@ function local:Set-FunctionsForEnvironment {
             'Functions/Functions.psm1'
             'Get-Hash/Get-Hash.psm1'
             'Strings/Strings.psm1'
+            'Windows/Windows.psm1'
         ) | ForEach-Object {
             $scriptPath = "${ProfileHome}/Scripts/${_}"
             if (-not (Split-Path $scriptPath -Parent | Test-Path)) {
@@ -1085,10 +1086,6 @@ function local:Set-FunctionsForWinget {
 }
 
 function local:Set-MiscellaneousFunctions {
-    function global:Edit-Hosts {
-        Start-Process notepad c:\windows\system32\drivers\etc\hosts -Verb runas
-    }
-
     function global:Get-UnixTimeSeconds {
         [CmdletBinding()]
         param (
