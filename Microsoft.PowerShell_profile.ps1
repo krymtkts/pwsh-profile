@@ -129,15 +129,7 @@ function local:Set-FunctionsForAWS {
     }
 
     # This idea was inspired by  https://github.com/aws/aws-cli/issues/5309#issuecomment-693941619
-    $awsCompleter = Get-Command -Name aws_completer -ErrorAction SilentlyContinue
-    if ($awsCompleter) {
-        # for PyPI installation.
-        if ($awsCompleter.Name -notlike '*.exe' ) {
-            $f = { python $awsCompleter.Source }
-        }
-        else {
-            $f = { & $awsCompleter.Name }
-        }
+    if (Get-Command -Name aws_completer -ErrorAction SilentlyContinue) {
         Register-ArgumentCompleter -Native -CommandName aws -ScriptBlock {
             param($wordToComplete, $commandAst, $cursorPosition)
             if ("$commandAst" -eq 'aws') {
@@ -149,7 +141,7 @@ function local:Set-FunctionsForAWS {
             }
             $env:COMP_LINE = $compLine
             $env:COMP_POINT = $cursorPosition
-            & $f | ForEach-Object {
+            aws_completer | ForEach-Object {
                 [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
             }
             Remove-Item env:\COMP_LINE
@@ -843,13 +835,13 @@ function local:Set-FunctionsForDotnet {
     # Don't use '$psake' named variable because Invoke-psake has broken if uses the '$psake'.
     $psakeCommand = Get-Command -Name Invoke-psake -ErrorAction SilentlyContinue
     if ($psakeCommand) {
-        Register-ArgumentCompleter -CommandName $psakeCommand.Name -ScriptBlock {
+        Register-ArgumentCompleter -CommandName Invoke-psake -ScriptBlock {
             param($wordToComplete, $commandAst, $cursorPosition)
             # "invoke=> [$wordToComplete], [$commandAst], [$cursorPosition]" >> test.log
             Get-ChildItem "$wordToComplete*.ps1" | Resolve-Path -Relative
         }
 
-        Register-ArgumentCompleter -CommandName $psakeCommand.Name -ParameterName taskList -ScriptBlock {
+        Register-ArgumentCompleter -CommandName Invoke-psake -ParameterName taskList -ScriptBlock {
             param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
             # "invoke tasklist=> [$commandName], [$parameterName], [$wordToComplete], [$commandAst], [$($fakeBoundParameters|Out-String)]" >> test.log
             if ($commandAst -match '(?<file>[^ ]*\.ps1)') {
@@ -913,7 +905,7 @@ function local:Set-FunctionsForDeno {
 
 function local:Set-FunctionsForSsh {
     if ((Get-Command -Name ssh -ErrorAction SilentlyContinue) -and (Test-Path "${env:USERPROFILE}/.ssh/config")) {
-        function Get-SshHosts {
+        function global:Get-SshHosts {
             Get-Content "${env:USERPROFILE}/.ssh/config" | Where-Object {
                 ($_ -ne '') -and ($_ -notlike '#*')
             } | ForEach-Object -Begin {
