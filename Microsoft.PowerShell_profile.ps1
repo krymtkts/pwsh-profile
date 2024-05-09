@@ -943,34 +943,6 @@ function local:Set-FunctionsForSsh {
 
 function local:Set-FunctionsForDocker {
     if (Get-Command -Name docker -ErrorAction SilentlyContinue) {
-        function global:Start-DockerSession {
-            [CmdletBinding()]
-            param (
-                [Parameter(Mandatory)]
-                [ValidateNotNullOrEmpty()]
-                [ArgumentCompleter({
-                        [OutputType([System.Management.Automation.CompletionResult])]
-                        param(
-                            [string] $CommandName,
-                            [string] $ParameterName,
-                            [string] $WordToComplete,
-                            [System.Management.Automation.Language.CommandAst] $CommandAst,
-                            [System.Collections.IDictionary] $FakeBoundParameters
-                        )
-                        docker container ls --format json | ConvertFrom-Json | Where-Object -Property Names -Like "$WordToComplete*" | ForEach-Object {
-                            [System.Management.Automation.CompletionResult]::new($_.Names, $_.Names, 'ParameterValue', $_.Names)
-                        }
-                    })]
-                [String]
-                $Container,
-                [Parameter(Mandatory)]
-                [ValidateNotNullOrEmpty()]
-                [String]
-                $Command
-            )
-            docker exec --interactive --tty $Container $Command
-        }
-
         # TODO: not work for now.
         function global:Optimize-DockerUsage {
             # Docker Desktop も dockerd も立ち上がってない前提
