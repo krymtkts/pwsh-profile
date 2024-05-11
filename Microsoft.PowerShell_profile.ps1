@@ -15,62 +15,61 @@ function local:Complete {
     Write-Host "$Horns pwsh $($PSVersionTable.PSVersion.ToString()) is ready $Horns User profile loaded in $(&$totalSeconds) seconds"
 }
 
-function local:Set-FunctionsForEnvironment {
-    Get-ChildItem "$($PROFILE | Split-Path -Parent)/Scripts" -Recurse -File -Filter *.psm1 | Import-Module -Force
+Get-ChildItem "$($PROFILE | Split-Path -Parent)/Scripts" -Recurse -File -Filter *.psm1 | Import-Module -Force
 
-    function global:Update-ProfileScripts {
-        @(
-            'Autocomplete/Autocomplete.psm1'
-            'AWS/AWS.psm1'
-            'Functions/Functions.psm1'
-            'Get-Hash/Get-Hash.psm1'
-            'Git/Git.psm1'
-            'Go/Go.psm1'
-            'Mod/Mod.psm1'
-            'Nodejs/Nodejs.psm1'
-            'OpenAI/OpenAI.psm1'
-            'Pocof/Pocof.psm1'
-            'Psake/Psake.psm1'
-            'PSResource/PSResource.psm1'
-            'Python/Python.psm1'
-            'StandardNotes/StandardNotes.psm1'
-            'Strings/Strings.psm1'
-            'Windows/Windows.psm1'
-        ) | ForEach-Object {
-            $scriptPath = "${ProfileHome}/Scripts/${_}"
-            if (-not (Split-Path $scriptPath -Parent | Test-Path)) {
-                New-Item -ItemType Directory -Path (Split-Path $scriptPath -Parent) -Force
-            }
-            $params = @{
-                Uri = "${baseUrl}/Scripts/${_}"
-                OutFile = "${ProfileHome}/Scripts/${_}"
-            }
-            Invoke-WebRequest @params | Out-Null
+function global:Update-ProfileScripts {
+    @(
+        'Autocomplete/Autocomplete.psm1'
+        'AWS/AWS.psm1'
+        'Functions/Functions.psm1'
+        'Get-Hash/Get-Hash.psm1'
+        'Git/Git.psm1'
+        'Go/Go.psm1'
+        'Mod/Mod.psm1'
+        'Nodejs/Nodejs.psm1'
+        'OpenAI/OpenAI.psm1'
+        'Pocof/Pocof.psm1'
+        'Psake/Psake.psm1'
+        'PSResource/PSResource.psm1'
+        'Python/Python.psm1'
+        'StandardNotes/StandardNotes.psm1'
+        'Strings/Strings.psm1'
+        'Windows/Windows.psm1'
+    ) | ForEach-Object {
+        $scriptPath = "${ProfileHome}/Scripts/${_}"
+        if (-not (Split-Path $scriptPath -Parent | Test-Path)) {
+            New-Item -ItemType Directory -Path (Split-Path $scriptPath -Parent) -Force
         }
-    }
-
-    function global:Update-Profile {
-        $ProfileHome = ($PROFILE | Split-Path -Parent)
-        $ProfilePath = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
-        $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main/'
         $params = @{
-            Uri = "${baseUrl}/Microsoft.PowerShell_profile.ps1"
-            OutFile = $ProfilePath
+            Uri = "${baseUrl}/Scripts/${_}"
+            OutFile = "${ProfileHome}/Scripts/${_}"
         }
         Invoke-WebRequest @params | Out-Null
-
-        if (-not (Test-Path "${ProfileHome}/Microsoft.VSCode_profile.ps1")) {
-            New-Item -ItemType HardLink -Path $ProfileHome -Name 'Microsoft.VSCode_profile.ps1' -Value $ProfilePath
-        }
-        # TODO: load the profile to prepare new psm1 files.
-        . $ProfilePath
-
-        Update-ProfileScripts
-
-        # TODO: load the profile again to apply new psm1 files.
-        . $ProfilePath
     }
 }
+
+function global:Update-Profile {
+    $ProfileHome = ($PROFILE | Split-Path -Parent)
+    $ProfilePath = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
+    $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main/'
+    $params = @{
+        Uri = "${baseUrl}/Microsoft.PowerShell_profile.ps1"
+        OutFile = $ProfilePath
+    }
+    Invoke-WebRequest @params | Out-Null
+
+    if (-not (Test-Path "${ProfileHome}/Microsoft.VSCode_profile.ps1")) {
+        New-Item -ItemType HardLink -Path $ProfileHome -Name 'Microsoft.VSCode_profile.ps1' -Value $ProfilePath
+    }
+    # TODO: load the profile to prepare new psm1 files.
+    . $ProfilePath
+
+    Update-ProfileScripts
+
+    # TODO: load the profile again to apply new psm1 files.
+    . $ProfilePath
+}
+
 
 function local:Set-FunctionsForDocker {
     if (Get-Command -Name docker -ErrorAction SilentlyContinue) {
@@ -114,8 +113,6 @@ function Update-Packages {
     }
 }
 
-Set-FunctionsForEnvironment
-Set-FunctionsForDocker
 
 # change display language for gpg.
 $env:LANG = 'en'
