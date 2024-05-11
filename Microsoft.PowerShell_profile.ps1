@@ -20,6 +20,7 @@ function local:Set-FunctionsForEnvironment {
 
     function global:Update-ProfileScripts {
         @(
+            'Autocomplete/Autocomplete.psm1'
             'AWS/AWS.psm1'
             'Functions/Functions.psm1'
             'Get-Hash/Get-Hash.psm1'
@@ -234,62 +235,6 @@ Task $task {
             }
         }
     }
-
-    if (Get-Command -Name dotnet -ErrorAction SilentlyContinue) {
-        # https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete#powershell
-        Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
-            # NOTE: The parameter names given in the above document are incorrect.
-            # param($commandName, $wordToComplete, $cursorPosition)
-            param($wordToComplete, $commandAst, $cursorPosition)
-            dotnet complete --position $cursorPosition "$wordToComplete" | ForEach-Object {
-                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
-            }
-        }
-    }
-}
-
-function local:Set-FunctionsForDeno {
-    if (Get-Command -Name dvm -ErrorAction SilentlyContinue) {
-        dvm completions powershell | Out-String | Invoke-Expression
-    }
-}
-
-function local:Set-FunctionsForSsh {
-    if ((Get-Command -Name ssh -ErrorAction SilentlyContinue) -and (Test-Path "${env:USERPROFILE}/.ssh/config")) {
-        function global:Get-SshHosts {
-            Get-Content "${env:USERPROFILE}/.ssh/config" | Where-Object {
-                ($_ -ne '') -and ($_ -notlike '#*')
-            } | ForEach-Object -Begin {
-                $configs = @()
-                $tmp = $null
-            } -Process {
-                $propertyName, $value = $_.Trim() -split '\s+', 2
-
-                if ($propertyName -eq 'Host') {
-                    if ($tmp) {
-                        $configs += $tmp
-                    }
-                    $tmp = New-Object PSObject
-                }
-                $tmp | Add-Member -MemberType NoteProperty -Name $propertyName -Value $value
-            } -End {
-                if ($tmp) {
-                    $configs += $tmp
-                }
-                $configs
-            }
-        }
-        Register-ArgumentCompleter -Native -CommandName ssh -ScriptBlock {
-            param($wordToComplete, $commandAst, $cursorPosition)
-            Get-SshHosts | Where-Object -Property Host -Like "$wordToComplete*" | ForEach-Object {
-                [System.Management.Automation.CompletionResult]::new($_.Host, $_.Host, 'ParameterValue', $_.Host)
-            }
-        }
-    }
-
-    # NOTE: to install ssh-agent service, run below command.
-    # `choco install openssh -params '"/SSHAgentFeature"' -y`
-    # don't use `install-sshd.ps1` to prevent from installing sshd service.
 }
 
 function local:Set-FunctionsForDocker {
@@ -386,20 +331,6 @@ function local:Set-FunctionsForOpenAI {
     }
 }
 
-function local:Set-FunctionsForWinget {
-    if (Get-Command -Name winget -ErrorAction SilentlyContinue) {
-        Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
-            param($wordToComplete, $commandAst, $cursorPosition)
-            [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [System.Text.Utf8Encoding]::new()
-            $Local:word = $wordToComplete.Replace('"', '""')
-            $Local:ast = $commandAst.ToString().Replace('"', '""')
-            winget complete --word="$Local:word" --commandline "$Local:ast" --position $cursorPosition | ForEach-Object {
-                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
-            }
-        }
-    }
-}
-
 # NOTE: setting section of Microsoft.PowerShell_profile.ps1
 
 function Update-Packages {
@@ -421,12 +352,9 @@ Set-FunctionsForPython
 Set-FunctionsForNodeJs
 Set-FunctionsForGo
 Set-FunctionsForDotnet
-Set-FunctionsForDeno
-Set-FunctionsForSsh
 Set-FunctionsForDocker
 Set-FunctionsForStandardNotes
 Set-FunctionsForOpenAI
-Set-FunctionsForWinget
 
 # change display language for gpg.
 $env:LANG = 'en'
@@ -445,6 +373,16 @@ Set-PSReadLineOption -BellStyle Visual
 
 # Set aliases.
 Set-Alias ll ls -Option ReadOnly -Force -Scope Global
+
+if (-not (Get-Service ssh-agent -ErrorAction SilentlyContinue)) {
+    Write-Error @'
+to install ssh-agent service, run below command.
+
+`choco install openssh -params '"/SSHAgentFeature"' -y`
+
+don't use `install-sshd.ps1` to prevent from installing sshd service.
+'@
+}
 
 # Set default parameter values.
 if (Get-Command -Name Get-PSDefaultParameterValuesForPocof -ErrorAction SilentlyContinue) {
