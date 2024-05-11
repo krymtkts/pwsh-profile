@@ -503,9 +503,8 @@ Set-PSReadLineOption -PredictionViewStyle ListView
 Set-PSReadLineOption -BellStyle Visual
 
 # Set default parameter values.
-$PSDefaultParameterValues = @{
-    'Select-Pocof:Layout' = 'TopDownHalf'
-    'Select-Pocof:Prompt' = ''
+if (Get-Command -Name Get-PSDefaultParameterValuesForPocof -ErrorAction SilentlyContinue) {
+    $PSDefaultParameterValues += Get-PSDefaultParameterValuesForPocof
 }
 
 # prepare for Chocolatey.

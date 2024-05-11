@@ -2,6 +2,15 @@ if (Test-Path -Path '~/.poco-cd') {
     Move-Item -Path '~/.poco-cd' -Destination '~/.pocof-cd' -Force
 }
 
+function Get-PSDefaultParameterValuesForPocof {
+    @{
+        'Select-Pocof:Layout' = 'TopDownHalf'
+        'Select-Pocof:Prompt' = ''
+    }
+}
+
+$PSDefaultParameterValues += Get-PSDefaultParameterValuesForPocof
+
 function Set-SelectedLocation {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
