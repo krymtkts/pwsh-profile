@@ -508,9 +508,11 @@ if (Get-Command -Name Get-PSDefaultParameterValuesForPocof -ErrorAction Silently
 }
 
 # prepare for Chocolatey.
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-    Import-Module "$ChocolateyProfile"
+$local:ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+if (Test-Path($local:ChocolateyProfile)) {
+    # NOTE: currently, autocomplete for Chocolatey is not work.
+    # https://github.com/chocolatey/choco/issues/3364
+    Import-Module "$local:ChocolateyProfile"
 }
 
 if (Test-Path "$env:ProgramFiles\PowerToys") {
