@@ -28,6 +28,7 @@ function local:Set-FunctionsForEnvironment {
             'Go/Go.psm1'
             'Mod/Mod.psm1'
             'Nodejs/Nodejs.psm1'
+            'OpenAI/OpenAI.psm1'
             'Pocof/Pocof.psm1'
             'Psake/Psake.psm1'
             'PSResource/PSResource.psm1'
@@ -128,42 +129,6 @@ function local:Set-FunctionsForStandardNotes {
     }
 }
 
-function local:Set-FunctionsForOpenAI {
-    $script:OpenAIKeyPath = '~/.openaikey'
-    function global:Set-OpenAIAuthentication {
-        [CmdletBinding(SupportsShouldProcess)]
-        param(
-            [PSCredential] $Credential
-        )
-
-        if (-not $Credential) {
-            $message = 'Please provide your OpenAI API key.'
-            $message = $message + "These credential is being cached into '${script:OpenAIKeyPath}'."
-            $Credential = Get-Credential -Message $message -UserName openai
-        }
-        if ($PSCmdlet.ShouldProcess($script:OpenAIKeyPath)) {
-            $script:OpenAIApiKey = $Credential.Password
-            New-Item -Path $script:OpenAIKeyPath -Force | Out-Null
-            $Credential.Password | ConvertFrom-SecureString | Set-Content -Path $script:OpenAIKeyPath -Force
-        }
-    }
-
-    function global:Get-OpenAIAPIKey {
-        [CmdletBinding()]
-        param(
-            [Parameter()]
-            [String] $KeyPath = $script:OpenAIKeyPath
-        )
-
-        if (Test-Path($KeyPath)) {
-            Get-Content $KeyPath | ConvertTo-SecureString
-        }
-        else {
-            $null
-        }
-    }
-}
-
 # NOTE: setting section of Microsoft.PowerShell_profile.ps1
 
 function Update-Packages {
@@ -183,7 +148,6 @@ function Update-Packages {
 Set-FunctionsForEnvironment
 Set-FunctionsForDocker
 Set-FunctionsForStandardNotes
-Set-FunctionsForOpenAI
 
 # change display language for gpg.
 $env:LANG = 'en'
