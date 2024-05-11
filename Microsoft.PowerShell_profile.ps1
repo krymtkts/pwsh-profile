@@ -24,6 +24,7 @@ function local:Set-FunctionsForEnvironment {
             'Functions/Functions.psm1'
             'Get-Hash/Get-Hash.psm1'
             'Git/Git.psm1'
+            'Mod/Mod.psm1'
             'Pocof/Pocof.psm1'
             'PSResource/PSResource.psm1'
             'Strings/Strings.psm1'
