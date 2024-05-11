@@ -1,8 +1,27 @@
-$installServicesForAwsToolsForPowerShell = @(
+function Get-AWSModuleConfiguration {
+    [CmdletBinding()]
+    param ()
+    $filePath = Join-Path -Path ($PROFILE | Split-Path -Parent) -ChildPath 'aws-modules.psd1'
 
-)
+    if (-not (Test-Path -Path $filePath)) {
+        $result = Read-Host -Prompt "File '$filePath' does not exist. Do you want to create it? (y/n)"
+        if ($result -eq 'y') {
+            # 配列をpsd1ファイルに保存
+            $installServicesForAwsToolsForPowerShell = @()
+            $hashTable = @{Services = $installServicesForAwsToolsForPowerShell }
+            $hashTable | ConvertTo-Json | Out-File -FilePath $filePath
+        }
+        else {
+            return @()
+        }
+    }
+
+    $data = Import-PowerShellDataFile -Path $filePath
+    $data.Services
+}
 
 function Install-AWSModules {
+    $installServicesForAwsToolsForPowerShell = Get-AWSModuleConfiguration
     if (-not $installServicesForAwsToolsForPowerShell) {
         Write-Warning 'No AWS services for AWS Tools for PowerShell installed.'
         return

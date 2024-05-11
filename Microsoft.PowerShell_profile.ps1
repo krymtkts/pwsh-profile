@@ -195,6 +195,7 @@ function local:Set-FunctionsForEnvironment {
         }
 
         @(
+            'AWS/AWS.psm1'
             'Functions/Functions.psm1'
             'Get-Hash/Get-Hash.psm1'
             'Strings/Strings.psm1'
@@ -780,7 +781,6 @@ function Update-Packages {
 }
 
 Set-FunctionsForPSResources
-Set-FunctionsForAWS
 Set-FunctionsForGit
 Set-FunctionsForEnvironment
 Set-FunctionsForPocof
