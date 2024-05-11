@@ -21,10 +21,28 @@ if (Get-Command -Name sn -ErrorAction SilentlyContinue) {
             $Title
         )
         $n = sn --use-session get note --title $Title
-        if ($n -and ($n -notlike 'no matches*')) {
-            $n | ConvertFrom-Json | Select-Object -ExpandProperty items | ForEach-Object {
-                $_.content.text
-            } | code -
+        if (-not $n) {
+            Write-Error "sn get note --title $Title failed."
+            return
+        }
+        if ($n -and ($n -in 'secret not found in keyring', 'invalid session found in keyring')) {
+            Write-Host 'renew standardnotes session.'
+            sn session --remove
+            sn session --add
+        }
+        if ($n -and ($n -like 'no matches*')) {
+            Write-Host 'no notes found.'
+            return
+        }
+        else {
+            try {
+                $n | ConvertFrom-Json | Select-Object -ExpandProperty items | ForEach-Object {
+                    $_.content.text
+                } | code -
+            }
+            catch {
+                Write-Error "failed to open notes.`n${_}"
+            }
         }
     }
 }
