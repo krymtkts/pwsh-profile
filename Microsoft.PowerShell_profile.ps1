@@ -386,7 +386,9 @@ don't use `install-sshd.ps1` to prevent from installing sshd service.
 
 # Set default parameter values.
 if (Get-Command -Name Get-PSDefaultParameterValuesForPocof -ErrorAction SilentlyContinue) {
-    $PSDefaultParameterValues += Get-PSDefaultParameterValuesForPocof
+    (Get-PSDefaultParameterValuesForPocof).GetEnumerator() | ForEach-Object {
+        $PSDefaultParameterValues[$_.Key] = $_.Value
+    }
 }
 
 # prepare for Chocolatey.
