@@ -7,9 +7,7 @@ function Get-AWSModuleConfiguration {
         $result = Read-Host -Prompt "File '$filePath' does not exist. Do you want to create it? (y/n)"
         if ($result -eq 'y') {
             # 配列をpsd1ファイルに保存
-            $installServicesForAwsToolsForPowerShell = @()
-            $hashTable = @{Services = $installServicesForAwsToolsForPowerShell }
-            $hashTable | ConvertTo-Json | Out-File -FilePath $filePath
+            '@{ AWSModules = @() }' | Out-File -FilePath $filePath
         }
         else {
             return @()
@@ -17,7 +15,7 @@ function Get-AWSModuleConfiguration {
     }
 
     $data = Import-PowerShellDataFile -Path $filePath
-    $data.Services
+    $data.AWSModules
 }
 
 function Install-AWSModules {
