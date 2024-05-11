@@ -42,7 +42,7 @@ if (Get-Command -Name sn -ErrorAction SilentlyContinue) {
                 } | code -
             }
             catch {
-                Write-Error "failed to open notes.`n${_}"
+                Write-Error "failed to open notes.`n$n`n${_}"
             }
         }
     }
