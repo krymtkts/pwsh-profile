@@ -29,6 +29,7 @@ if (Get-Command -Name sn -ErrorAction SilentlyContinue) {
             Write-Host 'renew standardnotes session.'
             sn session --remove
             sn session --add
+            $n = sn --use-session get note --title $Title
         }
         if ($n -and ($n -like 'no matches*')) {
             Write-Host 'no notes found.'
