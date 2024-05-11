@@ -1,3 +1,7 @@
+if (Test-Path -Path '~/.poco-cd') {
+    Move-Item -Path '~/.poco-cd' -Destination '~/.pocof-cd' -Force
+}
+
 function Set-SelectedLocation {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
@@ -5,9 +9,9 @@ function Set-SelectedLocation {
         [string]$Location,
         [switch]$Here
     )
+    $current = Get-Content ('~/.poco-cd', '~/.pocof-cd' | Where-Object { Test-Path -Path $_ } | Select-Object -First 1)
     switch ($Mode) {
         'Add' {
-            $current = @(Get-Content '~/.poco-cd')
             if ($Location) {
                 $current += "$Location"
 
@@ -15,19 +19,19 @@ function Set-SelectedLocation {
             elseif ($Here) {
                 $current += "$(Get-Location)"
             }
-            $current | Get-Unique | Set-Content -Encoding UTF8 '~/.poco-cd'
+            $current | Get-Unique | Set-Content -Encoding UTF8 '~/.pocof-cd'
         }
         'Move' {
-            Get-Content -Path '~/.poco-cd' | Select-Pocof -CaseSensitive | Select-Object -First 1 | Set-Location
+            $current | Select-Pocof -CaseSensitive | Select-Object -First 1 | Set-Location
         }
         'Open' {
-            Get-Content -Path '~/.poco-cd' | Select-Pocof -CaseSensitive | Select-Object -First 1 | Invoke-Item
+            $current | Select-Pocof -CaseSensitive | Select-Object -First 1 | Invoke-Item
         }
         'Remove' {
             if (-not $Location) {
-                $Location = Get-Content -Path '~/.poco-cd' | Select-Pocof -CaseSensitive
+                $Location = $current | Select-Pocof -CaseSensitive
             }
-            Get-Content '~/.poco-cd' | Where-Object { $_ -ne $Location } | Get-Unique | Set-Content -Encoding UTF8 '~/.poco-cd'
+            $current | Where-Object { $_ -ne $Location } | Get-Unique | Set-Content -Encoding UTF8 '~/.pocof-cd'
         }
     }
 }
