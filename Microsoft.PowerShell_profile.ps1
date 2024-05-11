@@ -399,20 +399,6 @@ function local:Set-FunctionsForWinget {
     }
 }
 
-function local:Set-MiscellaneousFunctions {
-    function global:Get-UnixTimeSeconds {
-        [CmdletBinding()]
-        param (
-            [Parameter()]
-            [datetime]
-            $date = (Get-Date)
-        )
-        [Math]::Truncate(($date - (Get-Date -UnixTimeSeconds 0)).TotalSeconds)
-    }
-
-    Set-Alias ll ls -Option ReadOnly -Force -Scope Global
-}
-
 # NOTE: setting section of Microsoft.PowerShell_profile.ps1
 
 function Update-Packages {
@@ -440,7 +426,6 @@ Set-FunctionsForDocker
 Set-FunctionsForStandardNotes
 Set-FunctionsForOpenAI
 Set-FunctionsForWinget
-Set-MiscellaneousFunctions
 
 # change display language for gpg.
 $env:LANG = 'en'
@@ -456,6 +441,9 @@ $env:PYTHONUTF8 = 1
 Set-PSReadLineOption -PredictionSource HistoryAndPlugin
 Set-PSReadLineOption -PredictionViewStyle ListView
 Set-PSReadLineOption -BellStyle Visual
+
+# Set aliases.
+Set-Alias ll ls -Option ReadOnly -Force -Scope Global
 
 # Set default parameter values.
 if (Get-Command -Name Get-PSDefaultParameterValuesForPocof -ErrorAction SilentlyContinue) {

@@ -102,3 +102,13 @@ function Invoke-TryCatch {
         }
     }
 }
+
+function Get-UnixTimeSeconds {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [datetime]
+        $date = (Get-Date)
+    )
+    [Math]::Truncate(($date - (Get-Date -UnixTimeSeconds 0)).TotalSeconds)
+}
