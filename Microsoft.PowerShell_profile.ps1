@@ -180,20 +180,7 @@ max-cache-ttl 86400
 function local:Set-FunctionsForEnvironment {
     Get-ChildItem "$($PROFILE | Split-Path -Parent)/Scripts" -Recurse -File -Filter *.psm1 | Import-Module -Force
 
-    function global:Update-Profile {
-        $ProfileHome = ($PROFILE | Split-Path -Parent)
-        $ProfilePath = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
-        $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main/'
-        $params = @{
-            Uri = "${baseUrl}/Microsoft.PowerShell_profile.ps1"
-            OutFile = $ProfilePath
-        }
-        Invoke-WebRequest @params | Out-Null
-
-        if (-not (Test-Path "${ProfileHome}/Microsoft.VSCode_profile.ps1")) {
-            New-Item -ItemType HardLink -Path $ProfileHome -Name 'Microsoft.VSCode_profile.ps1' -Value $ProfilePath
-        }
-
+    function global:Update-ProfileScripts {
         @(
             'AWS/AWS.psm1'
             'Functions/Functions.psm1'
@@ -211,6 +198,27 @@ function local:Set-FunctionsForEnvironment {
             }
             Invoke-WebRequest @params | Out-Null
         }
+    }
+
+    function global:Update-Profile {
+        $ProfileHome = ($PROFILE | Split-Path -Parent)
+        $ProfilePath = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
+        $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main/'
+        $params = @{
+            Uri = "${baseUrl}/Microsoft.PowerShell_profile.ps1"
+            OutFile = $ProfilePath
+        }
+        Invoke-WebRequest @params | Out-Null
+
+        if (-not (Test-Path "${ProfileHome}/Microsoft.VSCode_profile.ps1")) {
+            New-Item -ItemType HardLink -Path $ProfileHome -Name 'Microsoft.VSCode_profile.ps1' -Value $ProfilePath
+        }
+        # TODO: load the profile to prepare new psm1 files.
+        . $ProfilePath
+
+        Update-ProfileScripts
+
+        # TODO: load the profile again to apply new psm1 files.
         . $ProfilePath
     }
 
