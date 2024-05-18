@@ -28,7 +28,7 @@ function Set-SelectedLocation {
             elseif ($Here) {
                 $current += "$(Get-Location)"
             }
-            $current | Get-Unique | Set-Content -Encoding UTF8 '~/.pocof-cd'
+            $current | Sort-Object | Get-Unique | Set-Content -Encoding UTF8 '~/.pocof-cd'
         }
         'Move' {
             $current | Select-Pocof -CaseSensitive | Select-Object -First 1 | Set-Location
@@ -40,7 +40,7 @@ function Set-SelectedLocation {
             if (-not $Location) {
                 $Location = $current | Select-Pocof -CaseSensitive
             }
-            $current | Where-Object { $_ -ne $Location } | Get-Unique | Set-Content -Encoding UTF8 '~/.pocof-cd'
+            $current | Where-Object { $_ -ne $Location } | Sort-Object | Get-Unique | Set-Content -Encoding UTF8 '~/.pocof-cd'
         }
     }
 }
@@ -80,7 +80,7 @@ function Open-VSCodeWorkspace {
             if ($Path -and (Test-Path($Path))) {
                 $current = @(Get-Content $file)
                 $current += (Resolve-Path $Path).Path
-                $current | Get-Unique | Set-Content -Encoding UTF8 $file
+                $current | Sort-Object | Get-Unique | Set-Content -Encoding UTF8 $file
                 break
             }
             else {
@@ -137,7 +137,7 @@ function Show-Paths() {
 }
 
 function Show-ReadLineHistory() {
-    Get-Content -Path (Get-PSReadLineOption).HistorySavePath | Select-Object -Unique | Select-Pocof -CaseSensitive -Layout TopDown
+    Get-Content -Path (Get-PSReadLineOption).HistorySavePath | Select-Pocof -Unique -CaseSensitive -Layout TopDown
 }
 Set-Alias pghy Show-ReadLineHistory -Option ReadOnly -Force -Scope Global
 
