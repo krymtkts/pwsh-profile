@@ -15,7 +15,7 @@ $names = @(
     'powershell-yaml', 'PSToml'
     # for PowerShell
     'Microsoft.PowerShell.PSResourceGet', 'PSScriptAnalyzer', 'Pester'
-    'psake', 'PSProfiler', 'Microsoft.WinGet.Client'
+    'psake', 'PSProfiler', 'Microsoft.WinGet.Client', 'Microsoft.WinGet.CommandNotFound'
     # for GitHub
     'PowerShellForGitHub'
     # for AWS
