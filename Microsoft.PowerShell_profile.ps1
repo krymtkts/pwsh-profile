@@ -19,22 +19,22 @@ Get-ChildItem "$($PROFILE | Split-Path -Parent)/Scripts" -Recurse -File -Filter 
 
 function global:Update-ProfileScripts {
     @(
-        'Autocomplete/Autocomplete.psm1'
-        'AWS/AWS.psm1'
-        'Functions/Functions.psm1'
-        'Get-Hash/Get-Hash.psm1'
-        'Git/Git.psm1'
-        'Go/Go.psm1'
-        'Mod/Mod.psm1'
-        'Nodejs/Nodejs.psm1'
-        'OpenAI/OpenAI.psm1'
-        'Pocof/Pocof.psm1'
-        'Psake/Psake.psm1'
-        'PSResource/PSResource.psm1'
-        'Python/Python.psm1'
-        'StandardNotes/StandardNotes.psm1'
-        'Strings/Strings.psm1'
-        'Windows/Windows.psm1'
+        'Autocomplete'
+        'AWS'
+        'Functions'
+        'Get-Hash'
+        'Git'
+        'Go'
+        'Mod'
+        'Nodejs'
+        'OpenAI'
+        'Pocof'
+        'Psake'
+        'PSResource'
+        'Python'
+        'StandardNotes'
+        'Strings'
+        'Windows'
     ) | ForEach-Object {
         $ModulePath = "${_}/${_}.psm1"
         $scriptPath = "${ProfileHome}/Scripts/${ModulePath}"
