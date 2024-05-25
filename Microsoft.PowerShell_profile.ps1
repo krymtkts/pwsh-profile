@@ -176,9 +176,9 @@ if (Test-Path "$env:ProgramFiles\PowerToys") {
     # NOTE: PowerToys CommandNotFound module requires PSFeedbackProvider and PSCommandNotFoundSuggestion.
     ## Enable-ExperimentalFeature -Name PSFeedbackProvider
     ## Enable-ExperimentalFeature -Name PSCommandNotFoundSuggestion
-    #34de4b3d-13a8-4540-b76d-b9e8d3851756 PowerToys CommandNotFound module
-    Import-Module "$env:ProgramFiles\PowerToys\WinGetCommandNotFound.psd1"
-    #34de4b3d-13a8-4540-b76d-b9e8d3851756
+    #f45873b3-b655-43a6-b217-97c00aa0db58 PowerToys CommandNotFound module
+    Import-Module -Name Microsoft.WinGet.CommandNotFound
+    #f45873b3-b655-43a6-b217-97c00aa0db58
 }
 
 # set a prompt theme.
