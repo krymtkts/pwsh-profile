@@ -44,7 +44,6 @@ function global:Update-ProfileScripts {
         $params = @{
             Uri = "${baseUrl}/Scripts/${modulePath}"
             OutFile = $scriptPath
-            UseBasicParsing = $true
         }
         Invoke-WebRequest @params | Out-Null
     }
