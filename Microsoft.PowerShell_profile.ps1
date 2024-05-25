@@ -36,13 +36,13 @@ function global:Update-ProfileScripts {
         'Strings'
         'Windows'
     ) | ForEach-Object {
-        $ModulePath = "${_}/${_}.psm1"
-        $scriptPath = "${ProfileHome}/Scripts/${ModulePath}"
+        $modulePath = "${_}/${_}.psm1"
+        $scriptPath = "${ProfileHome}/Scripts/${modulePath}"
         if (-not (Split-Path $scriptPath -Parent | Test-Path)) {
             New-Item -ItemType Directory -Path (Split-Path $scriptPath -Parent) -Force
         }
         $params = @{
-            Uri = "${baseUrl}/Scripts/${ModulePath}"
+            Uri = "${baseUrl}/Scripts/${modulePath}"
             OutFile = $scriptPath
         }
         Invoke-WebRequest @params | Out-Null
