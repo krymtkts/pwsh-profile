@@ -17,7 +17,7 @@ function local:Complete {
 
 Get-ChildItem "$($PROFILE | Split-Path -Parent)/Scripts" -Recurse -File -Filter *.psm1 | Import-Module -Force
 
-function global:Update-ProfileScripts {
+function Update-ProfileScripts {
     @(
         'Autocomplete'
         'AWS'
@@ -49,7 +49,7 @@ function global:Update-ProfileScripts {
     }
 }
 
-function global:Update-Profile {
+function Update-Profile {
     $ProfileHome = ($PROFILE | Split-Path -Parent)
     $ProfilePath = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
     $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main/'
