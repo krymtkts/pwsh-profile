@@ -1,3 +1,5 @@
+$env:AWS_REGION = 'ap-northeast-1'
+
 function Get-AWSModuleConfiguration {
     [CmdletBinding()]
     param ()
@@ -301,7 +303,6 @@ if (Get-Command -Name cdk -ErrorAction SilentlyContinue) {
         )
         # NOTE: workaround for certificate issue.
         $env:NODE_TLS_REJECT_UNAUTHORIZED = 0
-        $env:AWS_REGION = 'ap-northeast-1'
         $ci = Get-STSCallerIdentity
         if ($ProfileName) {
             cdk bootstrap "aws://$($ci.Account)/$($env:AWS_REGION)" --profile $ProfileName
