@@ -112,3 +112,19 @@ function Get-UnixTimeSeconds {
     )
     [Math]::Truncate(($date - (Get-Date -UnixTimeSeconds 0)).TotalSeconds)
 }
+
+function Invoke-InfiniteLoop {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [scriptblock]
+        $ScriptBlock
+    )
+    end {
+        while ($true) {
+            if ($ScriptBlock) {
+                & $ScriptBlock
+            }
+        }
+    }
+}
