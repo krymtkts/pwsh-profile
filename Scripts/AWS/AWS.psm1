@@ -312,4 +312,14 @@ if (Get-Command -Name cdk -ErrorAction SilentlyContinue) {
         }
         $env:NODE_TLS_REJECT_UNAUTHORIZED = 1
     }
+
+    function Get-CdkStacks {
+        [CmdletBinding()]
+        param (
+            [Parameter()]
+            [String]$AppDirectory = 'cdk.out'
+        )
+        # NOTE: https://github.com/aws/aws-cdk/issues/3968#issuecomment-528895004
+        cdk --app $AppDirectory ls
+    }
 }
