@@ -128,3 +128,33 @@ function Invoke-InfiniteLoop {
         }
     }
 }
+
+function Get-BeginningOfMonth {
+    [CmdletBinding()]
+    param (
+        [Parameter(
+            Position = 0,
+            ValueFromPipeline
+        )]
+        [datetime]
+        $Date = (Get-Date)
+    )
+    process {
+        [datetime]::new($Date.Year, $Date.Month, 1)
+    }
+}
+
+function Get-EndOfMonth {
+    [CmdletBinding()]
+    param (
+        [Parameter(
+            Position = 0,
+            ValueFromPipeline
+        )]
+        [datetime]
+        $Date = (Get-Date)
+    )
+    process {
+        [datetime]::new($Date.Year, $Date.Month + 1, 1).AddMicroseconds(-1)
+    }
+}
