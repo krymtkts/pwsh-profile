@@ -215,10 +215,11 @@ function ConvertTo-Base64 {
 function Split-String {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true,
+            Position = 0)]
         [string]$Delimiter,
         [Parameter(Mandatory = $true,
-            Position = 0,
+            Position = 1,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true)]
         [ValidateNotNullOrEmpty()]
