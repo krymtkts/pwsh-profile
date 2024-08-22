@@ -211,3 +211,22 @@ function ConvertTo-Base64 {
         }
     }
 }
+
+function Split-String {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Delimiter,
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string[]]$InputString
+    )
+    process {
+        $InputString | ForEach-Object {
+            $_ -split $Delimiter
+        }
+    }
+}
