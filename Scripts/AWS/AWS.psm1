@@ -295,6 +295,7 @@ function ConvertFrom-CloudFrontAccessLog {
 }
 
 if (Get-Command -Name cdk -ErrorAction SilentlyContinue) {
+    # NOTE: cdk depends Node.js.
     function Invoke-CdkBootstrap {
         [CmdletBinding()]
         param (
