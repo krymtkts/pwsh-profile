@@ -20,13 +20,13 @@ Get-ChildItem "$($PROFILE | Split-Path -Parent)/Scripts" -Recurse -File -Filter 
 function Update-ProfileScripts {
     @(
         'Autocomplete'
+        'Nodejs'
         'AWS'
         'Functions'
         'Get-Hash'
         'Git'
         'Go'
         'Mod'
-        'Nodejs'
         'OpenAI'
         'Pocof'
         'Psake'
