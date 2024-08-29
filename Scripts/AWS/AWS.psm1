@@ -294,8 +294,8 @@ function ConvertFrom-CloudFrontAccessLog {
     }
 }
 
-if (Get-Command -Name cdk -ErrorAction SilentlyContinue) {
-    # NOTE: cdk depends Node.js.
+if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
+    # NOTE: cdk depends Node.js. fnm is a Node.js version manager.
     function Invoke-CdkBootstrap {
         [CmdletBinding()]
         param (
