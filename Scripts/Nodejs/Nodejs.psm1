@@ -45,4 +45,14 @@ if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
         Write-Warning "fnm completions --shell power-shell failed. $($_)"
     }
     Get-ChildItem "$env:FNM_MULTISHELL_PATH/../" | Where-Object -Property CreationTime -LE (Get-Date).AddDays(-1) | Remove-Item
+
+    Register-ArgumentCompleter -Native -CommandName 'npm' -ScriptBlock {
+        param($wordToComplete, $commandAst, $cursorPosition)
+        if (($commandAst -like 'npm run*') -and (Test-Path .\package.json)) {
+            $scripts = Get-Content .\package.json | ConvertFrom-Json | Select-Object -ExpandProperty scripts
+            $scripts.psobject.properties.Name | Where-Object { $_ -like "${wordToComplete}*" } | ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $scripts.$_)
+            }
+        }
+    }
 }
