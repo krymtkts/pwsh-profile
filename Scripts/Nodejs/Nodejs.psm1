@@ -48,10 +48,21 @@ if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
 
     Register-ArgumentCompleter -Native -CommandName 'npm' -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
+
+        $commandAst = $commandAst -replace $wordToComplete, ''
+        if ($commandAst -match 'npm\s*$') {
+            $help = npm --help
+            $help = $help[($help.IndexOf('All commands:') + 2)..($help.Count - 1)]
+            $help[0..($help.IndexOf('') - 1)] -join '' -split ',' `
+            | ForEach-Object { $_.Trim() } `
+            | Where-Object { $_ -like "${wordToComplete}*" } `
+            | ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+            }
+        }
         if (-not (Test-Path ./package.json)) {
             return
         }
-        $commandAst = $commandAst -replace $wordToComplete, ''
         if ($commandAst -match 'npm run(-script)?\s*$') {
             Get-Content .\package.json `
             | ConvertFrom-Json `
