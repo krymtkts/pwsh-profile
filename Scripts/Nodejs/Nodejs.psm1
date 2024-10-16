@@ -48,7 +48,10 @@ if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
 
     Register-ArgumentCompleter -Native -CommandName 'npm' -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
-        if (($commandAst -like 'npm run*') -and (Test-Path .\package.json)) {
+        if (-not (Test-Path ./package.json)) {
+            return
+        }
+        if ($commandAst -like 'npm run*') {
             $scripts = Get-Content .\package.json | ConvertFrom-Json | Select-Object -ExpandProperty scripts
             $scripts.psobject.properties.Name | Where-Object { $_ -like "${wordToComplete}*" } | ForEach-Object {
                 [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $scripts.$_)
