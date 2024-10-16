@@ -51,7 +51,8 @@ if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
         if (-not (Test-Path ./package.json)) {
             return
         }
-        if ($commandAst -like 'npm run*') {
+        $commandAst = $commandAst -replace $wordToComplete, ''
+        if ($commandAst -match 'npm run(-script)?\s*$') {
             $scripts = Get-Content .\package.json | ConvertFrom-Json | Select-Object -ExpandProperty scripts
             $scripts.psobject.properties.Name | Where-Object { $_ -like "${wordToComplete}*" } | ForEach-Object {
                 [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $scripts.$_)
