@@ -53,9 +53,13 @@ if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
         }
         $commandAst = $commandAst -replace $wordToComplete, ''
         if ($commandAst -match 'npm run(-script)?\s*$') {
-            $scripts = Get-Content .\package.json | ConvertFrom-Json | Select-Object -ExpandProperty scripts
-            $scripts.psobject.properties.Name | Where-Object { $_ -like "${wordToComplete}*" } | ForEach-Object {
-                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $scripts.$_)
+            Get-Content .\package.json `
+            | ConvertFrom-Json `
+            | Select-Object -ExpandProperty scripts `
+            | Get-Member -MemberType NoteProperty `
+            | Where-Object -Property Name -Like "${wordToComplete}*" `
+            | ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', $_.Definition)
             }
         }
     }
