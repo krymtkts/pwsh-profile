@@ -100,7 +100,14 @@ $PSReadLineParams = @{
     PredictionSource = 'HistoryAndPlugin'
     PredictionViewStyle = 'ListView'
     BellStyle = 'Visual'
-    WordDelimiters = Get-PSReadLineOption | Select-Object -ExpandProperty WordDelimiters | ForEach-Object { $_ + '_`' }
+    WordDelimiters = Get-PSReadLineOption | Select-Object -ExpandProperty WordDelimiters | ForEach-Object {
+        if ($_ -contains '_`') {
+            $_
+        }
+        else {
+            $_ + '_`'
+        }
+    }
 }
 Set-PSReadLineOption @PSReadLineParams
 
