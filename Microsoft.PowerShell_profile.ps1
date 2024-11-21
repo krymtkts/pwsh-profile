@@ -99,6 +99,7 @@ $env:PYTHONUTF8 = 1
 Set-PSReadLineOption -PredictionSource HistoryAndPlugin
 Set-PSReadLineOption -PredictionViewStyle ListView
 Set-PSReadLineOption -BellStyle Visual
+Get-PSReadLineOption | Select-Object -ExpandProperty WordDelimiters | ForEach-Object { Set-PSReadLineOption -WordDelimiters ($_ + '_`') }
 
 # Set aliases.
 Set-Alias ll ls -Option ReadOnly -Force -Scope Global
