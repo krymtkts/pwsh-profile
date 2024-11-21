@@ -101,12 +101,7 @@ $PSReadLineParams = @{
     PredictionViewStyle = 'ListView'
     BellStyle = 'Visual'
     WordDelimiters = Get-PSReadLineOption | Select-Object -ExpandProperty WordDelimiters | ForEach-Object {
-        if ($_ -contains '_`') {
-            $_
-        }
-        else {
-            $_ + '_`'
-        }
+        (($_ + '_`').GetEnumerator() | Get-Unique) -join ''
     }
 }
 Set-PSReadLineOption @PSReadLineParams
