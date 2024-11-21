@@ -96,10 +96,13 @@ $env:PYTHONUTF8 = 1
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13
 
 # set PSReadLine options.
-Set-PSReadLineOption -PredictionSource HistoryAndPlugin
-Set-PSReadLineOption -PredictionViewStyle ListView
-Set-PSReadLineOption -BellStyle Visual
-Get-PSReadLineOption | Select-Object -ExpandProperty WordDelimiters | ForEach-Object { Set-PSReadLineOption -WordDelimiters ($_ + '_`') }
+$PSReadLineParams = @{
+    PredictionSource = 'HistoryAndPlugin'
+    PredictionViewStyle = 'ListView'
+    BellStyle = 'Visual'
+    WordDelimiters = Get-PSReadLineOption | Select-Object -ExpandProperty WordDelimiters | ForEach-Object { $_ + '_`' }
+}
+Set-PSReadLineOption @PSReadLineParams
 
 # Set aliases.
 Set-Alias ll ls -Option ReadOnly -Force -Scope Global
