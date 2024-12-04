@@ -51,60 +51,60 @@ function Invoke-SelectedLocation() {
 }
 Set-Alias pii Invoke-SelectedLocation -Option ReadOnly -Force -Scope Global
 
-function Open-VSCodeWorkspace {
-    param(
-        [ValidateSet('Add', 'Open')]$Mode = 'Open',
-        # Specifies a path to one or more locations.
-        [Parameter(
-            Position = 0,
-            ParameterSetName = 'Path',
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Path to one or more locations.')]
-        [Alias('PSPath')]
-        [ValidateNotNullOrEmpty()]
-        [string[]]
-        $Path,
-        [Parameter()]
-        [ValidateSet('Stable', 'Insider')]
-        [string]
-        $Channel = 'Insider'
-    )
-    $code = switch ($Channel) {
-        'Stable' { 'code' }
-        'Insider' { 'code-insiders' }
-    }
-    $file = '~/.code-ws'
-    switch ($Mode) {
-        'Add' {
-            if ($Path -and (Test-Path($Path))) {
-                $current = @(Get-Content $file)
-                $current += (Resolve-Path $Path).Path
-                $current | Sort-Object | Get-Unique | Set-Content -Encoding UTF8 $file
+if (Get-Command code, code-insiders -ErrorAction SilentlyContinue) {
+    function Open-VSCodeWorkspace {
+        param(
+            [ValidateSet('Add', 'Open')]$Mode = 'Open',
+            # Specifies a path to one or more locations.
+            [Parameter(
+                Position = 0,
+                ParameterSetName = 'Path',
+                ValueFromPipeline = $true,
+                ValueFromPipelineByPropertyName = $true,
+                HelpMessage = 'Path to one or more locations.')]
+            [Alias('PSPath')]
+            [ValidateNotNullOrEmpty()]
+            [string[]]
+            $Path,
+            [Parameter()]
+            [ValidateSet('Stable', 'Insider')]
+            [string]
+            $Channel = 'Insider'
+        )
+        $code = switch ($Channel) {
+            'Stable' { 'code' }
+            'Insider' { 'code-insiders' }
+        }
+        $file = '~/.code-ws'
+        switch ($Mode) {
+            'Add' {
+                if ($Path -and (Test-Path($Path))) {
+                    $current = @(Get-Content $file)
+                    $current += (Resolve-Path $Path).Path
+                    $current | Sort-Object | Get-Unique | Set-Content -Encoding UTF8 $file
+                    break
+                }
+                else {
+                    Write-Host 'no .code-workspace found.'
+                }
+            }
+            'Open' {
+                $ws = Get-Content -Path $file | Where-Object { !$_.StartsWith('#') } | Select-Pocof -CaseSensitive | Select-Object -First 1
+                if ($ws.Count -eq 1) {
+                    & $code $ws
+                }
                 break
             }
-            else {
-                Write-Host 'no .code-workspace found.'
-            }
-        }
-        'Open' {
-            $ws = Get-Content -Path $file | Where-Object { !$_.StartsWith('#') } | Select-Pocof -CaseSensitive | Select-Object -First 1
-            if ($ws.Count -eq 1) {
-                & $code $ws
-            }
-            break
         }
     }
-}
-Set-Alias codeof Open-VSCodeWorkspace -Option ReadOnly -Force -Scope Global
+    Set-Alias codeof Open-VSCodeWorkspace -Option ReadOnly -Force -Scope Global
 
-if (Get-Command ghq -ErrorAction SilentlyContinue) {
-    function Set-SelectedRepository {
-        ghq list | Select-Pocof | Select-Object -First 1 | ForEach-Object { Set-Location "$(ghq root)/$_" }
-    }
-    Set-Alias gcd Set-SelectedRepository -Option ReadOnly -Force -Scope Global
+    if (Get-Command ghq -ErrorAction SilentlyContinue) {
+        function Set-SelectedRepository {
+            ghq list | Select-Pocof | Select-Object -First 1 | ForEach-Object { Set-Location "$(ghq root)/$_" }
+        }
+        Set-Alias gcd Set-SelectedRepository -Option ReadOnly -Force -Scope Global
 
-    if (Get-Command code, code-insiders -ErrorAction SilentlyContinue) {
         function Open-SelectedRepository {
             param(
                 [Parameter()]
@@ -125,11 +125,11 @@ if (Get-Command ghq -ErrorAction SilentlyContinue) {
         Set-Alias code code-insiders -Option ReadOnly -Force -Scope Global
     }
     else {
-        Write-Error 'code or code-insiders is not installed. run `choco install vscode -y` or `choco install vscode-insiders -y`'
+        Write-Error 'ghq is not installed. run `Install-GoModules`'
     }
 }
 else {
-    Write-Error 'ghq is not installed. run `Install-GoModules`'
+    Write-Error 'code or code-insiders is not installed. run `choco install vscode -y` or `choco install vscode-insiders -y`'
 }
 
 function Show-Paths() {
