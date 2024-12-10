@@ -14,14 +14,14 @@ $names = @(
     'PSReadLine', 'pocof', 'Get-GzipContent'
     'powershell-yaml', 'PSToml'
     # for PowerShell
-    'Microsoft.PowerShell.PSResourceGet', 'PSScriptAnalyzer', 'Pester', 'Microsoft.PowerShell.PlatyPS'
-    'psake', 'PSProfiler', 'Microsoft.WinGet.Client', 'Microsoft.WinGet.CommandNotFound'
+    'Microsoft.PowerShell.PSResourceGet', 'PSScriptAnalyzer', 'Microsoft.PowerShell.PlatyPS'
+    'Pester', 'psake', 'PSProfiler'
+    # for Windows
+    'Microsoft.WinGet.Client', 'Microsoft.WinGet.CommandNotFound'
     # for GitHub
     'PowerShellForGitHub'
     # for AWS
     'AWS.Tools.Installer'
-    # others
-    'PowerShellAI'
 ) + $pinStable + $importRequired
 
 Import-Module -Name $importRequired
