@@ -31,7 +31,7 @@ function Set-SelectedLocation {
             $current | Sort-Object | Get-Unique | Set-Content -Encoding UTF8 '~/.pocof-cd'
         }
         'Move' {
-            $current | Select-Pocof -CaseSensitive | Select-Object -First 1 | Set-Location
+            $current | Select-Pocof $Location -CaseSensitive | Select-Object -First 1 | Set-Location
         }
         'Open' {
             $current | Select-Pocof -CaseSensitive | Select-Object -First 1 | Invoke-Item
