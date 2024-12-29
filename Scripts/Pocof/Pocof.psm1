@@ -134,12 +134,29 @@ if (Get-Command code, code-insiders -ErrorAction SilentlyContinue) {
 
     if (Get-Command ghq -ErrorAction SilentlyContinue) {
         function Set-SelectedRepository {
-            ghq list | Select-Pocof | Select-Object -First 1 | ForEach-Object { Set-Location "$(ghq root)/$_" }
+            param(
+                [Parameter(
+                    Position = 0,
+                    ValueFromPipeline)]
+                [string]
+                $Query
+            )
+            $repos = ghq list
+            $repo = $repos | Select-Pocof $Query -NonInteractive
+            if ($repo.Count -ne 1) {
+                $repo = $repos | Select-Pocof $Query | Select-Object -First 1
+            }
+            Set-Location "$(ghq root)/$repo"
         }
         Set-Alias gcd Set-SelectedRepository -Option ReadOnly -Force -Scope Global
 
         function Open-SelectedRepository {
             param(
+                [Parameter(
+                    Position = 0,
+                    ValueFromPipeline)]
+                [string]
+                $Query,
                 [Parameter()]
                 [ValidateSet('Stable', 'Insider')]
                 [string]
@@ -149,10 +166,21 @@ if (Get-Command code, code-insiders -ErrorAction SilentlyContinue) {
                 'Stable' { 'code' }
                 'Insider' { 'code-insiders' }
             }
-            ghq list | Select-Pocof | Select-Object -First 1 | ForEach-Object {
-                Set-Location "$(ghq root)/$_"
-                & $code .
+            $repos = ghq list
+            function Open-RepoIfOne($repo) {
+                if ($repo.Count -eq 1) {
+                    Set-Location "$(ghq root)/$repo"
+                    & $code .
+                    $true
+                }
+                $false
             }
+            $repo = $repos | Select-Pocof $Query -NonInteractive
+            if (Open-RepoIfOne $repo) {
+                return
+            }
+            $repo = $repos | Select-Pocof $Query | Select-Object -First 1
+            Open-RepoIfOne $repo | Out-Null
         }
         Set-Alias gcode Open-SelectedRepository -Option ReadOnly -Force -Scope Global
         Set-Alias code code-insiders -Option ReadOnly -Force -Scope Global
