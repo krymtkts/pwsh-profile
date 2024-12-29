@@ -26,11 +26,19 @@ function Set-SelectedLocation {
         $Here
     )
     $current = Get-Content ('~/.poco-cd', '~/.pocof-cd' | Where-Object { Test-Path -Path $_ } | Select-Object -First 1)
+    function Select-One() {
+        $loc = $current | Select-Pocof $Location -CaseSensitive -NonInteractive
+        if ($loc.Count -eq 1) {
+            $loc
+        }
+        else {
+            $current | Select-Pocof $Location -CaseSensitive | Select-Object -First 1
+        }
+    }
     switch ($Mode) {
         'Add' {
             if ($Location) {
                 $current += "$Location"
-
             }
             elseif ($Here) {
                 $current += "$(Get-Location)"
@@ -38,10 +46,10 @@ function Set-SelectedLocation {
             $current | Sort-Object | Get-Unique | Set-Content -Encoding UTF8 '~/.pocof-cd'
         }
         'Move' {
-            $current | Select-Pocof $Location -CaseSensitive | Select-Object -First 1 | Set-Location
+            Select-One | Set-Location
         }
         'Open' {
-            $current | Select-Pocof $Location -CaseSensitive | Select-Object -First 1 | Invoke-Item
+            Select-One | Invoke-Item
         }
         'Remove' {
             if (-not $Location) {
@@ -60,47 +68,65 @@ Set-Alias pii Invoke-SelectedLocation -Option ReadOnly -Force -Scope Global
 
 if (Get-Command code, code-insiders -ErrorAction SilentlyContinue) {
     function Open-VSCodeWorkspace {
+        [CmdletBinding(DefaultParameterSetName = 'Open')]
         param(
-            [ValidateSet('Add', 'Open')]$Mode = 'Open',
-            # Specifies a path to one or more locations.
             [Parameter(
                 Position = 0,
-                ParameterSetName = 'Path',
-                ValueFromPipeline = $true,
-                ValueFromPipelineByPropertyName = $true,
+                ParameterSetName = 'Open',
+                ValueFromPipeline)]
+            [string]
+            $Query,
+            [Parameter(
+                ParameterSetName = 'Open')]
+            [ValidateSet('Stable', 'Insider')]
+            [string]
+            $Channel = 'Insider',
+            [Parameter(
+                ParameterSetName = 'Add')]
+            [switch]
+            $Add,
+            [Parameter(
+                Position = 0,
+                ParameterSetName = 'Add',
+                ValueFromPipeline,
+                ValueFromPipelineByPropertyName,
                 HelpMessage = 'Path to one or more locations.')]
             [Alias('PSPath')]
             [ValidateNotNullOrEmpty()]
             [string[]]
-            $Path,
-            [Parameter()]
-            [ValidateSet('Stable', 'Insider')]
-            [string]
-            $Channel = 'Insider'
+            $Path
         )
         $code = switch ($Channel) {
             'Stable' { 'code' }
             'Insider' { 'code-insiders' }
         }
         $file = '~/.code-ws'
-        switch ($Mode) {
+        function Open-WorkspaceIfOne($ws) {
+            if ($ws.Count -eq 1) {
+                & $code $ws
+                $true
+            }
+            $false
+        }
+        switch ($PSCmdlet.ParameterSetName) {
             'Add' {
                 if ($Path -and (Test-Path($Path))) {
                     $current = @(Get-Content $file)
                     $current += (Resolve-Path $Path).Path
                     $current | Sort-Object | Get-Unique | Set-Content -Encoding UTF8 $file
-                    break
                 }
                 else {
                     Write-Host 'no .code-workspace found.'
                 }
             }
             'Open' {
-                $ws = Get-Content -Path $file | Where-Object { !$_.StartsWith('#') } | Select-Pocof -CaseSensitive | Select-Object -First 1
-                if ($ws.Count -eq 1) {
-                    & $code $ws
+                $wss = Get-Content -Path $file | Where-Object { !$_.StartsWith('#') }
+                $ws = $wss | Select-Pocof $Query -CaseSensitive -NonInteractive
+                if (Open-WorkspaceIfOne $ws) {
+                    return
                 }
-                break
+                $ws = $wss | Select-Pocof $Query -CaseSensitive | Select-Object -First 1
+                Open-WorkspaceIfOne $ws | Out-Null
             }
         }
     }
