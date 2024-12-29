@@ -34,7 +34,7 @@ function Set-SelectedLocation {
             $current | Select-Pocof $Location -CaseSensitive | Select-Object -First 1 | Set-Location
         }
         'Open' {
-            $current | Select-Pocof -CaseSensitive | Select-Object -First 1 | Invoke-Item
+            $current | Select-Pocof $Location -CaseSensitive | Select-Object -First 1 | Invoke-Item
         }
         'Remove' {
             if (-not $Location) {
