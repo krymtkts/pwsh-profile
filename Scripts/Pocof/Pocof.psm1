@@ -14,9 +14,16 @@ $PSDefaultParameterValues += Get-PSDefaultParameterValuesForPocof
 function Set-SelectedLocation {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
-        [ValidateSet('Add', 'Move', 'Open', 'Remove')]$Mode = 'Move',
-        [string]$Location,
-        [switch]$Here
+        [ValidateSet('Add', 'Move', 'Open', 'Remove')]
+        [string]
+        $Mode = 'Move',
+        [Parameter(
+            Position = 0,
+            ValueFromPipeline)]
+        [string]
+        $Location,
+        [switch]
+        $Here
     )
     $current = Get-Content ('~/.poco-cd', '~/.pocof-cd' | Where-Object { Test-Path -Path $_ } | Select-Object -First 1)
     switch ($Mode) {
