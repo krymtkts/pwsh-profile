@@ -193,16 +193,37 @@ else {
     Write-Error 'code or code-insiders is not installed. run `choco install vscode -y` or `choco install vscode-insiders -y`'
 }
 
-function Show-Paths() {
-        ($Env:Path).split(';') | Select-Pocof -Layout TopDown
+function Show-Paths {
+    param(
+        [Parameter(
+            Position = 0,
+            ValueFromPipeline)]
+        [string]
+        $Query
+    )
+    ($Env:Path).split(';') | Select-Pocof $Query -Layout TopDown
 }
 
-function Show-ReadLineHistory() {
-    Get-Content -Path (Get-PSReadLineOption).HistorySavePath | Select-Pocof -Unique -CaseSensitive -Layout TopDown
+function Show-ReadLineHistory {
+    param(
+        [Parameter(
+            Position = 0,
+            ValueFromPipeline)]
+        [string]
+        $Query
+    )
+    Get-Content -Path (Get-PSReadLineOption).HistorySavePath | Select-Pocof $Query -Unique -CaseSensitive -Layout TopDown
 }
 Set-Alias pghy Show-ReadLineHistory -Option ReadOnly -Force -Scope Global
 
-function Invoke-ReadLineHistory() {
-    Show-ReadLineHistory | Select-Object -First 1 | Invoke-Expression
+function Invoke-ReadLineHistory {
+    param(
+        [Parameter(
+            Position = 0,
+            ValueFromPipeline)]
+        [string]
+        $Query
+    )
+    Show-ReadLineHistory $Query | Select-Object -First 1 | Invoke-Expression
 }
 Set-Alias pihy Invoke-ReadLineHistory -Option ReadOnly -Force -Scope Global
