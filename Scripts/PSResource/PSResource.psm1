@@ -6,8 +6,7 @@ $importRequired = @(
 )
 $pinStable = @(
     # NOTE: use stable to avoid error in AWS.Tools.Installer.
-    'PowerShellGet',
-    'platyPS'
+    'PowerShellGet'
 )
 $names = @(
     # basic utilities
@@ -15,7 +14,7 @@ $names = @(
     'powershell-yaml', 'PSToml'
     # for PowerShell
     'Microsoft.PowerShell.PSResourceGet', 'PSScriptAnalyzer', 'Microsoft.PowerShell.PlatyPS'
-    'Pester', 'psake', 'PSProfiler'
+    'Pester', 'psake', 'PSProfiler', 'platyPS'
     # for Windows
     'Microsoft.WinGet.Client', 'Microsoft.WinGet.CommandNotFound'
     # for GitHub
