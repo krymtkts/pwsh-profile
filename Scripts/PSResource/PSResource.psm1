@@ -39,7 +39,7 @@ function Install-NonExistsModule {
 
     process {
         foreach ($n in $Name) {
-            Write-Debug $n
+            Write-Verbose $n
             if (!($modules | Where-Object -Property Name -EQ $n)) {
                 $Prerelease = $n -notin $pinStable
                 Install-PSResource -Name $n -Prerelease:$Prerelease -Scope AllUsers
