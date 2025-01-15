@@ -14,7 +14,7 @@ $names = @(
     'powershell-yaml', 'PSToml'
     # for PowerShell
     'Microsoft.PowerShell.PSResourceGet', 'PSScriptAnalyzer', 'Microsoft.PowerShell.PlatyPS'
-    'Pester', 'psake', 'PSProfiler', 'platyPS'
+    'Pester', 'psake', 'PSProfiler'
     # for Windows
     'Microsoft.WinGet.Client', 'Microsoft.WinGet.CommandNotFound'
     # for GitHub
