@@ -8,7 +8,7 @@ function Get-AWSModuleConfiguration {
     if (-not (Test-Path -Path $filePath)) {
         $result = Read-Host -Prompt "File '$filePath' does not exist. Do you want to create it? (y/n)"
         if ($result -eq 'y') {
-            # 配列をpsd1ファイルに保存
+            # NOTE: create an empty psd1.
             '@{ AWSModules = @() }' | Out-File -FilePath $filePath
         }
         else {
