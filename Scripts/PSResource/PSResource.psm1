@@ -3,6 +3,7 @@ $importRequired = @(
     'MavenAutoCompletion'
     'DockerCompletion', 'DockerComposeCompletion'
     'posh-git'
+    'SnippetPredictor'
 )
 $pinStable = @(
     # NOTE: use stable to avoid error in AWS.Tools.Installer.
@@ -10,7 +11,8 @@ $pinStable = @(
 )
 $names = @(
     # basic utilities
-    'PSReadLine', 'pocof', 'Get-GzipContent'
+    'PSReadLine'
+    'pocof', 'Get-GzipContent'
     'powershell-yaml', 'PSToml'
     # for PowerShell
     'Microsoft.PowerShell.PSResourceGet', 'PSScriptAnalyzer', 'Microsoft.PowerShell.PlatyPS'
