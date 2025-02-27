@@ -20,7 +20,7 @@ function Edit-Hosts {
 #     Stop-Process -Name explorer -Force
 # }
 
-if (Get-Command -Name docker -ErrorAction SilentlyContinue) {
+if ((Get-Command -Name docker -ErrorAction SilentlyContinue) -and (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) {
     # NOTE: This function depends Windows Subsystem for Linux.
     function Optimize-DockerUsage {
         # NOTE: Requires running as Administrator.
@@ -51,14 +51,23 @@ if (Get-Command -Name docker -ErrorAction SilentlyContinue) {
         Write-Host 'shutdown wsl.'
         wsl --shutdown
         Write-Host 'compact vhdx.'
-        $vdisk = Resolve-Path "${env:LOCALAPPDATA}\Docker\wsl\data\ext4.vhdx"
-        $tmp = "${env:Temp}/diskpart.txt"
-        @"
+
+        Get-ChildItem "${env:LOCALAPPDATA}\Docker\wsl\*\*.vhdx" | ForEach-Object {
+            $vdisk = Resolve-Path $_
+            if (-not $vdisk) {
+                Write-Host "failed to resolve path for $_."
+                return
+            }
+            Write-Host "compact $vdisk."
+            $tmp = "${env:Temp}/diskpart.txt"
+            @"
 select vdisk file="$vdisk"
 compact vdisk
 "@ | Set-Content -Path $tmp
-        diskpart /s $tmp > ./log.txt
-        Get-Content ./log.txt | Write-Host
-        Remove-Item $tmp, ./log.txt
+            diskpart /s $tmp > ./log.txt
+            Get-Content ./log.txt | Write-Host
+            Remove-Item $tmp, ./log.txt
+            Write-Host "compacted $vdisk."
+        }
     }
 }
