@@ -1,8 +1,11 @@
 $importRequired = @(
+    # NOTE: terminal decoration
     'Terminal-Icons'
+    'posh-git'
+    # NOTE: completion
     'MavenAutoCompletion'
     'DockerCompletion', 'DockerComposeCompletion'
-    'posh-git'
+    # NOTE: PSReadLine plugin
     'SnippetPredictor'
 )
 $pinStable = @(
