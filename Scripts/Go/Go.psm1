@@ -1,7 +1,6 @@
 function Install-GoModules {
     $mods = @(
         'github.com/x-motemen/ghq@latest'
-        'mvdan.cc/sh/v3/cmd/shfmt@latest'
         'github.com/jonhadfield/sn-cli/cmd/sncli@latest'
     )
     $mods | ForEach-Object {
