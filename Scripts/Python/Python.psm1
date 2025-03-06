@@ -30,3 +30,16 @@ function Remove-CurrentVirtualenv {
         poetry env list | Where-Object { $_ -like "*$(Get-Location | Split-Path -Leaf)*" } | Select-Object -First 1 | ForEach-Object { ($_ -split ' ')[0] }
     }
 }
+
+
+if (Get-Command -Name uv -ErrorAction SilentlyContinue) {
+    try {
+        uv generate-shell-completion powershell 2>&1 | Out-String | Invoke-Expression
+    }
+    catch {
+        Write-Warning "uv completions --shell power-shell failed. $($_)"
+    }
+}
+else {
+    Write-Warning "Install uv with command below. 'choco install fnm -y'"
+}
