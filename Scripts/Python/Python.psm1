@@ -39,6 +39,8 @@ if (Get-Command -Name uv -ErrorAction SilentlyContinue) {
     catch {
         Write-Warning "uv completions --shell power-shell failed. $($_)"
     }
+    # NOTE: uv doesn't append the path for dll. So, I need to do it manually.
+    Resolve-Path "$($env:APPDATA)/uv/python/*/python*.dll" | Split-Path -Parent | Get-Unique | ForEach-Object { $env:Path += ';' + $_ }
 }
 else {
     Write-Warning "Install uv with command below. 'choco install fnm -y'"
