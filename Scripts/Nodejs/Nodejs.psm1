@@ -77,8 +77,9 @@ if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
 
     function Set-CurrentNodeVersionToSystem {
         $defaultNodeJs = Join-Path $env:APPDATA 'fnm' ' node-versions' $(fnm current) 'installation'
-        if (-not (Test-Path env:DEFAULT_NODE_PATH)) {
-            [System.Environment]::SetEnvironmentVariable('DEFAULT_NODE_PATH', $defaultNodeJs, [System.EnvironmentVariableTarget]::User)
+        $currentPath = [System.Environment]::GetEnvironmentVariable('PATH', [System.EnvironmentVariableTarget]::User)
+        if (-not ($currentPath -contains $defaultNodeJs)) {
+            [System.Environment]::SetEnvironmentVariable('PATH', "$defaultNodeJs;$($env:PATH)", [System.EnvironmentVariableTarget]::User)
         }
     }
 }
