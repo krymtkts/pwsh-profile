@@ -294,7 +294,7 @@ function ConvertFrom-CloudFrontAccessLog {
     }
 }
 
-if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
+if ((Get-Command -Name fnm -ErrorAction SilentlyContinue) -and (Get-Command -Name cdk -ErrorAction SilentlyContinue)) {
     # NOTE: cdk depends Node.js. fnm is a Node.js version manager.
     function Invoke-CdkBootstrap {
         [CmdletBinding()]
@@ -322,5 +322,30 @@ if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
         )
         # NOTE: https://github.com/aws/aws-cdk/issues/3968#issuecomment-528895004
         cdk --app $AppDirectory ls
+    }
+
+    Register-ArgumentCompleter -Native -CommandName 'cdk' -ScriptBlock {
+        param($wordToComplete, $commandAst, $cursorPosition)
+
+        $commandAst = $commandAst -replace $wordToComplete, ''
+        if ($commandAst -match 'cdk\s*$') {
+            $help = cdk --help
+            $help = $help[($help.IndexOf('Commands:') + 2)..($help.Count - 1)]
+            $help[0..($help.IndexOf('') - 1)] -join '' -split ',' `
+            | ForEach-Object { $_.Trim() } `
+            | Where-Object { $_ -like "${wordToComplete}*" } `
+            | ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+            }
+        }
+        if (-not (Test-Path ./package.json)) {
+            return
+        }
+        if ($commandAst -match 'cdk (deploy|destroy|diff|synth)?\s*$') {
+            Get-CdkStacks | Where-Object { $_ -like "${wordToComplete}*" } `
+            | ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', $_.Definition)
+            }
+        }
     }
 }
