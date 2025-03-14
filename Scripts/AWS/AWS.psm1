@@ -1,3 +1,6 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
+
 $env:AWS_REGION = 'ap-northeast-1'
 
 function Get-AWSModuleConfiguration {
@@ -329,22 +332,39 @@ if ((Get-Command -Name fnm -ErrorAction SilentlyContinue) -and (Get-Command -Nam
 
         $commandAst = $commandAst -replace $wordToComplete, ''
         if ($commandAst -match 'cdk\s*$') {
-            $help = cdk --help
-            $help = $help[($help.IndexOf('Commands:') + 2)..($help.Count - 1)]
-            $help[0..($help.IndexOf('') - 1)] -join '' -split ',' `
-            | ForEach-Object { $_.Trim() } `
-            | Where-Object { $_ -like "${wordToComplete}*" } `
-            | ForEach-Object {
-                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+            cdk --help | Where-Object {
+                $_ -match '^\s'
+            } | ForEach-Object -Begin { $acc = @() } -Process {
+                if ($_ -match '^\s{4}') {
+                    $latest = $acc.Length - 1
+                    $acc[$latest] = $acc[$latest].TrimEnd() + ' ' + $_.Trim()
+                }
+                else {
+                    $acc += $_.TrimStart() -replace '^cdk ', ''
+                }
+            } -End { $acc } | ForEach-Object {
+                $i = $_.IndexOf('  ')
+                if ($i -eq -1) {
+                    return
+                }
+                $name = $_.Substring(0, $i) -replace '\s\[.+', ''
+                $description = $_.Substring($i).Trim() -replace '\s+', ' '
+                $name -split ',' | ForEach-Object {
+                    [PSCustomObject]@{
+                        Name = $_.Trim()
+                        Description = $description
+                    }
+                }
+            } | ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', $_.Description)
             }
         }
         if (-not (Test-Path ./package.json)) {
             return
         }
         if ($commandAst -match 'cdk (deploy|destroy|diff|synth)?\s*$') {
-            Get-CdkStacks | Where-Object { $_ -like "${wordToComplete}*" } `
-            | ForEach-Object {
-                [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', $_.Definition)
+            Get-CdkStacks | Where-Object { $_ -like "${wordToComplete}*" } | ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
             }
         }
     }
