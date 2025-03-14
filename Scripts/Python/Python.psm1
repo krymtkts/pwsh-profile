@@ -43,5 +43,5 @@ if (Get-Command -Name uv -ErrorAction SilentlyContinue) {
     Resolve-Path "$($env:APPDATA)/uv/python/*/python*.dll" | Split-Path -Parent | Get-Unique | ForEach-Object { $env:Path += ';' + $_ }
 }
 else {
-    Write-Warning "Install uv with command below. 'choco install fnm -y'"
+    Write-Warning "Install uv with command below. 'choco install uv -y'"
 }
