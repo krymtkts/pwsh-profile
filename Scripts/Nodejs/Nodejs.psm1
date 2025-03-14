@@ -49,7 +49,7 @@ if (Get-Command -Name fnm -ErrorAction SilentlyContinue) {
     Register-ArgumentCompleter -Native -CommandName 'npm' -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
 
-        $commandAst = $commandAst -replace $wordToComplete, ''
+        $commandAst = "$commandAst".Substring(0, $cursorPosition - $wordToComplete.Length)
         if ($commandAst -match 'npm\s*$') {
             $help = npm --help
             $help = $help[($help.IndexOf('All commands:') + 2)..($help.Count - 1)]
