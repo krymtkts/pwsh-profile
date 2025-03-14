@@ -330,9 +330,11 @@ if ((Get-Command -Name fnm -ErrorAction SilentlyContinue) -and (Get-Command -Nam
     Register-ArgumentCompleter -Native -CommandName 'cdk' -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
 
-        $commandAst = "$commandAst".Substring(0, $cursorPosition - $wordToComplete.Length)
+        if ("$commandAst".Length -ge $cursorPosition) {
+            $commandAst = "$commandAst".Substring(0, $cursorPosition - $wordToComplete.Length)
+        }
         if ($commandAst -match '\s*cdk\s*$') {
-            $help = cdk --help | Where-Object {
+            cdk --help | Where-Object {
                 $_ -match '^\s'
             } | ForEach-Object -Begin { $acc = @() } -Process {
                 if ($_ -match '^\s{4}') {
