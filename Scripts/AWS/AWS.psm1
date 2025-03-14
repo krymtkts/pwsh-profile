@@ -330,9 +330,9 @@ if ((Get-Command -Name fnm -ErrorAction SilentlyContinue) -and (Get-Command -Nam
     Register-ArgumentCompleter -Native -CommandName 'cdk' -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
 
-        $commandAst = $commandAst -replace $wordToComplete, ''
-        if ($commandAst -match 'cdk\s*$') {
-            cdk --help | Where-Object {
+        $commandAst = "$commandAst".Substring(0, $cursorPosition - $wordToComplete.Length)
+        if ($commandAst -match '\s*cdk\s*$') {
+            $help = cdk --help | Where-Object {
                 $_ -match '^\s'
             } | ForEach-Object -Begin { $acc = @() } -Process {
                 if ($_ -match '^\s{4}') {
@@ -355,8 +355,14 @@ if ((Get-Command -Name fnm -ErrorAction SilentlyContinue) -and (Get-Command -Nam
                         Description = $description
                     }
                 }
-            } | ForEach-Object {
-                [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', $_.Description)
+            } | Where-Object -Property Name -Like "${wordToComplete}*" | ForEach-Object {
+                try {
+                    "${wordToComplete}: $($_.Name) -> $($_.Description))" | Add-Content ./tmp.txt
+                    [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', $_.Description)
+                }
+                catch {
+                    $_ | Add-Content ./tmp.txt
+                }
             }
         }
         if (-not (Test-Path ./package.json)) {
