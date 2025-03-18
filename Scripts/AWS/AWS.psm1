@@ -358,13 +358,7 @@ if ((Get-Command -Name fnm -ErrorAction SilentlyContinue) -and (Get-Command -Nam
                     }
                 }
             } | Where-Object -Property Name -Like "${wordToComplete}*" | ForEach-Object {
-                try {
-                    "${wordToComplete}: $($_.Name) -> $($_.Description))" | Add-Content ./tmp.txt
-                    [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', $_.Description)
-                }
-                catch {
-                    $_ | Add-Content ./tmp.txt
-                }
+                [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', $_.Description)
             }
         }
         if ($commandAst -match '\s*cdk\s+(deploy|destroy|diff|synth)?\s*$') {
