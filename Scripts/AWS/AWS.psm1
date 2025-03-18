@@ -367,10 +367,7 @@ if ((Get-Command -Name fnm -ErrorAction SilentlyContinue) -and (Get-Command -Nam
                 }
             }
         }
-        if (-not (Test-Path ./package.json)) {
-            return
-        }
-        if ($commandAst -match 'cdk (deploy|destroy|diff|synth)?\s*$') {
+        if ($commandAst -match '\s*cdk\s+(deploy|destroy|diff|synth)?\s*$') {
             Get-CdkStacks | Where-Object { $_ -like "${wordToComplete}*" } | ForEach-Object {
                 [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
             }
