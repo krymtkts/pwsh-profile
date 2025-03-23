@@ -157,7 +157,9 @@ if (Get-Command -Name oh-my-posh -ErrorAction SilentlyContinue) {
 }
 
 # NOTE: to load help correctly.
-Import-Module SnippetPredictor
+if (-not (Get-Module -Name SnippetPredictor -ErrorAction SilentlyContinue)) {
+    Import-Module SnippetPredictor
+}
 
 # NOTE: end of Microsoft.PowerShell_profile.ps1
 local:Complete
