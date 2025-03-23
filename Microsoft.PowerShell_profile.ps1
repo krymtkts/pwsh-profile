@@ -103,6 +103,13 @@ $PSReadLineParams = @{
     WordDelimiters = Get-PSReadLineOption | Select-Object -ExpandProperty WordDelimiters | ForEach-Object {
         (($_ + '_`').GetEnumerator() | Sort-Object | Get-Unique) -join ''
     }
+    Colors = @{
+        Comment = "`e[39;2;3m"
+        Keyword = "`e[34m"
+        Number = "`e[35m"
+        Operator = "`e[32m"
+        Variable = "`e[34m"
+    }
 }
 Set-PSReadLineOption @PSReadLineParams
 
