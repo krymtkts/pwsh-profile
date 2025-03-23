@@ -156,5 +156,8 @@ if (Get-Command -Name oh-my-posh -ErrorAction SilentlyContinue) {
     oh-my-posh init pwsh --config ~/.oh-my-posh.omp.yaml | Invoke-Expression
 }
 
+# NOTE: to load help correctly.
+Import-Module SnippetPredictor
+
 # NOTE: end of Microsoft.PowerShell_profile.ps1
 local:Complete
