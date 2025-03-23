@@ -109,6 +109,7 @@ $PSReadLineParams = @{
         Number = "`e[35m"
         Operator = "`e[32m"
         Variable = "`e[34m"
+        Type = "`e[95m"
     }
 }
 Set-PSReadLineOption @PSReadLineParams
