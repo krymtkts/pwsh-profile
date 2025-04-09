@@ -19,12 +19,6 @@ function global:Remove-GitGoneBranches {
     git branch --format '%(refname:short)=%(upstream:track)' | Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object -ExpandProperty Keys | ForEach-Object { git branch $deleteFlag $_ }
 }
 
-function global:Get-GitGraph {
-    git log --graph --all --decorate --abbrev-commit --branches --oneline
-}
-
-Set-Alias gitgraph Get-GitGraph -Option ReadOnly -Force -Scope Global
-
 function global:Set-GitGlobalConfig {
     git config --global core.autocrlf input
     git config --global core.excludesfile ~/.gitignore_global
