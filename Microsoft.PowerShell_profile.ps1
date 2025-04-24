@@ -118,6 +118,7 @@ Set-PSReadLineOption @PSReadLineParams
 Set-Alias ll ls -Option ReadOnly -Force -Scope Global
 
 if (-not (Get-Service ssh-agent -ErrorAction SilentlyContinue)) {
+    # TODO: Switch to using WinGet.
     Write-Error @'
 to install ssh-agent service, run below command.
 
