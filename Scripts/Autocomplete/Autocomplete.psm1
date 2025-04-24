@@ -4,8 +4,7 @@
     If you want to add functions that are not related to completions, move specific complete function to a specific module.
 #>
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Variables are used in script blocks and argument completers')]
-param (
-)
+param ()
 
 if (Get-Command -Name dotnet -ErrorAction SilentlyContinue) {
     # https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete#powershell
