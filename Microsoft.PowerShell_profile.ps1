@@ -19,8 +19,8 @@ Get-ChildItem "$($PROFILE | Split-Path -Parent)/Scripts" -Recurse -File -Filter 
 
 function Update-ProfileScripts {
     @(
-        'Autocomplete'
         'AWS'
+        'Autocomplete'
         'Functions'
         'Get-Hash'
         'Git'
@@ -28,9 +28,9 @@ function Update-ProfileScripts {
         'Mod'
         'Nodejs'
         'OpenAI'
+        'PSResource'
         'Pocof'
         'Psake'
-        'PSResource'
         'Python'
         'StandardNotes'
         'Strings'
