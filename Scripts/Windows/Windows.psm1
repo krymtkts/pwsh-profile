@@ -28,6 +28,8 @@ if ((Get-Command -Name docker -ErrorAction SilentlyContinue) -and (([Security.Pr
         }
         Write-Host 'shutdown wsl.'
         wsl --shutdown
+        Write-Host 'cooling down in 5 seconds...'
+        Start-Sleep -Seconds 5
         Write-Host 'compact vhdx.'
 
         Get-ChildItem "${env:LOCALAPPDATA}\Docker\wsl\*\*.vhdx" | ForEach-Object {
