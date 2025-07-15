@@ -158,3 +158,20 @@ function Get-EndOfMonth {
         [datetime]::new($Date.Year, $Date.Month + 1, 1).AddMicroseconds(-1)
     }
 }
+
+function Resolve-HostName {
+    [CmdletBinding()]
+    param (
+        [Parameter(
+            Position = 0,
+            Mandatory,
+            ValueFromPipeline
+        )]
+        [string]
+        [ValidateNotNullOrEmpty()]
+        $Address
+    )
+    process {
+        [System.Net.Dns]::GetHostEntry($Address)
+    }
+}
