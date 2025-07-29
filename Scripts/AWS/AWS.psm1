@@ -218,13 +218,15 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
             [ValidateNotNullOrEmpty()]
             [String]$ProfileName = $UserName,
             [Parameter()]
-            $AWSRegion = 'ap-northeast-1'
+            $AWSRegion = 'ap-northeast-1',
+            [int]$DurationInSeconds = 3600
         )
         $env:AWS_REGION = $AWSRegion
         $p = @{
             ProfileName = $ProfileName
             RoleSessionName = $RoleSessionName
             AWSRegion = $AWSRegion
+            DurationInSeconds = $DurationInSeconds
         }
         if ($RoleName) {
             $p.RoleName = $RoleName
