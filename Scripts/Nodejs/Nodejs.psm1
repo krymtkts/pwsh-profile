@@ -12,7 +12,7 @@ function Update-NodeModules {
     }
     $firstTime = -not (Get-Command npm -ErrorAction SilentlyContinue)
     if ($firstTime) {
-        18, 20 | ForEach-Object { fnm install "v$_" }
+        20, 22 | ForEach-Object { fnm install "v$_" }
         fnm default v20
         fnm env --use-on-cd | Out-String | Invoke-Expression
         fnm completions --shell powershell | Out-String | Invoke-Expression
