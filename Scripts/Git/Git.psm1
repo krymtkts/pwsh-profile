@@ -36,7 +36,7 @@ function global:Set-GitGlobalConfig {
         git config --global gpg.program "'$(Get-Command gpg | Select-Object -ExpandProperty Source | Resolve-Path | Select-Object -ExpandProperty Path)'"
     }
 
-    git config --global safe.directory="$('~/dev/' | Resolve-Path )*"
+    git config --global --add safe.directory "$('~/dev/' | Resolve-Path )*"
 }
 
 function global:Set-GPGConfig {
