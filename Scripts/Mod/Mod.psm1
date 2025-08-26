@@ -4,9 +4,17 @@ function Edit-TerminalIcons {
         Write-Error 'Terminal-Icons not found. install it!'
         return
     }
+    $installedLocation = $ti[0].InstalledLocation
+    if ($installedLocation -notlike '*Terminal-Icons*') {
+        # NOTE: first time installation, the InstalledLocation doesn't contain Terminal-Icons folder. So we need to look for it.
+        $glyphs = Get-ChildItem "$($ti[0].InstalledLocation)\Terminal-Icons\*\Data\glyphs.ps1" | Sort-Object -Descending Name | Select-Object -First 1 | ForEach-Object FullName
+    }
+    else {
+        $glyphs = Resolve-Path "$($ti[0].InstalledLocation)\Data\glyphs.ps1" | ForEach-Object Path
+    }
     $params = @{
         Uri = 'https://gist.githubusercontent.com/krymtkts/4457a23124b2db860a6b32eba6490b03/raw/glyphs.ps1'
-        OutFile = "$($ti[0].InstalledLocation)\Terminal-Icons\Data\glyphs.ps1"
+        OutFile = $glyphs
     }
     Invoke-WebRequest @params
 }
