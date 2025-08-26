@@ -6,7 +6,7 @@ function Edit-TerminalIcons {
     }
     $params = @{
         Uri = 'https://gist.githubusercontent.com/krymtkts/4457a23124b2db860a6b32eba6490b03/raw/glyphs.ps1'
-        OutFile = "$($ti[0].InstalledLocation)\Data\glyphs.ps1"
+        OutFile = "$($ti[0].InstalledLocation)\Terminal-Icons\Data\glyphs.ps1"
     }
     Invoke-WebRequest @params
 }
