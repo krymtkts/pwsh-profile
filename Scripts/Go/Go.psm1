@@ -1,3 +1,6 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Variables are used in script blocks and argument completers')]
+param ()
+
 function Install-GoModules {
     $mods = @(
         'github.com/x-motemen/ghq@latest'
@@ -23,5 +26,35 @@ function Update-GoModules {
         $_ -like '*path*'
     } | ConvertFrom-StringData -Delimiter "`t" | Select-Object -ExpandProperty Values | ForEach-Object {
         go install "${_}@latest"
+    }
+}
+
+if (Get-Command -Name ghq -ErrorAction SilentlyContinue) {
+    function global:Get-GhqCommand {
+        ghq --help | ForEach-Object -Begin {
+            $captureCommand = $false
+        } -Process {
+            if ($_ -like 'COMMANDS:*' ) {
+                $captureCommand = $true
+            }
+            elseif ($captureCommand -and $_ -ne '') {
+                $command = $_.Trim() -split '\s{2,}', 2
+                $command[0].Split(',') | ForEach-Object {
+                    [PSCustomObject]@{
+                        Command = $_.Trim()
+                        Description = $command[1]
+                    }
+                }
+            }
+            elseif ($captureCommand -and $_ -eq '') {
+                $captureCommand = $false
+            }
+        }
+    }
+    Register-ArgumentCompleter -Native -CommandName ghq -ScriptBlock {
+        param($wordToComplete, $commandAst, $cursorPosition)
+        Get-GhqCommand | Where-Object -Property Host -Like "$wordToComplete*" | ForEach-Object {
+            [System.Management.Automation.CompletionResult]::new($_.Command, $_.Command, 'ParameterValue', $_.Description)
+        }
     }
 }
