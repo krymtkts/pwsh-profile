@@ -1,4 +1,14 @@
 if ((Get-Command -Name docker -ErrorAction SilentlyContinue) -and (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) {
+    function Set-WindowsClassicContextMenu {
+        $path = 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32'
+        New-Item -Path $path -Force
+        Split-Path $path -Parent | Get-ChildItem
+        Set-ItemProperty -Path $path -Name '(Default)' -Value ''
+        Get-ItemProperty $path
+
+        Stop-Process -Name explorer -Force
+    }
+
     # NOTE: This function depends Windows Subsystem for Linux.
     function Optimize-DockerUsage {
         # NOTE: Requires running as Administrator.
