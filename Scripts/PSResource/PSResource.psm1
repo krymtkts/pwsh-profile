@@ -80,6 +80,12 @@ function Initialize-PackageSource {
     Register-PackageSource -Name NuGet -Location $url -ProviderName NuGet -Trusted -Force | Out-Null
 }
 
+function Initialize-PSRepository {
+    [CmdletBinding()]
+    param()
+    Register-PSRepository -Name 'PSGallery' -SourceLocation 'https://www.powershellgallery.com/api/v2' -InstallationPolicy Trusted
+}
+
 function Update-InstalledModules {
     [CmdletBinding(SupportsShouldProcess)]
     param()
