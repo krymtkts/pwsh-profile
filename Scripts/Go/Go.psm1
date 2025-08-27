@@ -53,7 +53,7 @@ if (Get-Command -Name ghq -ErrorAction SilentlyContinue) {
     }
     Register-ArgumentCompleter -Native -CommandName ghq -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
-        Get-GhqCommand | Where-Object -Property Host -Like "$wordToComplete*" | ForEach-Object {
+        Get-GhqCommand | Where-Object -Property Command -Like "$wordToComplete*" | ForEach-Object {
             [System.Management.Automation.CompletionResult]::new($_.Command, $_.Command, 'ParameterValue', $_.Description)
         }
     }
