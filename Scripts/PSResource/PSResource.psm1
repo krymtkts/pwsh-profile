@@ -83,7 +83,7 @@ function Initialize-PackageSource {
 function Initialize-PSRepository {
     [CmdletBinding()]
     param()
-    Register-PSRepository -Default
+    Register-PSRepository -Default -InstallationPolicy Trusted
 }
 
 function Update-InstalledModules {
