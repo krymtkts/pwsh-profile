@@ -1,3 +1,8 @@
+function Install-WindowsTerminalCanary {
+    Invoke-WebRequest 'https://aka.ms/terminal-canary-installer' -OutFile 'Microsoft.WindowsTerminalCanary.appinstaller'
+    Start-Process 'Microsoft.WindowsTerminalCanary.appinstaller'
+}
+
 if ((Get-Command -Name docker -ErrorAction SilentlyContinue) -and (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) {
     function Set-WindowsClassicContextMenu {
         $path = 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32'
