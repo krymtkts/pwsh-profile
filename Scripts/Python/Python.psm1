@@ -1,6 +1,6 @@
 function Resolve-UvPythonPath {
     # NOTE: uv doesn't append the path for dll. So, I need to do it manually.
-    Resolve-Path "$($env:APPDATA)/uv/python/*/python*.dll" | Split-Path -Parent | Get-Unique | Sort-Object -Descending | Select-Object -First 1 | ForEach-Object { $env:Path += ';' + $_ }
+    uv python update-shell
 }
 
 function Update-PipModules {
