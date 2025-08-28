@@ -8,24 +8,24 @@ function Update-PipModules {
         Write-Error "Install uv with command below. 'choco install -y uv'"
         return
     }
-    $firstTime = -not (Get-Command pip -ErrorAction SilentlyContinue)
+    $firstTime = -not (Get-Command python -ErrorAction SilentlyContinue)
     if ($firstTime) {
         $latest = '3.13'
         uv python install $latest
         Resolve-UvPythonPath
-    }
-    python -m pip install --upgrade pip
-    if ($firstTime) {
         $list = @(
             'sqlfmt'
         )
-        pip install ($list -join ' ')
+        uv tool install ($list -join ' ')
     }
     else {
-        pip list --outdated | ForEach-Object { [string]::Join(',', $_ -split '\s+') } | `
-                ConvertFrom-Csv -Header Package, Version, Latest, Type | `
-                Select-Object -Property Package -Skip 2 | `
-                ForEach-Object { pip install -U $_.Package }
+        uv tool list | Where-Object {
+            $_ -notlike '-*'
+        } | ForEach-Object {
+            $_ -split ' ' | Select-Object -First 1
+        } | ForEach-Object {
+            uv tool upgrade $_
+        }
     }
 }
 
