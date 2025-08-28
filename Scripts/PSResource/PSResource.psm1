@@ -83,7 +83,7 @@ function Initialize-PackageSource {
 function Initialize-PSRepository {
     [CmdletBinding()]
     param()
-    Register-PSRepository -Name 'PSGallery' -SourceLocation 'https://www.powershellgallery.com/api/v2' -InstallationPolicy Trusted
+    Register-PSRepository -Default
 }
 
 function Update-InstalledModules {
