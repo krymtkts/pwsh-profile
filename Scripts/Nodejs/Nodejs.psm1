@@ -21,7 +21,7 @@ function Update-NodeModules {
     else {
         npm update -g
     }
-    if (-not (Test-Path ~/.textlint)) {
+    if (-not (Test-Path ~/.textlintrc)) {
         @'
 {
   "filters": {},
