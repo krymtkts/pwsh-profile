@@ -33,6 +33,7 @@ function Update-NodeModules {
   }
 }
 '@ | Set-Content ~/.textlintrc -Encoding utf8
+        '' | Set-Content ~/.textlintignore -Encoding utf8
     }
 }
 
