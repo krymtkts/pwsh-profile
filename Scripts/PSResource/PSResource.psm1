@@ -16,7 +16,9 @@ $names = @(
     # basic utilities
     'PSReadLine'
     'pocof', 'Get-GzipContent'
-    'powershell-yaml', 'PSToml'
+    'powershell-jwt', 'powershell-yaml', 'PSToml'
+    'psedit'
+    'PSGameOfLife'
     # for PowerShell
     'Microsoft.PowerShell.PSResourceGet', 'PSScriptAnalyzer', 'Microsoft.PowerShell.PlatyPS'
     'Pester', 'psake', 'PSProfiler'
