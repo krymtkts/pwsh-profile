@@ -1,8 +1,3 @@
-function Resolve-UvPythonPath {
-    # NOTE: uv doesn't append the path for dll. So, I need to do it manually.
-    uv python update-shell
-}
-
 function Update-PipModules {
     if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
         Write-Error "Install uv with command below. 'choco install -y uv'"
@@ -12,7 +7,8 @@ function Update-PipModules {
     if ($firstTime) {
         $latest = '3.13'
         uv python install $latest
-        Resolve-UvPythonPath
+        # NOTE: uv doesn't append the path for dll. So, I need to do it manually.
+        uv python update-shell
         $list = @(
             'sqlfmt'
         )
@@ -36,7 +32,6 @@ if (Get-Command -Name uv -ErrorAction SilentlyContinue) {
     catch {
         Write-Warning "uv completions --shell power-shell failed. $($_)"
     }
-    Resolve-UvPythonPath
 }
 else {
     Write-Warning "Install uv with command below. 'choco install uv -y'"
