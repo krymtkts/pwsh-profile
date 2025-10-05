@@ -10,7 +10,7 @@ function Update-PipModules {
         # NOTE: uv doesn't append the path for dll. So, I need to do it manually.
         uv python update-shell
         $list = @(
-            'sqlfmt'
+            'shandy-sqlfmt[jinjafmt]'
         )
         uv tool install ($list -join ' ')
     }
