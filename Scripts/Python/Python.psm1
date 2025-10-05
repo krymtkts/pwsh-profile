@@ -3,7 +3,7 @@ function Update-PipModules {
         Write-Error "Install uv with command below. 'choco install -y uv'"
         return
     }
-    $firstTime = -not (Get-Command python -ErrorAction SilentlyContinue)
+    $firstTime = -not (uv python list --only-installed)
     if ($firstTime) {
         $latest = '3.13'
         uv python install $latest
