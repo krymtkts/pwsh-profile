@@ -24,6 +24,8 @@ function Get-AWSModuleConfiguration {
 }
 
 function Install-AWSModules {
+    [CmdletBinding()]
+    param ()
     $installServicesForAwsToolsForPowerShell = Get-AWSModuleConfiguration
     if (-not $installServicesForAwsToolsForPowerShell) {
         Write-Warning 'No AWS services for AWS Tools for PowerShell installed.'
@@ -35,6 +37,8 @@ function Install-AWSModules {
     }
 }
 function Update-AWSModules {
+    [CmdletBinding()]
+    param ()
     if (Get-Command -Name Update-AWSToolsModule -ErrorAction SilentlyContinue) {
         Update-AWSToolsModule -Scope AllUsers -Force -CleanUp
     }
