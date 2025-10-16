@@ -78,7 +78,10 @@ function New-Password {
         $Length,
         [Parameter()]
         [switch]
-        $NoSymbol
+        $NoSymbol,
+        [Parameter()]
+        [switch]
+        $NoCaseSensitive
     )
 
     process {
@@ -86,12 +89,10 @@ function New-Password {
         $lowers = $uppers.ToLower()
         $digits = '123456789'
         $symbols = "!@#$%^&*()-=[];',./_+{}:`"<>?\|``~"
-        $chars = if ($NoSymbol) {
-            ($uppers + $lowers + $digits).ToCharArray()
-        }
-        else {
-            ($uppers + $lowers + $digits + $symbols).ToCharArray()
-        }
+        $chars = (
+            ($NoCaseSensitive ? $lowers : $uppers + $lowers) +
+            ($NoSymbol ? $digits : $digits + $symbols)
+        ).ToCharArray()
 
         do {
             $pwdChars = ''.ToCharArray()
