@@ -72,7 +72,10 @@ function ConvertTo-RegexReplacedString {
 function New-Password {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory, Position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory,
+            Position = 0,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName)]
         [ValidateRange(16, 128)]
         [int]
         $Length,
@@ -124,10 +127,10 @@ function New-Password {
 function Convert-CodeToUnicode {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true,
+        [Parameter(Mandatory,
             Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [int[]] $Code
     )
@@ -149,10 +152,10 @@ function Convert-CodeToUnicode {
 function Convert-UnicodeToCode {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true,
+        [Parameter(Mandatory,
             Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [String[]]$s
     )
@@ -166,10 +169,10 @@ function Convert-UnicodeToCode {
 function Convert-0xTo10 {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true,
+        [Parameter(Mandatory,
             Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [String[]]$0x
     )
@@ -183,10 +186,10 @@ function Convert-0xTo10 {
 function ConvertFrom-Base64 {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true,
+        [Parameter(Mandatory,
             Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [String[]]$Value
     )
@@ -202,10 +205,10 @@ function ConvertFrom-Base64 {
 function ConvertTo-Base64 {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true,
+        [Parameter(Mandatory,
             Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
+            ValueFromPipelineMandatory,
+            ValueFromPipelineByPropertyNameMandatory)]
         [ValidateNotNullOrEmpty()]
         [String[]]$Value
     )
@@ -220,13 +223,13 @@ function ConvertTo-Base64 {
 function Split-String {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true,
+        [Parameter(Mandatory,
             Position = 0)]
         [string]$Delimiter,
-        [Parameter(Mandatory = $true,
+        [Parameter(Mandatory,
             Position = 1,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [string[]]$InputString
     )
