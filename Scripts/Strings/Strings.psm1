@@ -99,7 +99,7 @@ function New-Password {
             $goodPassword = $false
             $hasDigit = $false
             $hasSymbol = $false
-            $pwdChars += (Get-SecureRandom -InputObject $uppers.ToCharArray() -Count 1)
+            $pwdChars += (Get-SecureRandom -InputObject $chars -Count 1)
             for ($i = 1; $i -lt $length; $i++) {
                 $char = Get-SecureRandom -InputObject $chars -Count 1
                 if ($digits.Contains($char)) { $hasDigit = $true }
