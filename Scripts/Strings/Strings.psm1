@@ -95,7 +95,7 @@ function New-Password {
         ).ToCharArray()
 
         do {
-            $pwdChars = ''.ToCharArray()
+            $pwdChars = @()
             $goodPassword = $false
             $hasDigit = $false
             $hasSymbol = $false
