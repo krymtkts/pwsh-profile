@@ -117,10 +117,8 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
         param (
             [Parameter(ParameterSetName = 'Default', Mandatory)]
             [Parameter(ParameterSetName = 'MFA', Mandatory)]
-            # [ValidateNotNullOrEmpty()]
             [String]$RoleName,
             [Parameter(ParameterSetName = 'Cross', Mandatory)]
-            # [ValidateNotNullOrEmpty()]
             [String]$RoleArn,
             [Parameter(Mandatory)]
             [ValidateNotNullOrEmpty()]
@@ -156,10 +154,8 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
         param (
             [Parameter(ParameterSetName = 'Default', Mandatory)]
             [Parameter(ParameterSetName = 'MFA', Mandatory)]
-            # [ValidateNotNullOrEmpty()]
             [String]$RoleName,
             [Parameter(ParameterSetName = 'Cross', Mandatory)]
-            # [ValidateNotNullOrEmpty()]
             [String]$RoleArn,
             [Parameter(Mandatory)]
             [ValidateNotNullOrEmpty()]
@@ -200,10 +196,8 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
         param (
             [Parameter(ParameterSetName = 'Default', Mandatory)]
             [Parameter(ParameterSetName = 'MFA', Mandatory)]
-            # [ValidateNotNullOrEmpty()]
             [String]$RoleName,
             [Parameter(ParameterSetName = 'Cross', Mandatory)]
-            # [ValidateNotNullOrEmpty()]
             [String]$RoleArn,
             [Parameter(Mandatory)]
             [ValidateNotNullOrEmpty()]
@@ -249,10 +243,10 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
 function Get-IAMPolicyDocument {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true,
+        [Parameter(Mandatory,
             Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [String]$PolicyArn
     )
@@ -266,10 +260,10 @@ function Get-IAMPolicyDocument {
 function Get-IAMRolePolicyDocument {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true,
+        [Parameter(Mandatory,
             Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [String]$RoleName
     )
@@ -281,10 +275,10 @@ function Get-IAMRolePolicyDocument {
 function ConvertFrom-CloudFrontAccessLog {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true,
+        [Parameter(Mandatory,
             Position = 0,
-            ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true,
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName,
             HelpMessage = 'Path to one or more locations.')]
         [Alias('PSPath')]
         [ValidateNotNullOrEmpty()]
