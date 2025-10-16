@@ -1,12 +1,30 @@
-function New-EmptyFIle([parameter(mandatory)][string]$Name) {
-    New-Item -Name $Name -ItemType File
+function New-EmptyFIle {
+    [CmdletBinding()]
+    param (
+        [parameter(Mandatory)]
+        [string]
+        $Name
+    )
+    process {
+        New-Item -Name $Name -ItemType File
+    }
 }
 Set-Alias touch New-EmptyFile -Option ReadOnly -Force -Scope Global
 
 function New-TemporaryDirectory {
-    $parent = [System.IO.Path]::GetTempPath()
-    [string] $name = [System.Guid]::NewGuid()
-    New-Item -ItemType Directory -Path (Join-Path $parent $name)
+    [CmdletBinding()]
+    param (
+        [parameter(Mandatory)]
+        [string]
+        $Name
+    )
+    begin {
+        $parent = [System.IO.Path]::GetTempPath()
+    }
+    process {
+        [string] $name = [System.Guid]::NewGuid()
+        New-Item -ItemType Directory -Path (Join-Path $parent $name)
+    }
 }
 Set-Alias tmpdir New-TemporaryDirectory -Option ReadOnly -Force -Scope Global
 
