@@ -72,8 +72,8 @@ function ConvertTo-RegexReplacedString {
 function New-Password {
     [CmdletBinding()]
     param (
-        # Length is password length.
-        [Parameter(Mandatory = $True)]
+        [Parameter(Mandatory, Position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [ValidateRange(16, 128)]
         [int]
         $Length,
         [Parameter()]
@@ -97,21 +97,25 @@ function New-Password {
         do {
             $pwdChars = @()
             $goodPassword = $false
+            $hasUpper = $true
+            $hasLower = $true
             $hasDigit = $false
             $hasSymbol = $false
-            $pwdChars += (Get-SecureRandom -InputObject $chars -Count 1)
-            for ($i = 1; $i -lt $length; $i++) {
+            for ($i = 0; $i -lt $length; $i++) {
                 $char = Get-SecureRandom -InputObject $chars -Count 1
+                if ($uppers.Contains($char)) { $hasUpper = $true }
+                if ($lowers.Contains($char)) { $hasLower = $true }
                 if ($digits.Contains($char)) { $hasDigit = $true }
                 if ($symbols.Contains($char)) { $hasSymbol = $true }
                 $pwdChars += $char
             }
             $password = $pwdChars -join ''
-            $goodPassword = $hasDigit -and ($NoSymbol -or $hasSymbol)
+            $goodPassword = (
+                $hasLower -and ($NoCaseSensitive -or $hasUpper) -and
+                $hasDigit -and ($NoSymbol -or $hasSymbol)
+            )
         } until ($goodPassword)
-    }
 
-    end {
         $password
     }
 }
