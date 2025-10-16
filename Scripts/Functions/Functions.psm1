@@ -128,7 +128,9 @@ function Get-UnixTimeSeconds {
         [datetime]
         $date = (Get-Date)
     )
-    [Math]::Truncate(($date - (Get-Date -UnixTimeSeconds 0)).TotalSeconds)
+    process {
+        [Math]::Truncate(($date - (Get-Date -UnixTimeSeconds 0)).TotalSeconds)
+    }
 }
 
 function Invoke-InfiniteLoop {
