@@ -87,10 +87,10 @@ function New-Password {
         $digits = '123456789'
         $symbols = "!@#$%^&*()-=[];',./_+{}:`"<>?\|``~"
         $chars = if ($NoSymbol) {
-        ($uppers + $lowers + $digits).ToCharArray()
+            ($uppers + $lowers + $digits).ToCharArray()
         }
         else {
-        ($uppers + $lowers + $digits + $symbols).ToCharArray()
+            ($uppers + $lowers + $digits + $symbols).ToCharArray()
         }
 
         do {
