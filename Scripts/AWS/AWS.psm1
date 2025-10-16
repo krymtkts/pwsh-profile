@@ -44,20 +44,16 @@ function Update-AWSModules {
     }
 }
 
-# This idea was inspired by  https://github.com/aws/aws-cli/issues/5309#issuecomment-693941619
+# NOTE: based on https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html#cli-command-completion-windows
 if (Get-Command -Name aws_completer -ErrorAction SilentlyContinue) {
     Register-ArgumentCompleter -Native -CommandName aws -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
-        if ("$commandAst" -eq 'aws') {
-            # complement the deleted space so that aws_completer lists all services.
-            $compLine = "$commandAst "
+        $env:COMP_LINE = $wordToComplete
+        if ($env:COMP_LINE.Length -lt $cursorPosition) {
+            $env:COMP_LINE = $env:COMP_LINE + ' '
         }
-        else {
-            $compLine = $commandAst
-        }
-        $env:COMP_LINE = $compLine
         $env:COMP_POINT = $cursorPosition
-        aws_completer | ForEach-Object {
+        aws_completer.exe | ForEach-Object {
             [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
         }
         Remove-Item env:\COMP_LINE
