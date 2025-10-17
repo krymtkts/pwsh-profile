@@ -195,3 +195,8 @@ function Resolve-HostName {
         [System.Net.Dns]::GetHostEntry($Address)
     }
 }
+
+function Get-PublicIPInfo {
+    Invoke-RestMethod -Uri https://ipinfo.io/json
+}
+Set-Alias myip Get-PublicIPInfo -Option ReadOnly -Force -Scope Global
