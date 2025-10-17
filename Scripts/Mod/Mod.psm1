@@ -1,4 +1,7 @@
 function Edit-TerminalIcons {
+    [CmdletBinding()]
+    param ()
+
     $ti = Get-PSResource Terminal-Icons -ErrorAction SilentlyContinue -Scope AllUsers
     if (-not $ti) {
         Write-Error 'Terminal-Icons not found. install it!'
@@ -44,6 +47,9 @@ function Edit-EverMonkey {
 }
 
 function Update-PoshTheme {
+    [CmdletBinding()]
+    param ()
+
     $params = @{
         Uri = 'https://gist.githubusercontent.com/krymtkts/d320ff5ec30fa47b138c2df018f95423/raw/bf406fbf181413c62f0228e56f63db9c57017093/.oh-my-posh.omp.yaml'
         OutFile = '~/.oh-my-posh.omp.yaml'
