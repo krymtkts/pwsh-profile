@@ -15,7 +15,8 @@ function local:Complete {
     Write-Host "$Horns pwsh $($PSVersionTable.PSVersion.ToString()) is ready $Horns User profile loaded in $(&$totalSeconds) seconds"
 }
 
-Get-ChildItem "$($PROFILE | Split-Path -Parent)/Scripts" -Recurse -File -Filter *.psm1 | Import-Module -Force
+$env:ProfileHome = ($PROFILE | Split-Path -Parent)
+Get-ChildItem "${env:ProfileHome}/Scripts" -Recurse -File -Filter *.psm1 | Import-Module -Force
 
 function Update-ProfileScripts {
     @(
@@ -50,7 +51,6 @@ function Update-ProfileScripts {
 }
 
 function Update-Profile {
-    $ProfileHome = ($PROFILE | Split-Path -Parent)
     $ProfilePath = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
     $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main/'
     $params = @{
