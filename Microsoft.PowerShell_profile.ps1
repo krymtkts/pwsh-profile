@@ -19,7 +19,6 @@ Get-ChildItem "$($PROFILE | Split-Path -Parent)/Scripts" -Recurse -File -Filter 
 
 function Update-ProfileScripts {
     @(
-        'AWS'
         'Autocomplete'
         'Functions'
         'Get-Hash'
@@ -35,6 +34,7 @@ function Update-ProfileScripts {
         'StandardNotes'
         'Strings'
         'Windows'
+        'AWS'
     ) | ForEach-Object {
         $modulePath = "${_}/${_}.psm1"
         $scriptPath = "${ProfileHome}/Scripts/${modulePath}"
