@@ -1,6 +1,10 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 param ()
 
+$deps = Get-ChildItem "${env:ProfileHome}/Scripts/Nodejs/Nodejs.psm1"
+if ($deps) {
+    Import-Module $deps.FullName -Force
+}
 $env:AWS_REGION = 'ap-northeast-1'
 
 function Get-AWSModuleConfiguration {
