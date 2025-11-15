@@ -41,7 +41,8 @@ function Update-ProfileScripts {
         $modulePath = "${_}/${_}.psm1"
         $scriptPath = "${ProfileHome}/Scripts/${modulePath}"
         if (-not (Split-Path $scriptPath -Parent | Test-Path)) {
-            New-Item -ItemType Directory -Path (Split-Path $scriptPath -Parent) -Force
+            New-Item -ItemType Directory -Path (Split-Path $scriptPath -Parent) -Force | Out-Null
+            Write-Host "Created directory: $(Split-Path $scriptPath -Parent)"
         }
         $params = @{
             Uri = "${baseUrl}/Scripts/${modulePath}"
