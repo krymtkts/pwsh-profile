@@ -6,17 +6,6 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Variables are used in script blocks and argument completers')]
 param ()
 
-if (Get-Command -Name dotnet -ErrorAction SilentlyContinue) {
-    # https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete#powershell
-    Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
-        # NOTE: The parameter names given in the above document are incorrect.
-        param($wordToComplete, $commandAst, $cursorPosition)
-        dotnet complete --position $cursorPosition "$commandAst" | ForEach-Object {
-            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
-        }
-    }
-}
-
 if (Get-Command -Name dvm -ErrorAction SilentlyContinue) {
     dvm completions powershell | Out-String | Invoke-Expression
 }
@@ -24,7 +13,7 @@ if (Get-Command -Name dvm -ErrorAction SilentlyContinue) {
 if ((Get-Command -Name ssh -ErrorAction SilentlyContinue) -and (Test-Path "${env:USERPROFILE}/.ssh/config")) {
     function global:Get-SshHosts {
         Get-Content "${env:USERPROFILE}/.ssh/config" | Where-Object {
-                ($_ -ne '') -and ($_ -notlike '#*')
+            ($_ -ne '') -and ($_ -notlike '#*')
         } | ForEach-Object -Begin {
             $configs = @()
             $tmp = $null
