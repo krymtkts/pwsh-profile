@@ -2,6 +2,15 @@ if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
     Write-Error 'dotnet is not installed. run `choco install dotnet -y` or `winget install Microsoft.DotNet.SDK.10` to install it. '
 }
 
+# https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete#powershell
+Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
+    # NOTE: The parameter names given in the above document are incorrect.
+    param($wordToComplete, $commandAst, $cursorPosition)
+    dotnet complete --position $cursorPosition "$commandAst" | ForEach-Object {
+        [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+    }
+}
+
 function Set-DotnetGlobalJson {
     [CmdletBinding()]
     param(
