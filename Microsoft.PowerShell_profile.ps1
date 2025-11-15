@@ -22,6 +22,7 @@ function Update-ProfileScripts {
     @(
         'AWS'
         'Autocomplete'
+        'Dotnet'
         'Functions'
         'Get-Hash'
         'Git'
