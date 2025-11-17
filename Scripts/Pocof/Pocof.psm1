@@ -1,3 +1,7 @@
+if (-not (Get-Command pocof -ErrorAction SilentlyContinue)) {
+    Write-Error 'pocof is not installed. run `Install-PSResource -Name pocof -Scope AllUsers` to install it. '
+}
+
 if (Test-Path -Path '~/.poco-cd') {
     Move-Item -Path '~/.poco-cd' -Destination '~/.pocof-cd' -Force
 }
