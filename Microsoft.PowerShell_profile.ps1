@@ -39,7 +39,7 @@ function Update-ProfileScripts {
         'Windows'
     ) | ForEach-Object {
         $modulePath = "${_}/${_}.psm1"
-        $scriptPath = "${ProfileHome}/Scripts/${modulePath}"
+        $scriptPath = "${env:ProfileHome}/Scripts/${modulePath}"
         if (-not (Split-Path $scriptPath -Parent | Test-Path)) {
             New-Item -ItemType Directory -Path (Split-Path $scriptPath -Parent) -Force | Out-Null
             Write-Host "Created directory: $(Split-Path $scriptPath -Parent)"
@@ -53,7 +53,7 @@ function Update-ProfileScripts {
 }
 
 function Update-Profile {
-    $ProfilePath = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
+    $ProfilePath = "${env:ProfileHome}/Microsoft.PowerShell_profile.ps1"
     $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main/'
     $params = @{
         Uri = "${baseUrl}/Microsoft.PowerShell_profile.ps1"
@@ -61,8 +61,8 @@ function Update-Profile {
     }
     Invoke-WebRequest @params | Out-Null
 
-    if (-not (Test-Path "${ProfileHome}/Microsoft.VSCode_profile.ps1")) {
-        New-Item -ItemType HardLink -Path $ProfileHome -Name 'Microsoft.VSCode_profile.ps1' -Value $ProfilePath
+    if (-not (Test-Path "${env:ProfileHome}/Microsoft.VSCode_profile.ps1")) {
+        New-Item -ItemType HardLink -Path $env:ProfileHome -Name 'Microsoft.VSCode_profile.ps1' -Value $ProfilePath
     }
     # TODO: load the profile to prepare new psm1 files.
     . $ProfilePath
