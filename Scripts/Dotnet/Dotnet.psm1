@@ -1,5 +1,6 @@
 if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
     Write-Error 'dotnet is not installed. run `choco install dotnet -y` or `winget install Microsoft.DotNet.SDK.10` to install it. '
+    return
 }
 
 # https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete#powershell
