@@ -31,4 +31,3 @@ try {
 catch {
     Write-Warning "uv completions --shell power-shell failed. $($_)"
 }
-
