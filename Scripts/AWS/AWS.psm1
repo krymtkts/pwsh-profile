@@ -302,7 +302,7 @@ if ((Get-Command -Name fnm -ErrorAction SilentlyContinue) -and (Get-Command -Nam
     function Invoke-CdkBootstrap {
         [CmdletBinding()]
         param (
-            [Parameter()]
+            [Parameter(Position = 0)]
             [String]$ProfileName
         )
         # NOTE: workaround for certificate issue.
