@@ -1,3 +1,11 @@
+if (-not (Get-Command -Name sn, sncli -ErrorAction SilentlyContinue)) {
+    Write-Error @'
+sn,sncli are not found. Install sn with following command.
+`Install-GoModules`
+'@
+    return
+}
+
 # NOTE: command name will be 'sncli' when built with go install.
 Set-Alias sn -Value sncli -Option ReadOnly -Force -Scope Global
 
