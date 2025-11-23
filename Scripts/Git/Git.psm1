@@ -1,9 +1,11 @@
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     Write-Error 'git is not installed. run `choco install git -y`'
+    return
 }
 
 if (-not (Get-Command gpg -ErrorAction SilentlyContinue)) {
     Write-Error 'gpg is not installed. run `choco install gnupg gpg4win -y`'
+    return
 }
 
 function global:Remove-GitGoneBranches {
