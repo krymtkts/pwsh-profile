@@ -38,6 +38,7 @@ function Update-NodeModules {
     }
 }
 
+# NOTE: setup fnm environment variables and completions for PowerShell.
 fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
 try {
     fnm completions --shell powershell 2>&1 | Out-String | Invoke-Expression
