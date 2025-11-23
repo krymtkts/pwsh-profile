@@ -45,8 +45,11 @@ try {
 catch {
     Write-Warning "fnm completions --shell powershell failed. $($_)"
 }
+
+# NOTE: clean up old fnm installations.
 Get-ChildItem "$env:FNM_MULTISHELL_PATH/../" | Where-Object -Property CreationTime -LE (Get-Date).AddDays(-1) | Remove-Item
 
+# NOTE: register npm argument completer.
 Register-ArgumentCompleter -Native -CommandName 'npm' -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
 
