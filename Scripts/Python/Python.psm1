@@ -25,14 +25,10 @@ function Update-PipModules {
     }
 }
 
-if (Get-Command -Name uv -ErrorAction SilentlyContinue) {
-    try {
-        uv generate-shell-completion powershell 2>&1 | Out-String | Invoke-Expression
-    }
-    catch {
-        Write-Warning "uv completions --shell power-shell failed. $($_)"
-    }
+try {
+    uv generate-shell-completion powershell 2>&1 | Out-String | Invoke-Expression
 }
-else {
-    Write-Warning "Install uv with command below. 'choco install uv -y'"
+catch {
+    Write-Warning "uv completions --shell power-shell failed. $($_)"
 }
+
