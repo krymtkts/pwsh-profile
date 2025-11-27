@@ -52,7 +52,7 @@ function Update-AWSModules {
 if (Get-Command -Name aws_completer -ErrorAction SilentlyContinue) {
     Register-ArgumentCompleter -Native -CommandName aws -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
-        $env:COMP_LINE = $wordToComplete
+        $env:COMP_LINE = $commandAst
         if ($env:COMP_LINE.Length -lt $cursorPosition) {
             $env:COMP_LINE = $env:COMP_LINE + ' '
         }
