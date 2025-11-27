@@ -59,3 +59,7 @@ if (Get-Command -Name ghq -ErrorAction SilentlyContinue) {
         }
     }
 }
+
+if (Get-Command -Name dive -ErrorAction SilentlyContinue) {
+    dive completion powershell | Out-String | Invoke-Expression
+}
