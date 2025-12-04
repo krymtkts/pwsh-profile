@@ -130,8 +130,8 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
             [Parameter(ParameterSetName = 'MFA', Mandatory)]
             [Parameter(ParameterSetName = 'Cross', Mandatory)]
             [String]$UserName,
-            [Parameter(ParameterSetName = 'MFA', Mandatory)]
-            [Parameter(ParameterSetName = 'Cross', Mandatory)]
+            [Parameter(ParameterSetName = 'MFA')]
+            [Parameter(ParameterSetName = 'Cross')]
             [String]$AWSLogin,
             [Parameter()]
             [ValidateNotNullOrEmpty()]
@@ -167,8 +167,8 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
             [Parameter(ParameterSetName = 'MFA', Mandatory)]
             [Parameter(ParameterSetName = 'Cross', Mandatory)]
             [String]$UserName,
-            [Parameter(ParameterSetName = 'MFA', Mandatory)]
-            [Parameter(ParameterSetName = 'Cross', Mandatory)]
+            [Parameter(ParameterSetName = 'MFA')]
+            [Parameter(ParameterSetName = 'Cross')]
             [String]$AWSLogin,
             [Parameter()]
             [ValidateNotNullOrEmpty()]
@@ -209,8 +209,8 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
             [Parameter(ParameterSetName = 'MFA', Mandatory)]
             [Parameter(ParameterSetName = 'Cross', Mandatory)]
             [String]$UserName,
-            [Parameter(ParameterSetName = 'MFA', Mandatory)]
-            [Parameter(ParameterSetName = 'Cross', Mandatory)]
+            [Parameter(ParameterSetName = 'MFA')]
+            [Parameter(ParameterSetName = 'Cross')]
             [String]$AWSLogin,
             [Parameter()]
             [ValidateNotNullOrEmpty()]
