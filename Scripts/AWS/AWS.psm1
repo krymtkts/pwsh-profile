@@ -180,6 +180,7 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
         $p = @{
             ProfileName = $ProfileName
             RoleSessionName = $RoleSessionName
+            UserName = $UserName
             AWSRegion = $AWSRegion
         }
         if ($RoleName) {
@@ -189,7 +190,6 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
             $p.RoleArn = $RoleArn
         }
         if ($AWSLogin) {
-            $p.UserName = $UserName
             $p.AWSLogin = $AWSLogin
         }
 
@@ -223,6 +223,7 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
         $p = @{
             ProfileName = $ProfileName
             RoleSessionName = $RoleSessionName
+            UserName = $UserName
             AWSRegion = $AWSRegion
             DurationInSeconds = $DurationInSeconds
         }
@@ -233,7 +234,6 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
             $p.RoleArn = $RoleArn
         }
         if ($AWSLogin) {
-            $p.UserName = $UserName
             $p.AWSLogin = $AWSLogin
         }
 
