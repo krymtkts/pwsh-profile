@@ -1,7 +1,9 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 param ()
 
-$deps = Get-ChildItem "${env:ProfileHome}/Scripts/Nodejs/Nodejs.psm1"
+# NOTE: Recalculate $ProfileHome each time so this function also works correctly after Update-Profile reloads the profile.
+$ProfileHome = ($PROFILE | Split-Path -Parent)
+$deps = Get-ChildItem "${ProfileHome}/Scripts/Nodejs/Nodejs.psm1"
 if ($deps) {
     Import-Module $deps.FullName -Force
 }
