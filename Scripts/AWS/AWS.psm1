@@ -77,7 +77,7 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
             [Parameter(ParameterSetName = 'MFA', Mandatory)]
             [ValidateNotNullOrEmpty()]
             [String]$UserName,
-            [Parameter(ParameterSetName = 'MFA', Mandatory)]
+            [Parameter(ParameterSetName = 'MFA')]
             [String]$AWSLogin,
             [Parameter()]
             $AWSRegion = 'ap-northeast-1'
@@ -101,7 +101,7 @@ if (Get-Command -Name op -ErrorAction SilentlyContinue) {
             [Parameter(ParameterSetName = 'MFA', Mandatory)]
             [ValidateNotNullOrEmpty()]
             [String]$UserName,
-            [Parameter(ParameterSetName = 'MFA', Mandatory)]
+            [Parameter(ParameterSetName = 'MFA')]
             [String]$AWSLogin,
             [Parameter()]
             $AWSRegion = 'ap-northeast-1'
