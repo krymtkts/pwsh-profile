@@ -22,7 +22,7 @@ function Update-ProfileScripts {
     param (
         [Parameter()]
         [string]
-        $ProfileHome = ($PROFILE | Split-Path -Parent)
+        $ProfileHome = ($PROFILE | Split-Path -Parent) # NOTE: for backward compatibility.
     )
     @(
         'AWS'
