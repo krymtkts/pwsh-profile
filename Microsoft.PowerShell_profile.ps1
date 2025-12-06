@@ -63,7 +63,7 @@ function Update-Profile {
     $ProfilePath = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
     $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main'
     $params = @{
-        Uri = "${baseUrl}/Microsoft.PowerShell_profile.ps1$(Get-Random)" # prevent caching
+        Uri = "${baseUrl}/Microsoft.PowerShell_profile.ps1$(Get-Random)" # NOTE: prevent caching
         OutFile = $ProfilePath
     }
     Invoke-WebRequest @params | Out-Null
