@@ -15,10 +15,15 @@ function local:Complete {
     Write-Host "$Horns pwsh $($PSVersionTable.PSVersion.ToString()) is ready $Horns User profile loaded in $(&$totalSeconds) seconds"
 }
 
-$env:ProfileHome = ($PROFILE | Split-Path -Parent)
-Get-ChildItem "${env:ProfileHome}/Scripts" -Recurse -File -Filter *.psm1 | Import-Module -Force
+$ProfileHome = ($PROFILE | Split-Path -Parent)
+Get-ChildItem "${ProfileHome}/Scripts" -Recurse -File -Filter *.psm1 | Import-Module -Force
 
 function Update-ProfileScripts {
+    param (
+        [Parameter(Mandatory)]
+        [string]
+        $ProfileHome
+    )
     @(
         'AWS'
         'Autocomplete'
@@ -39,7 +44,7 @@ function Update-ProfileScripts {
         'Windows'
     ) | ForEach-Object {
         $modulePath = "${_}/${_}.psm1"
-        $scriptPath = "${env:ProfileHome}/Scripts/${modulePath}"
+        $scriptPath = "${ProfileHome}/Scripts/${modulePath}"
         if (-not (Split-Path $scriptPath -Parent | Test-Path)) {
             New-Item -ItemType Directory -Path (Split-Path $scriptPath -Parent) -Force | Out-Null
             Write-Host "Created directory: $(Split-Path $scriptPath -Parent)"
@@ -53,7 +58,9 @@ function Update-ProfileScripts {
 }
 
 function Update-Profile {
-    $ProfilePath = "${env:ProfileHome}/Microsoft.PowerShell_profile.ps1"
+    # NOTE: Recalculate $ProfileHome each time so this function also works correctly after Update-Profile reloads the profile.
+    $ProfileHome = ($PROFILE | Split-Path -Parent)
+    $ProfilePath = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
     $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main/'
     $params = @{
         Uri = "${baseUrl}/Microsoft.PowerShell_profile.ps1"
@@ -61,13 +68,13 @@ function Update-Profile {
     }
     Invoke-WebRequest @params | Out-Null
 
-    if (-not (Test-Path "${env:ProfileHome}/Microsoft.VSCode_profile.ps1")) {
-        New-Item -ItemType HardLink -Path $env:ProfileHome -Name 'Microsoft.VSCode_profile.ps1' -Value $ProfilePath
+    if (-not (Test-Path "${ProfileHome}/Microsoft.VSCode_profile.ps1")) {
+        New-Item -ItemType HardLink -Path $ProfileHome -Name 'Microsoft.VSCode_profile.ps1' -Value $ProfilePath
     }
     # TODO: load the profile to prepare new psm1 files.
     . $ProfilePath
 
-    Update-ProfileScripts
+    Update-ProfileScripts -ProfileHome $ProfileHome
 
     # TODO: load the profile again to apply new psm1 files.
     . $ProfilePath
