@@ -20,9 +20,9 @@ Get-ChildItem "${ProfileHome}/Scripts" -Recurse -File -Filter *.psm1 | Import-Mo
 
 function Update-ProfileScripts {
     param (
-        [Parameter(Mandatory)]
+        [Parameter()]
         [string]
-        $ProfileHome
+        $ProfileHome = ($PROFILE | Split-Path -Parent)
     )
     @(
         'AWS'
