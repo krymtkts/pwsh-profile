@@ -61,7 +61,7 @@ function Update-Profile {
     # NOTE: Recalculate $ProfileHome each time so this function also works correctly after Update-Profile reloads the profile.
     $ProfileHome = ($PROFILE | Split-Path -Parent)
     $ProfilePath = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
-    $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main/'
+    $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main'
     $params = @{
         Uri = "${baseUrl}/Microsoft.PowerShell_profile.ps1"
         OutFile = $ProfilePath
