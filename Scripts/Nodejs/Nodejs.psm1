@@ -4,11 +4,11 @@ if (-not (Get-Command fnm -ErrorAction SilentlyContinue)) {
 }
 
 function Install-NodeModules {
-    # NOTE: workaround for certificate issue.
-    $env:NODE_TLS_REJECT_UNAUTHORIZED = 0
+    # # NOTE: workaround for certificate issue.
+    # $env:NODE_TLS_REJECT_UNAUTHORIZED = 0
     npm update -g npm
     npm install -g @google/clasp aws-cdk snyk textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good wrangler
-    $env:NODE_TLS_REJECT_UNAUTHORIZED = 1
+    # $env:NODE_TLS_REJECT_UNAUTHORIZED = 1
 }
 function Update-NodeModules {
     $firstTime = -not (Get-Command npm -ErrorAction SilentlyContinue)
