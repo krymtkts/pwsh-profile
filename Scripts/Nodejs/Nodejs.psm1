@@ -7,7 +7,7 @@ function Install-NodeModules {
     # NOTE: workaround for certificate issue.
     $env:NODE_TLS_REJECT_UNAUTHORIZED = 0
     npm update -g npm
-    npm install -g @google/clasp @openapitools/openapi-generator-cli aws-cdk textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good wrangler
+    npm install -g @google/clasp aws-cdk snyk textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good wrangler
     $env:NODE_TLS_REJECT_UNAUTHORIZED = 1
 }
 function Update-NodeModules {
