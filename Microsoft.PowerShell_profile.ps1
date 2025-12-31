@@ -34,7 +34,6 @@ function Update-ProfileScripts {
         'Go'
         'Mod'
         'Nodejs'
-        'OpenAI'
         'PSResource'
         'Pocof'
         'Psake'
