@@ -81,3 +81,16 @@ compact vdisk
         }
     }
 }
+
+if (Get-Command Get-WinGetPackage -ErrorAction SilentlyContinue) {
+    @(
+        'Microsoft.VisualStudioCode.Insiders'
+        'Microsoft.OpenSSH.Preview'
+        'Microsoft.PowerShell.Preview'
+    ) | ForEach-Object {
+        $pkg = Get-WinGetPackage -Id $_
+        if (($pkg -and $pkg.IsUpdateAvailable)) {
+            Write-Warning "💡 Newer '${_}' is available. $($pkg.AvailableVersions | Select-Object -First 1)"
+        }
+    }
+}
