@@ -3,6 +3,21 @@ function Install-WindowsTerminalCanary {
     Start-Process 'Microsoft.WindowsTerminalCanary.appinstaller'
 }
 
+function Install-OhMyPoshTheme {
+    [CmdletBinding()]
+    param (
+        [Parameter(Position = 0)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ThemePath = '~/.oh-my-posh.omp.yaml'
+    )
+    $params = @{
+        Uri = 'https://gist.githubusercontent.com/krymtkts/d320ff5ec30fa47b138c2df018f95423/raw/58450313f773df801225f6e4053b289d67de4cb1/.oh-my-posh.omp.yaml'
+        OutFile = $ThemePath
+    }
+    Invoke-WebRequest @params
+}
+
 if ((Get-Command -Name docker -ErrorAction SilentlyContinue) -and (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) {
     function Set-WindowsClassicContextMenu {
         $path = 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32'
