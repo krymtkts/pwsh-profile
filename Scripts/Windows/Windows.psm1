@@ -1,6 +1,13 @@
 function Install-WindowsTerminalCanary {
     Invoke-WebRequest 'https://aka.ms/terminal-canary-installer' -OutFile 'Microsoft.WindowsTerminalCanary.appinstaller'
     Start-Process 'Microsoft.WindowsTerminalCanary.appinstaller'
+    # TODO; check if this works as intended.
+    # try {
+    #     Add-AppxPackage -AppInstallerFile $installer
+    # }
+    # finally {
+    #     Remove-Item $installer -Force -ErrorAction SilentlyContinue
+    # }
 }
 
 function Install-OhMyPoshTheme {
