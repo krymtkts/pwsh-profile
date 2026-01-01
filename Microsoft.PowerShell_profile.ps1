@@ -57,26 +57,36 @@ function Update-ProfileScripts {
 }
 
 function Update-Profile {
-    # NOTE: Recalculate $ProfileHome each time so this function also works correctly after Update-Profile reloads the profile.
-    $ProfileHome = ($PROFILE | Split-Path -Parent)
-    $ProfilePath = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
-    $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main'
-    $params = @{
-        Uri = "${baseUrl}/Microsoft.PowerShell_profile.ps1?$(Get-Random)" # NOTE: prevent caching
-        OutFile = $ProfilePath
+    $old = $ErrorActionPreference
+    $ErrorActionPreference = 'Stop'
+    try {
+        # NOTE: Recalculate $ProfileHome each time so this function also works correctly after Update-Profile reloads the profile.
+        $ProfileHome = ($PROFILE | Split-Path -Parent)
+        $ProfilePath = "${ProfileHome}/Microsoft.PowerShell_profile.ps1"
+        $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main'
+        $params = @{
+            Uri = "${baseUrl}/Microsoft.PowerShell_profile.ps1?$(Get-Random)" # NOTE: prevent caching
+            OutFile = $ProfilePath
+        }
+        Invoke-WebRequest @params | Out-Null
+
+        if (-not (Test-Path "${ProfileHome}/Microsoft.VSCode_profile.ps1")) {
+            New-Item -ItemType HardLink -Path $ProfileHome -Name 'Microsoft.VSCode_profile.ps1' -Value $ProfilePath
+        }
+        # TODO: load the profile to prepare new psm1 files.
+        . $ProfilePath
+
+        Update-ProfileScripts -ProfileHome $ProfileHome
+
+        # TODO: load the profile again to apply new psm1 files.
+        . $ProfilePath
     }
-    Invoke-WebRequest @params | Out-Null
-
-    if (-not (Test-Path "${ProfileHome}/Microsoft.VSCode_profile.ps1")) {
-        New-Item -ItemType HardLink -Path $ProfileHome -Name 'Microsoft.VSCode_profile.ps1' -Value $ProfilePath
+    catch {
+        throw $_
     }
-    # TODO: load the profile to prepare new psm1 files.
-    . $ProfilePath
-
-    Update-ProfileScripts -ProfileHome $ProfileHome
-
-    # TODO: load the profile again to apply new psm1 files.
-    . $ProfilePath
+    finally {
+        $ErrorActionPreference = $old
+    }
 }
 
 function Update-Packages {
