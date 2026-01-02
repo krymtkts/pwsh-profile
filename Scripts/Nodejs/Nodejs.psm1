@@ -4,16 +4,28 @@ if (-not (Get-Command fnm -ErrorAction SilentlyContinue)) {
 }
 
 function Install-NodeModules {
-    # # NOTE: workaround for certificate issue.
-    # $env:NODE_TLS_REJECT_UNAUTHORIZED = 0
+    [CmdletBinding(SupportsShouldProcess)]
+    param (
+        [Parameter()]
+        [ValidateSet('default', 'minimal')]
+        [string]
+        $Mode = 'default'
+    )
     npm update -g npm
-    npm install -g @google/clasp aws-cdk snyk textlint textlint-rule-preset-ja-technical-writing textlint-rule-date-weekday-mismatch textlint-rule-terminology textlint-rule-write-good wrangler
-    # $env:NODE_TLS_REJECT_UNAUTHORIZED = 1
+    $modules = @('textlint', 'textlint-rule-preset-ja-technical-writing', 'textlint-rule-date-weekday-mismatch', 'textlint-rule-terminology', 'textlint-rule-write-good')
+    $modules = switch ($Mode) {
+        'minimal' { @('snyk') + $modules }
+        default { @('@google/clasp', 'aws-cdk', 'wrangler') + $modules }
+    }
+    if ($PSCmdlet.ShouldProcess("Install Node.js modules: $($modules -join ', ')")) {
+        npm install -g @modules
+    }
 }
+
 function Update-NodeModules {
     $firstTime = -not (Get-Command npm -ErrorAction SilentlyContinue)
     if ($firstTime) {
-        22, 24 | ForEach-Object { fnm install "v$_" }
+        @(24) | ForEach-Object { fnm install "v$_" }
         fnm default v24
         fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
         fnm completions --shell powershell | Out-String | Invoke-Expression
