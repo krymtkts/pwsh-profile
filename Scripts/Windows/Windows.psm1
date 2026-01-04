@@ -97,7 +97,9 @@ if (Get-Command Get-WinGetPackage -ErrorAction SilentlyContinue) {
     ) | ForEach-Object {
         $pkg = Get-WinGetPackage -Id $_
         if (($pkg -and $pkg.IsUpdateAvailable)) {
-            Write-Warning "💡 Newer '${_}' is available. $($pkg.AvailableVersions | Select-Object -First 1)"
+            Write-Warning "💡 Newer '${_}' is available. $($pkg.AvailableVersions | Where-Object {
+                [version]$_ -gt [version]$pkg.InstalledVersion
+            } | Sort-Object -Descending | Select-Object -First 1)"
         }
     }
 }
