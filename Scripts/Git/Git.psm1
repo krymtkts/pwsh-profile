@@ -73,6 +73,21 @@ function New-GitHubComparUrl {
     "https://github.com/${Repository}/compare/${FromCommit}...${ToCommit}"
 }
 
+function New-GitHubCoAuthoredBy {
+    param (
+        [Parameter(Mandatory, Position = 0)]
+        [ValidateSet('dependabot', 'github-copilot-code-review', 'github-copilot-coding-agent')]
+        $CoAuthor
+    )
+    # about co-author. https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
+    "Co-authored-by: $(switch ($CoAuthor) {
+        'dependabot' { 'dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>' }
+        'github-copilot-code-review' { 'Copilot <175728472+Copilot@users.noreply.github.com>' }
+        'github-copilot-coding-agent' { 'copilot-swe-agent[bot] <198982749+Copilot@users.noreply.github.com>' }
+        Default { throw "Unsupported co-author: $CoAuthor" }
+    })"
+}
+
 if (Get-Command -Name gh -ErrorAction SilentlyContinue) {
     gh completion -s powershell | Out-String | Invoke-Expression
 }
