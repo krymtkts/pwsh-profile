@@ -55,6 +55,24 @@ max-cache-ttl 86400
 '@ | Set-Content "$env:APPDATA/gnupg/gpg.conf"
 }
 
+function New-GitHubComparUrl {
+    param (
+        [Parameter(Mandatory, Position = 0)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Repository,
+        [Parameter(Mandatory, Position = 1)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $FromCommit,
+        [Parameter(Mandatory, Position = 2)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ToCommit
+    )
+    "https://github.com/${Repository}/compare/${FromCommit}...${ToCommit}"
+}
+
 if (Get-Command -Name gh -ErrorAction SilentlyContinue) {
     gh completion -s powershell | Out-String | Invoke-Expression
 }
