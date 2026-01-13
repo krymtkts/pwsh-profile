@@ -92,8 +92,8 @@ if (Get-Command -Name gh -ErrorAction SilentlyContinue) {
     gh completion -s powershell | Out-String | Invoke-Expression
 }
 
-if (Get-Command -Name 'gpg-connect-agent' -ErrorAction SilentlyContinue) {
-    Start-Job -ScriptBlock {
-        gpg-connect-agent updatestartuptty /bye
-    } | Out-Null
+if (Get-Command -Name 'gpgconf' -ErrorAction SilentlyContinue) {
+    gpgconf --launch gpg-agent | Out-Null
+    # NOTE: open pinentry for caching passphrase.
+    'warmup' | gpg --clearsign *> $null
 }
