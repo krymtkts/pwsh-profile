@@ -42,10 +42,16 @@ function global:Set-GitGlobalConfig {
 }
 
 function global:Set-GPGConfig {
-    @'
+    $pinentry = "${env:ProgramFiles(x86)}\Gpg4win\bin\pinentry.exe"
+    if (-not (Test-Path $pinentry)) {
+        $pinentryPath = "pinentry-program $pinentry"
+    }
+    @"
 default-cache-ttl 86400
 max-cache-ttl 86400
-'@ | Set-Content "$env:APPDATA/gnupg/gpg-agent.conf"
+
+$pinentryPath
+"@ | Set-Content "$env:APPDATA/gnupg/gpg-agent.conf"
 
     # currently unused.
     @'
