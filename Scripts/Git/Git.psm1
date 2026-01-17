@@ -42,10 +42,12 @@ function global:Set-GitGlobalConfig {
 }
 
 function global:Set-GPGConfig {
-    $pinentry = "${env:ProgramFiles(x86)}\Gpg4win\bin\pinentry.exe"
-    if (-not (Test-Path $pinentry)) {
-        $pinentryPath = "pinentry-program $pinentry"
-    }
+    $pinentryPath = ${env:ProgramFiles}, ${env:ProgramFiles(x86)} | ForEach-Object {
+        $path = "${_}\Gpg4win\bin\pinentry.exe"
+        if (Test-Path $path) {
+            "pinentry-program ${path}"
+        }
+    } | Where-Object { $_ -ne $null } | Select-Object -First 1
     @"
 default-cache-ttl 86400
 max-cache-ttl 86400
