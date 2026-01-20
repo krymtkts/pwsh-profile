@@ -92,6 +92,7 @@ function New-GitHubCoAuthoredBy {
         'dependabot' { 'dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>' }
         'github-copilot-code-review' { 'Copilot <175728472+Copilot@users.noreply.github.com>' }
         'github-copilot-coding-agent' { 'copilot-swe-agent[bot] <198982749+Copilot@users.noreply.github.com>' }
+        'chatgpt-codex' { 'chatgpt-codex-connector[bot] <199175422+chatgpt-codex-connector[bot]@users.noreply.github.com>' }
         Default { throw "Unsupported co-author: $CoAuthor" }
     })"
 }
