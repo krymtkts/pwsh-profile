@@ -49,7 +49,7 @@ function Update-ProfileScripts {
             Write-Host "Created directory: $(Split-Path $scriptPath -Parent)"
         }
         $params = @{
-            Uri = "${baseUrl}/Scripts/${modulePath}"
+            Uri = "${baseUrl}/Scripts/${modulePath}?$(Get-Random)" # NOTE: prevent caching
             OutFile = $scriptPath
         }
         Invoke-WebRequest @params | Out-Null
