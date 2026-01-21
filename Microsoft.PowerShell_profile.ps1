@@ -50,6 +50,9 @@ function Update-ProfileScripts {
         }
         $params = @{
             Uri = "${baseUrl}/Scripts/${modulePath}?$(Get-Random)" # NOTE: prevent caching
+            Headers = @{
+                'Cache-Control' = 'no-cache'
+            }
             OutFile = $scriptPath
         }
         Invoke-WebRequest @params | Out-Null
@@ -66,6 +69,9 @@ function Update-Profile {
         $baseUrl = 'https://raw.githubusercontent.com/krymtkts/pwsh-profile/main'
         $params = @{
             Uri = "${baseUrl}/Microsoft.PowerShell_profile.ps1?$(Get-Random)" # NOTE: prevent caching
+            Headers = @{
+                'Cache-Control' = 'no-cache'
+            }
             OutFile = $ProfilePath
         }
         Invoke-WebRequest @params | Out-Null
