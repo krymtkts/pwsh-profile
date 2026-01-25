@@ -120,6 +120,69 @@ if (Test-Path "${env:ProgramFiles}/PowerToys") {
         function FancyZonesCli {
             & $fancyZonesCli @Args
         }
+        function global:Get-FancyZonesCliOptions {
+            & $fancyZonesCli --help | ForEach-Object -Begin {
+                $options = @()
+                $subcommands = @()
+                $current = ''
+            } -Process {
+                $line = $_
+                if (-not $line) {
+                    $current = ''
+                }
+                elseif ($_ -match '^Options:$') {
+                    # TODO: currently Options section has no entries.
+                    $current = 'Options'
+                    '--help', '--version' | ForEach-Object {
+                        $options += [PSCustomObject]@{Option = $_; Description = $_ }
+                    }
+                }
+                elseif ($_ -match '^Commands:$') {
+                    $current = 'Commands'
+                }
+                elseif ($_ -match '^Examples:$') {
+                    $current = 'Examples'
+                }
+                switch ($current) {
+                    'Options' {
+                    }
+                    'Commands' {
+                        if ($line -match '^\s{2}(?<cmdpart>.+?),\s*(?<alias>\S+)\s+(?<desc>.+)$') {
+                            $primary = ($matches.cmdpart.Trim() -split '\s+')[0]   # set-hotkey / set-layout など
+                            $primary, $matches.alias.Trim() | Where-Object Length | ForEach-Object {
+                                $subcommands += [PSCustomObject]@{
+                                    Option = $_
+                                    Description = $matches.desc.Trim()
+                                }
+                            }
+                        }
+                        elseif ($line -match '^\s{2}(?<cmdpart>.+?)\s{2,}(?<desc>.+)$') {
+                            $primary = ($matches.cmdpart.Trim() -split '\s+')[0]
+                            if ($primary) {
+                                $subcommands += [PSCustomObject]@{
+                                    Option = $primary
+                                    Description = $matches.desc.Trim()
+                                }
+                            }
+                        }
+                    }
+                    'Examples' {
+                    }
+                }
+            } -End {
+                $options
+                $subcommands
+            }
+        }
+        Register-ArgumentCompleter -Native -CommandName FancyZonesCli -ScriptBlock {
+            param($wordToComplete, $commandAst, $cursorPosition)
+
+            Add-Content ./debug.txt "$wordToComplete, $commandAst, $cursorPosition"
+            Add-Content ./debug.txt "$wordToComplete* -> $(Get-FancyZonesCliOptions | Where-Object -Property Option -Like "$wordToComplete*"  | Measure-Object | ForEach-Object Count)"
+            Get-FancyZonesCliOptions | Where-Object -Property Option -Like "$wordToComplete*" | ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new($_.Option, $_.Option, 'ParameterValue', $_.Description)
+            }
+        }
     }
     if (Test-Path $fileLocksmithCLI) {
         function FileLocksmithCli {
