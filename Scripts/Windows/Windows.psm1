@@ -116,6 +116,8 @@ if (Get-Command Get-WinGetPackage -ErrorAction SilentlyContinue) {
 if (Test-Path "${env:ProgramFiles}/PowerToys") {
     $fancyZonesCli = "${env:ProgramFiles}/PowerToys/FancyZonesCli.exe"
     $fileLocksmithCLI = "${env:ProgramFiles}/PowerToys/FileLocksmithCLI.exe"
+
+    # NOTE: Define FancyZonesCli function ins and its argument completer.
     if (Test-Path $fancyZonesCli) {
         function FancyZonesCli {
             & $fancyZonesCli @Args
@@ -184,6 +186,7 @@ if (Test-Path "${env:ProgramFiles}/PowerToys") {
             }
         }
     }
+    # NOTE: Define FileLocksmithCli function and its argument completer.
     if (Test-Path $fileLocksmithCLI) {
         function FileLocksmithCli {
             & $fileLocksmithCLI @Args
