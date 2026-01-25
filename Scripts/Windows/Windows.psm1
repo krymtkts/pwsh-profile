@@ -97,21 +97,6 @@ compact vdisk
     }
 }
 
-if (Get-Command Get-WinGetPackage -ErrorAction SilentlyContinue) {
-    @(
-        'Microsoft.VisualStudioCode.Insiders'
-        'Microsoft.OpenSSH.Preview'
-        'Microsoft.PowerShell.Preview'
-    ) | ForEach-Object {
-        $pkg = Get-WinGetPackage -Id $_
-        if (($pkg -and $pkg.IsUpdateAvailable)) {
-            Write-Warning "💡 Newer '${_}' is available. $($pkg.AvailableVersions | Where-Object {
-                [version]$_ -gt [version]$pkg.InstalledVersion
-            } | Sort-Object -Descending | Select-Object -First 1)"
-        }
-    }
-}
-
 # NOTE: Define FancyZonesCli and FileLocksmithCLI aliases if PowerToys is installed.
 if (Test-Path "${env:ProgramFiles}/PowerToys") {
     $fancyZonesCli = "${env:ProgramFiles}/PowerToys/FancyZonesCli.exe"
@@ -221,6 +206,21 @@ if (Test-Path "${env:ProgramFiles}/PowerToys") {
             Get-FileLocksmithCliOptions | Where-Object -Property Option -Like "$wordToComplete*" | ForEach-Object {
                 [System.Management.Automation.CompletionResult]::new($_.Option, $_.Option, 'ParameterValue', $_.Description)
             }
+        }
+    }
+}
+
+if (Get-Command Get-WinGetPackage -ErrorAction SilentlyContinue) {
+    @(
+        'Microsoft.VisualStudioCode.Insiders'
+        'Microsoft.OpenSSH.Preview'
+        'Microsoft.PowerShell.Preview'
+    ) | ForEach-Object {
+        $pkg = Get-WinGetPackage -Id $_
+        if (($pkg -and $pkg.IsUpdateAvailable)) {
+            Write-Warning "💡 Newer '${_}' is available. $($pkg.AvailableVersions | Where-Object {
+                [version]$_ -gt [version]$pkg.InstalledVersion
+            } | Sort-Object -Descending | Select-Object -First 1)"
         }
     }
 }
