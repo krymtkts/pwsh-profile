@@ -103,3 +103,20 @@ if (Get-Command Get-WinGetPackage -ErrorAction SilentlyContinue) {
         }
     }
 }
+
+# NOTE: Define FancyZonesCli and FileLocksmithCLI aliases if PowerToys is installed.
+if (Test-Path "${env:ProgramFiles}/PowerToys") {
+    $fancyZonesCli = "${env:ProgramFiles}/PowerToys/FancyZonesCli.exe"
+    $fileLocksmithCLI = "${env:ProgramFiles}/PowerToys/FileLocksmithCLI.exe"
+    if (Test-Path $fancyZonesCli) {
+        function FancyZonesCli {
+            & $fancyZonesCli @Args
+        }
+    }
+    if (Test-Path $fileLocksmithCLI) {
+        function FileLocksmithCLI {
+            & $fileLocksmithCLI @Args
+        }
+
+    }
+}
