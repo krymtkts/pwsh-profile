@@ -1,3 +1,11 @@
+<#
+.SYNOPSIS
+    This script provides argument completions for various commands.
+    If you want to add functions that are not related to completions, move specific complete function to a specific module.
+#>
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Variables are used in script blocks and argument completers')]
+param ()
+
 function Install-WindowsTerminalCanary {
     Invoke-WebRequest 'https://aka.ms/terminal-canary-installer' -OutFile 'Microsoft.WindowsTerminalCanary.appinstaller'
     Start-Process 'Microsoft.WindowsTerminalCanary.appinstaller'
@@ -114,9 +122,39 @@ if (Test-Path "${env:ProgramFiles}/PowerToys") {
         }
     }
     if (Test-Path $fileLocksmithCLI) {
-        function FileLocksmithCLI {
+        function FileLocksmithCli {
             & $fileLocksmithCLI @Args
         }
+        function global:Get-FileLocksmithCliOptions {
+            & $fileLocksmithCLI --help | ForEach-Object -Begin {
+                $options = @()
+                $beginOptions = $false
+            } -Process {
+                if ($_ -match '^Options:$') {
+                    $beginOptions = $true
+                }
+                else {
+                    if ($beginOptions) {
+                        if ($_ -match '^\s{2}(--\S+)\s+(.*)$') {
+                            $option = $matches[1]
+                            $description = $matches[2].Trim()
+                            $options += [PSCustomObject]@{
+                                Option = $option
+                                Description = $description
+                            }
+                        }
+                    }
+                }
+            } -End {
+                $options
+            }
+        }
+        Register-ArgumentCompleter -Native -CommandName FileLocksmithCli -ScriptBlock {
+            param($wordToComplete, $commandAst, $cursorPosition)
 
+            Get-FileLocksmithCliOptions | Where-Object -Property Option -Like "$wordToComplete*" | ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new($_.Option, $_.Option, 'ParameterValue', $_.Description)
+            }
+        }
     }
 }
