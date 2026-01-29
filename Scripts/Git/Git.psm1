@@ -73,10 +73,10 @@ function New-GitHubCompareUrl {
         [ValidateNotNullOrEmpty()]
         [string]
         $FromCommit,
-        [Parameter(Mandatory, Position = 2)]
+        [Parameter(Position = 2)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $ToCommit
+        $ToCommit = 'HEAD'
     )
     "https://github.com/${Repository}/compare/${FromCommit}...${ToCommit}"
 }
