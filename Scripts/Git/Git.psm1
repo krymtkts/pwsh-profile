@@ -63,7 +63,7 @@ $pinentryPath
 '@ | Set-Content "$env:APPDATA/gnupg/gpg.conf"
 }
 
-function New-GitHubComparUrl {
+function New-GitHubCompareUrl {
     param (
         [Parameter(Mandatory, Position = 0)]
         [ValidateNotNullOrEmpty()]
