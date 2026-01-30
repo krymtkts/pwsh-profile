@@ -8,6 +8,11 @@ if (-not (Get-Command gpg -ErrorAction SilentlyContinue)) {
     return
 }
 
+if (-not (Test-Path '~/dev')) {
+    New-Item -ItemType Directory -Path '~/dev' | Out-Null
+    Write-Information 'Created ~/dev directory for ghq root.'
+}
+
 function global:Remove-GitGoneBranches {
     [CmdletBinding()]
     param (
@@ -38,7 +43,7 @@ function global:Set-GitGlobalConfig {
         git config --global gpg.program "'$(Get-Command gpg | Select-Object -ExpandProperty Source | Resolve-Path | Select-Object -ExpandProperty Path)'"
     }
 
-    git config --global --add safe.directory "$('~/dev/' | Resolve-Path )*"
+    git config --global --add safe.directory "$('~/dev' | Resolve-Path )*"
 }
 
 function global:Set-GPGConfig {
