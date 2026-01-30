@@ -80,11 +80,6 @@ function Initialize-PackageSource {
     Set-PSResourceRepository -Name PSGallery -Trusted
     $url = 'https://api.nuget.org/v3/index.json'
     Register-PackageSource -Name NuGet -Location $url -ProviderName NuGet -Trusted -Force | Out-Null
-}
-
-function Initialize-PSRepository {
-    [CmdletBinding()]
-    param()
     Register-PSRepository -Default -InstallationPolicy Trusted
 }
 
