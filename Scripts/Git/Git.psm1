@@ -107,6 +107,28 @@ if (Get-Command -Name gh -ErrorAction SilentlyContinue) {
 }
 
 if (Get-Command -Name 'gpgconf' -ErrorAction SilentlyContinue) {
+    function Import-GitHubPublicKey {
+        [CmdletBinding(SupportsShouldProcess)]
+        param ()
+        # https://github.blog/news-insights/company-news/rotating-credentials-for-github-com-and-new-ghes-patches/
+        Invoke-WebRequest 'https://github.com/web-flow.gpg' | ForEach-Object {
+            $PublicKey = $_.Content
+            if ($PSCmdlet.ShouldProcess("Import GitHub's GPG public key")) {
+                $PublicKey | gpg --import
+                if (gpg --list-secret-keys | Select-String -Quiet 'sec') {
+                    gpg --quick-lsign-key 968479A1AFF927E37D1A566BB5690EEEBB952194
+                }
+                else {
+                    Write-Warning 'No secret key; skip lsign'
+                }
+            }
+            else {
+                $PublicKey | gpg --import-options show-only --import
+                $PublicKey | gpg --with-fingerprint --show-keys
+            }
+        }
+    }
+
     gpgconf --launch gpg-agent | Out-Null
     # NOTE: open pinentry for caching passphrase.
     'warmup' | gpg --clearsign *> $null
