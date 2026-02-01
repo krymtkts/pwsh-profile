@@ -31,6 +31,26 @@ function Update-GoModules {
 }
 
 if (Get-Command -Name ghq -ErrorAction SilentlyContinue) {
+    function global:Copy-KrymtktsGitHubRepositories {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory, Position = 0)]
+            [ValidateNotNullOrEmpty()]
+            [string[]]
+            $RepositoryNames
+        )
+        $exists = ghq list
+        $RepositoryNames | ForEach-Object {
+            $RepositoryName = "krymtkts.github.com/krymtkts/$_"
+            if ($exists -notcontains $RepositoryName) {
+                ghq get -p $RepositoryName
+            }
+            else {
+                Write-Host "Repository '$RepositoryName' already exists locally."
+            }
+        }
+    }
+
     function global:Get-GhqCommand {
         ghq --help | ForEach-Object -Begin {
             $captureCommand = $false
