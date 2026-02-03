@@ -219,10 +219,13 @@ if (Get-Command Get-WinGetPackage -ErrorAction SilentlyContinue) {
         'WinsiderSS.SystemInformer.Canary'
     ) | ForEach-Object {
         $pkg = Get-WinGetPackage -Id $_
-        if (($pkg -and $pkg.IsUpdateAvailable)) {
+        if ($pkg -and $pkg.IsUpdateAvailable) {
+            # NOTE: Avoid errors when InstalledVersion returns multiple values.
+            $installedVersion = [version]($pkg.InstalledVersion | Get-Unique | Sort-Object -Descending | Select-Object -First 1)
             Write-Warning "💡 Newer '${_}' is available. $($pkg.AvailableVersions | Where-Object {
-                [version]$_ -gt [version]$pkg.InstalledVersion
+                [version]$_ -gt $installedVersion
             } | Sort-Object -Descending | Select-Object -First 1)"
         }
     }
 }
+
