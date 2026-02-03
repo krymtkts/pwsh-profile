@@ -215,6 +215,8 @@ if (Get-Command Get-WinGetPackage -ErrorAction SilentlyContinue) {
         'Microsoft.VisualStudioCode.Insiders'
         'Microsoft.OpenSSH.Preview'
         'Microsoft.PowerShell.Preview'
+        'Microsoft.PowerToys'
+        'WinsiderSS.SystemInformer.Canary'
     ) | ForEach-Object {
         $pkg = Get-WinGetPackage -Id $_
         if (($pkg -and $pkg.IsUpdateAvailable)) {
