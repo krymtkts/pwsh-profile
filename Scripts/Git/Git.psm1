@@ -129,7 +129,10 @@ if (Get-Command -Name 'gpgconf' -ErrorAction SilentlyContinue) {
         }
     }
 
-    gpgconf --launch gpg-agent | Out-Null
-    # NOTE: open pinentry for caching passphrase.
-    'warmup' | gpg --clearsign *> $null
+    # NOTE: launch gpg-agent in background to avoid delay on first gpg use.
+    Start-Job -ScriptBlock {
+        gpgconf --launch gpg-agent | Out-Null
+        # NOTE: open pinentry for caching passphrase.
+        'warmup' | gpg --clearsign *> $null
+    } | Out-Null
 }
