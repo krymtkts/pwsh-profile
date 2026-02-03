@@ -228,4 +228,3 @@ if (Get-Command Get-WinGetPackage -ErrorAction SilentlyContinue) {
         }
     }
 }
-
