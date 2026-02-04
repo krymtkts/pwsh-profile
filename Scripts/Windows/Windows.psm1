@@ -218,13 +218,14 @@ if (Get-Command Get-WinGetPackage -ErrorAction SilentlyContinue) {
         'Microsoft.PowerToys'
         'WinsiderSS.SystemInformer.Canary'
     ) | ForEach-Object {
-        $pkg = Get-WinGetPackage -Id $_
+        $pkg = Get-WinGetPackage -Id $_ -MatchOption EqualsCaseInsensitive
         if ($pkg -and $pkg.IsUpdateAvailable) {
             # NOTE: Avoid errors when InstalledVersion returns multiple values.
             $installedVersion = [version]($pkg.InstalledVersion | Get-Unique | Sort-Object -Descending | Select-Object -First 1)
-            Write-Warning "💡 Newer '${_}' is available. $($pkg.AvailableVersions | Where-Object {
-                [version]$_ -gt $installedVersion
-            } | Sort-Object -Descending | Select-Object -First 1)"
+            $newerVersion = ($pkg.AvailableVersions | Where-Object {
+                    [version]$_ -gt $installedVersion
+                } | Sort-Object -Descending | Select-Object -First 1)
+            Write-Warning "💡 Newer '${_}' is available. '$installedVersion' -> '$newerVersion'"
         }
     }
 }
