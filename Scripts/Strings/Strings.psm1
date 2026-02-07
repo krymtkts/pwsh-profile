@@ -239,3 +239,22 @@ function Split-String {
         }
     }
 }
+
+function ConvertTo-Utf8WithLf {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true,
+            Position = 0,
+            ValueFromPipeline = $true)]
+        [Alias('PSPath')]
+        [ValidateNotNullOrEmpty()]
+        [string[]]
+        $Path
+    )
+    process {
+        $content = Get-Content -Path $Path -Raw -Encoding utf8 | ForEach-Object {
+            $_ -replace "`r`n", "`n"
+        }
+        $content | Set-Content -Encoding utf8 -NoNewline -Path $Path -Force
+    }
+}
