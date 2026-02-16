@@ -89,7 +89,7 @@ function New-GitHubCompareUrl {
 function New-GitHubCoAuthoredBy {
     param (
         [Parameter(Mandatory, Position = 0)]
-        [ValidateSet('dependabot', 'github-copilot-code-review', 'github-copilot-coding-agent')]
+        [ValidateSet('dependabot', 'github-copilot-code-review', 'github-copilot-coding-agent', 'chatgpt-codex')]
         $CoAuthor
     )
     # about co-author. https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
