@@ -53,3 +53,7 @@ if (Get-Command -Name winget -ErrorAction SilentlyContinue) {
         }
     }
 }
+
+if (Get-Command -Name codex -ErrorAction SilentlyContinue) {
+    codex completion powershell | Out-String | Invoke-Expression
+}
