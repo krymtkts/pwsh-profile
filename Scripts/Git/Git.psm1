@@ -104,7 +104,12 @@ function New-GitHubCoAuthoredBy {
 
 if (Get-Command -Name gh -ErrorAction SilentlyContinue) {
     gh completion -s powershell | Out-String | Invoke-Expression
-    gh aw completion powershell | Out-String | Invoke-Expression
+    if (gh extension list | Select-String -Quiet 'github/gh-aw') {
+        gh aw completion powershell | Out-String | Invoke-Expression
+    }
+    else {
+        gh extension install github/gh-aw
+    }
 }
 
 if (Get-Command -Name 'gpgconf' -ErrorAction SilentlyContinue) {
