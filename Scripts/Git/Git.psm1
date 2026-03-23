@@ -89,13 +89,20 @@ function New-GitHubCompareUrl {
 function New-GitHubCoAuthoredBy {
     param (
         [Parameter(Mandatory, Position = 0)]
-        [ValidateSet('dependabot', 'github-actions', 'github-copilot-code-review', 'github-copilot-coding-agent', 'chatgpt-codex')]
+        [ValidateSet(
+            'dependabot',
+            'github-actions',
+            'github-copilot-code-review',
+            'github-copilot-coding-agent',
+            'chatgpt-codex',
+            'openai-codex')]
         $CoAuthor
     )
     # about co-author. https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
     "Co-authored-by: $(switch ($CoAuthor) {
         'dependabot' { 'dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>' }
         'github-actions' { 'github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>' }
+        'github-copilot-cli-agent' { 'Copilot <223556219+Copilot@users.noreply.github.com>' }
         'github-copilot-code-review' { 'Copilot <175728472+Copilot@users.noreply.github.com>' }
         'github-copilot-coding-agent' { 'copilot-swe-agent[bot] <198982749+Copilot@users.noreply.github.com>' }
         'chatgpt-codex' { 'chatgpt-codex-connector[bot] <199175422+chatgpt-codex-connector[bot]@users.noreply.github.com>' }
