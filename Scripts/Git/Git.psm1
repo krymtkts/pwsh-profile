@@ -92,6 +92,7 @@ function New-GitHubCoAuthoredBy {
         [ValidateSet(
             'dependabot',
             'github-actions',
+            'github-copilot-cli-agent',
             'github-copilot-code-review',
             'github-copilot-coding-agent',
             'chatgpt-codex',
