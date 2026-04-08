@@ -34,6 +34,7 @@ function global:Set-GitGlobalConfig {
     git config --global core.quotepath false
     git config --global core.pager 'LESSCHARSET=utf-8 less'
     git config --global core.sshcommand "'$(Get-Command ssh | Select-Object -ExpandProperty Source)'"
+    git config --global fetch.prune true
     git config --global ghq.root ~/dev
     git config --global init.defaultBranch main
     git config --global push.default simple
