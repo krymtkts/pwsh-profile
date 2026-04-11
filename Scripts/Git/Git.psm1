@@ -38,6 +38,7 @@ function global:Set-GitGlobalConfig {
     git config --global ghq.root ~/dev
     git config --global init.defaultBranch main
     git config --global push.default simple
+    git config --global sequence.editor "'$(Get-Command code-insiders | Select-Object -ExpandProperty Source)' --wait"
 
     if ((Get-Command gpg -ErrorAction SilentlyContinue)) {
         git config --global commit.gpgsign true
