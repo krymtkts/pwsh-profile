@@ -110,7 +110,6 @@ function New-GitHubCoAuthoredBy {
         'github-copilot-coding-agent' { 'copilot-swe-agent[bot] <198982749+Copilot@users.noreply.github.com>' }
         'chatgpt-codex' { 'chatgpt-codex-connector[bot] <199175422+chatgpt-codex-connector[bot]@users.noreply.github.com>' }
         'openai-codex' { 'codex <codex@openai.com>' }
-        'openai-codex' { 'codex <codex@openai.com>' }
         Default { throw "Unsupported co-author: $CoAuthor" }
     })"
 }
