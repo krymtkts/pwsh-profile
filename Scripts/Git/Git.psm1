@@ -70,6 +70,51 @@ $pinentryPath
 '@ | Set-Content "$env:APPDATA/gnupg/gpg.conf"
 }
 
+function New-GitLocalRepository {
+    [CmdletBinding(SupportsShouldProcess)]
+    param (
+        [Parameter(Mandatory, Position = 0)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Path
+    )
+
+    $fullPath = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $Path))
+
+    if (Test-Path -LiteralPath $fullPath -PathType Leaf) {
+        Write-Error "Path '$fullPath' is a file."
+        return
+    }
+
+    if (-not (Test-Path -LiteralPath $fullPath -PathType Container)) {
+        New-Item -ItemType Directory -Path $fullPath | Out-Null
+        Write-Information "Created directory '$fullPath'."
+    }
+
+    if (Test-Path -LiteralPath (Join-Path $fullPath '.git')) {
+        Write-Warning "Git repository already exists in '$fullPath'."
+        return
+    }
+
+    if (-not $PSCmdlet.ShouldProcess($fullPath, 'Initialize Git repository and create initial commit')) {
+        return
+    }
+
+    git -C $fullPath init
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "git init failed in '$fullPath'."
+        return
+    }
+
+    git -C $fullPath commit --allow-empty --message 'Initial commit.'
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Initial commit failed in '$fullPath'. Check git user.name/user.email and GPG settings."
+        return
+    }
+
+    Write-Information "Initialized empty Git repository and created initial commit in '$fullPath'."
+}
+
 function New-GitHubCompareUrl {
     param (
         [Parameter(Mandatory, Position = 0)]
