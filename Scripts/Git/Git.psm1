@@ -16,14 +16,33 @@ if (-not (Test-Path '~/dev')) {
 function global:Remove-GitGoneBranches {
     [CmdletBinding()]
     param (
-        [switch]$Force
+        [switch]$Force,
+        [switch]$ForceWorktree
     )
-    $deleteFlag = '--delete'
-    if ($Force) {
-        $deleteFlag = '-D'
-    }
+
     git remote prune origin
-    git branch --format '%(refname:short)=%(upstream:track)' | Where-Object -FilterScript { $_ -like '*`[gone`]*' } | ConvertFrom-StringData | Select-Object -ExpandProperty Keys | ForEach-Object { git branch $deleteFlag $_ }
+
+    $worktreeByBranch = @{}
+    $worktree = $null
+    switch -Regex (git worktree list --porcelain) {
+        '^worktree (.+)$' { $worktree = $Matches[1] }
+        '^branch refs/heads/(.+)$' { $worktreeByBranch[$Matches[1]] = $worktree }
+    }
+
+    $deleteFlag = $Force ? '-D' : '--delete'
+    $worktreeRemoveFlags = if ($ForceWorktree) { @('--force') } else { @() }
+
+    git branch --format '%(refname:short)=%(upstream:track)' | Where-Object -FilterScript {
+        $_ -like '*`[gone`]*'
+    } | ConvertFrom-StringData | Select-Object -ExpandProperty Keys | ForEach-Object {
+        if ($worktreeByBranch[$_]) {
+            Write-Host "Removing worktree for branch '$_' at '$($worktreeByBranch[$_])'."
+            git worktree remove @worktreeRemoveFlags $worktreeByBranch[$_]
+            if ($LASTEXITCODE -ne 0) { return }
+        }
+
+        git branch $deleteFlag $_
+    }
 }
 
 function global:Set-GitGlobalConfig {
