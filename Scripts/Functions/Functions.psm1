@@ -200,3 +200,28 @@ function Get-PublicIPInfo {
     Invoke-RestMethod -Uri https://ipinfo.io/json
 }
 Set-Alias myip Get-PublicIPInfo -Option ReadOnly -Force -Scope Global
+
+function Invoke-Sum {
+    [CmdletBinding()]
+    param (
+        [Parameter(
+            Position = 0,
+            ValueFromPipeline
+        )]
+        # NOTE: use implicit type conversion to support integer and floating point numbers and decimal numbers.
+        [object[]]
+        $Numbers
+    )
+    begin {
+        $sum = 0
+    }
+    process {
+        foreach ($number in $Numbers) {
+            $sum += $number
+        }
+    }
+    end {
+        $sum
+    }
+}
+Set-Alias sum Invoke-Sum -Option ReadOnly -Force -Scope Global
