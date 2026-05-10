@@ -217,4 +217,14 @@ if (Get-Command -Name 'gpgconf' -ErrorAction SilentlyContinue) {
         # NOTE: open pinentry for caching passphrase.
         'warmup' | gpg --clearsign *> $null
     } | Out-Null
+
+    function Restart-GpgAgent {
+        [CmdletBinding()]
+        param ()
+        gpgconf --kill keyboxd
+        gpgconf --kill gpg-agent
+        gpgconf --launch gpg-agent
+        "warmup" | & gpg --clearsign
+        Write-Information 'Restarted gpg-agent.'
+    }
 }
