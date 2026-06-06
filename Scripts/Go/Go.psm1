@@ -6,6 +6,7 @@ function Install-GoModules {
         'github.com/x-motemen/ghq@latest'
         'github.com/jonhadfield/sn-cli/cmd/sncli@latest'
         'github.com/wagoodman/dive@latest'
+        'github.com/rhysd/actionlint/cmd/actionlint@latest'
     )
     $mods | ForEach-Object {
         $start = $_.LastIndexOf('/') + 1
