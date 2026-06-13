@@ -12,7 +12,7 @@ function Install-NodeModules {
         $Mode = 'default'
     )
     npm update -g npm
-    $modules = @('textlint', 'textlint-rule-preset-ja-technical-writing', 'textlint-rule-date-weekday-mismatch', 'textlint-rule-terminology', 'textlint-rule-write-good')
+    $modules = @('textlint', 'textlint-filter-rule-allowlist', 'textlint-rule-preset-ja-technical-writing', 'textlint-rule-date-weekday-mismatch', 'textlint-rule-terminology', 'textlint-rule-write-good')
     $modules = switch ($Mode) {
         'minimal' { @('snyk') + $modules }
         default { @('@google/clasp', 'aws-cdk', 'wrangler') + $modules }
